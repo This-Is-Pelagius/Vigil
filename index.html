@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Vigil</title>
+
+<!-- PWA: manifest and theme -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#F5F0E8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Vigil">
+
+<!-- PWA: icons -->
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ══════════════════════════════════════════════
+   SEASONAL PALETTES
+   ══════════════════════════════════════════════ */
+:root {
+  /* Eastertide */
+  --et-bg:          #F5F0E8;
+  --et-panel:       #EDE5D0;
+  --et-accent:      #8B6914;
+  --et-accent-soft: rgba(139,105,20,0.18);
+  --et-text:        #1E1A14;
+  --et-dim:         #8A7D65;
+  --et-gold:        #8B6914;
+  --et-shell:       #E8E0CC;
+  /* Pentecost */
+  --pent-bg:          #1A0A0A;
+  --pent-panel:       #251010;
+  --pent-accent:      #8B1A1A;
+  --pent-accent-soft: rgba(139,26,26,0.3);
+  --pent-text:        #F0E0D0;
+  --pent-dim:         #9A7060;
+  --pent-gold:        #C04040;
+  --pent-shell:       #100505;
+  /* Active tokens — set by JS on day load */
+  --bg:          #F5F0E8;
+  --panel:       #EDE5D0;
+  --accent:      #8B6914;
+  --accent-soft: rgba(139,105,20,0.18);
+  --text:        #1E1A14;
+  --dim:         #8A7D65;
+  --gold:        #8B6914;
+  --shell:       #E8E0CC;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: var(--shell);
+  font-family: 'Raleway', sans-serif;
+  color: var(--text);
+  overscroll-behavior: none;
+}
+body { overflow: hidden; }
+
+/* ══════════════════════════════════════════════
+   APP SHELL
+   ══════════════════════════════════════════════ */
+.app {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── Top bar: transparent background (fix #4) ── */
+.top-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 40;
+  padding: 1rem 1.5rem 0.8rem;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* No background gradient — screen bg shows through cleanly */
+  background: transparent;
+}
+.top-bar .brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+/* Date only — right side (fix #1) */
+.top-bar .day-meta-date {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* ── Screens container: vertical stack ── */
+.screens-wrapper {
+  flex: 1;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+.screens-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+/* ── Each screen ── */
+.screen {
+  width: 100%;
+  height: 100vh;
+  min-height: 100vh;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  /* top: clear brand bar; right: clear nav dots; bottom: clear day picker */
+  padding: 3.8rem 2.8rem 4.5rem 2.2rem;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+}
+.screen-word,
+.screen-contemplation,
+.screen-practice { background: var(--panel); }
+
+/* Noise texture */
+.screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+.screen > * { position: relative; z-index: 1; }
+
+/* Screen label — outside scroll area, always visible at top */
+.screen-label {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.63rem;
+  font-weight: 600;
+  letter-spacing: 0.46em;
+  text-transform: uppercase;
+  margin-bottom: 1.6rem;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+/* ── Scrollable inner content (fix #6: reset to top on navigate) ── */
+.screen-inner {
+  width: 100%;
+  max-width: 480px;
+  flex: 1;
+  min-height: 0;          /* required for flex-child overflow scroll */
+  overflow-y: scroll;     /* always allow scroll, JS decides gesture intent */
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* padding ensures content clears the fade masks */
+  padding-top: 0.5rem;
+  padding-bottom: 5rem;
+}
+.screen-inner::-webkit-scrollbar { display: none; }
+
+/* Scripture screen centres content vertically (fix #5) */
+.screen-scripture {
+  justify-content: center;
+}
+.screen-scripture .screen-inner {
+  flex: 0 1 auto;
+}
+
+/* ── Fade masks (fix #2 & #4) ──
+   These sit above the screen-inner but within the screen.
+   They match the exact screen background colour — no gradient
+   bleeding into a different shade. The top fade starts AFTER
+   the screen-label, so it never obscures the label. */
+.screen-fade-top,
+.screen-fade-bottom {
+  position: absolute;
+  left: 0; right: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+/* Top fade sits just below the screen-label area */
+.screen-fade-top    { top: 0;    height: 3.5rem; }
+.screen-fade-bottom { bottom: 0; height: 5.5rem; }
+
+/* Eastertide — primary bg (Season, Scripture, Prayer) */
+.palette-eastertide .screen-season    .screen-fade-top,
+.palette-eastertide .screen-scripture .screen-fade-top,
+.palette-eastertide .screen-prayer    .screen-fade-top {
+  background: linear-gradient(to bottom, #F5F0E8 50%, rgba(245,240,232,0));
+}
+.palette-eastertide .screen-season    .screen-fade-bottom,
+.palette-eastertide .screen-scripture .screen-fade-bottom,
+.palette-eastertide .screen-prayer    .screen-fade-bottom {
+  background: linear-gradient(to top, #F5F0E8 55%, rgba(245,240,232,0));
+}
+/* Eastertide — panel bg (Word, Contemplation, Practice) */
+.palette-eastertide .screen-word          .screen-fade-top,
+.palette-eastertide .screen-contemplation .screen-fade-top,
+.palette-eastertide .screen-practice      .screen-fade-top {
+  background: linear-gradient(to bottom, #EDE5D0 50%, rgba(237,229,208,0));
+}
+.palette-eastertide .screen-word          .screen-fade-bottom,
+.palette-eastertide .screen-contemplation .screen-fade-bottom,
+.palette-eastertide .screen-practice      .screen-fade-bottom {
+  background: linear-gradient(to top, #EDE5D0 55%, rgba(237,229,208,0));
+}
+/* Pentecost — primary bg */
+.palette-pentecost .screen-season    .screen-fade-top,
+.palette-pentecost .screen-scripture .screen-fade-top,
+.palette-pentecost .screen-prayer    .screen-fade-top {
+  background: linear-gradient(to bottom, #1A0A0A 50%, rgba(26,10,10,0));
+}
+.palette-pentecost .screen-season    .screen-fade-bottom,
+.palette-pentecost .screen-scripture .screen-fade-bottom,
+.palette-pentecost .screen-prayer    .screen-fade-bottom {
+  background: linear-gradient(to top, #1A0A0A 55%, rgba(26,10,10,0));
+}
+/* Pentecost — panel bg */
+.palette-pentecost .screen-word          .screen-fade-top,
+.palette-pentecost .screen-contemplation .screen-fade-top,
+.palette-pentecost .screen-practice      .screen-fade-top {
+  background: linear-gradient(to bottom, #251010 50%, rgba(37,16,16,0));
+}
+.palette-pentecost .screen-word          .screen-fade-bottom,
+.palette-pentecost .screen-contemplation .screen-fade-bottom,
+.palette-pentecost .screen-practice      .screen-fade-bottom {
+  background: linear-gradient(to top, #251010 55%, rgba(37,16,16,0));
+}
+
+/* ── Fade-up entry animation ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.screen.animating .screen-label                  { animation: fadeUp 0.5s ease forwards; animation-delay: 0.02s; opacity: 0; }
+.screen.animating .screen-inner > *:nth-child(1) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.08s; opacity: 0; }
+.screen.animating .screen-inner > *:nth-child(2) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.15s; opacity: 0; }
+.screen.animating .screen-inner > *:nth-child(3) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.22s; opacity: 0; }
+.screen.animating .screen-inner > *:nth-child(4) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.29s; opacity: 0; }
+.screen.animating .screen-inner > *:nth-child(5) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.36s; opacity: 0; }
+.screen.animating .screen-inner > *:nth-child(6) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.43s; opacity: 0; }
+
+/* ══════════════════════════════════════════════
+   SCREEN COMPONENTS
+   ══════════════════════════════════════════════ */
+
+/* Season */
+.season-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.5rem, 5.5vw, 2.1rem);
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  line-height: 1.1;
+  margin-bottom: 0.35rem;
+  color: var(--text);
+  max-width: 420px;
+}
+.season-sub {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.22rem;
+  opacity: 0.8;
+}
+.season-sub.sub-primary { font-weight: 500; opacity: 0.95; }
+.season-divider {
+  width: 40px; height: 1px;
+  background: var(--accent);
+  margin: 1.6rem 0 2rem;
+}
+.season-body {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.05rem;
+  line-height: 2;
+  max-width: 420px;
+  color: var(--text);
+}
+.season-body p + p { margin-top: 1.1rem; }
+
+/* Word */
+.word-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3rem, 12vw, 5rem);
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  line-height: 0.95;
+  margin-bottom: 0.6rem;
+  color: var(--text);
+}
+.word-pronunciation {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.85rem;
+  font-style: normal;
+  margin-bottom: 2rem;
+  color: var(--dim);
+}
+.word-divider {
+  width: 100%;
+  height: 1px;
+  margin-bottom: 2rem;
+  max-width: 420px;
+  background: linear-gradient(to right, var(--accent), transparent);
+}
+.word-definition {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.05rem;
+  line-height: 2;
+  max-width: 420px;
+  color: var(--text);
+}
+.word-definition p + p { margin-top: 1.1rem; }
+
+/* Scripture */
+.scripture-passage + .scripture-passage {
+  margin-top: 3.5rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--accent-soft);
+}
+.scripture-ref {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  color: var(--gold);
+}
+.scripture-block {
+  position: relative;
+  padding-left: 1.5rem;
+  border-left: 2px solid var(--accent);
+  max-width: 420px;
+}
+.scripture-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.45rem;
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.75;
+  color: var(--text);
+}
+.scripture-text p + p { margin-top: 1rem; }
+.scripture-translation {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-top: 1.2rem;
+  color: var(--dim);
+}
+
+/* Contemplation */
+.contemplation-body {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.05rem;
+  line-height: 2;
+  max-width: 420px;
+  color: var(--text);
+}
+.contemplation-body p + p { margin-top: 1.1rem; }
+.contemplation-question {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.6;
+  max-width: 400px;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--accent-soft);
+  color: var(--text);
+}
+
+/* Prayer */
+.prayer-body {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.85;
+  max-width: 420px;
+  color: var(--text);
+}
+.prayer-body p + p { margin-top: 1.2rem; }
+.prayer-amen {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-style: italic;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  margin-top: 1.5rem;
+  color: var(--gold);
+}
+
+/* Practice */
+.practice-body {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.05rem;
+  line-height: 2;
+  max-width: 420px;
+  color: var(--text);
+}
+.practice-body p + p { margin-top: 1.1rem; }
+.practice-anchor {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.65;
+  max-width: 400px;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--accent-soft);
+  color: var(--text);
+}
+
+/* Figure links */
+.figure-link {
+  background: none; border: none; padding: 0;
+  font: inherit; color: inherit; cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: rgba(139,105,20,0.4);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color 0.2s ease;
+}
+.figure-link:hover, .figure-link:focus-visible {
+  text-decoration-color: var(--gold); outline: none;
+}
+.palette-pentecost .figure-link { text-decoration-color: rgba(192,64,64,0.4); }
+.palette-pentecost .figure-link:hover { text-decoration-color: var(--pent-gold); }
+
+/* Placeholder */
+.placeholder-body {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.05rem; line-height: 2;
+  max-width: 420px; color: var(--dim); font-style: italic;
+}
+
+/* ══════════════════════════════════════════════
+   NAVIGATION — right edge dots, vertical
+   ══════════════════════════════════════════════ */
+.nav-dots {
+  position: fixed;
+  right: 0.95rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.62rem;
+  z-index: 30;
+}
+.dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--dim);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none; padding: 0;
+  opacity: 0.5;
+}
+.palette-eastertide .dot.active { background: var(--et-accent); transform: scale(1.5); opacity: 1; }
+.palette-pentecost  .dot.active { background: var(--pent-gold); transform: scale(1.5); opacity: 1; }
+
+.screen-counter {
+  position: fixed;
+  bottom: 1.5rem; right: 1.5rem;
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.52rem; font-weight: 400;
+  letter-spacing: 0.2em;
+  color: var(--dim); z-index: 30; opacity: 0.55;
+}
+.swipe-hint {
+  position: fixed;
+  bottom: 1.5rem; left: 1.5rem;
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.52rem; font-weight: 400;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--dim); opacity: 0.4; z-index: 30;
+  transition: opacity 0.5s ease;
+}
+
+/* Day picker */
+.day-picker {
+  position: fixed;
+  bottom: 1.2rem; left: 50%;
+  transform: translateX(-50%);
+  z-index: 35;
+  display: flex; gap: 0.4rem; align-items: center;
+}
+.day-btn {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.48rem; font-weight: 500;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  border: 1px solid; padding: 0.28rem 0.55rem;
+  cursor: pointer; transition: all 0.25s ease; background: transparent;
+}
+.palette-eastertide .day-btn { color: var(--dim); border-color: rgba(139,105,20,0.22); }
+.palette-eastertide .day-btn.active,
+.palette-eastertide .day-btn:hover { color: var(--et-text); border-color: var(--et-accent); background: rgba(139,105,20,0.08); }
+.palette-pentecost .day-btn { color: var(--dim); border-color: rgba(139,26,26,0.3); }
+.palette-pentecost .day-btn.active,
+.palette-pentecost .day-btn:hover { color: var(--pent-text); border-color: var(--pent-accent); background: rgba(139,26,26,0.12); }
+
+/* ══════════════════════════════════════════════
+   FIGURE MODAL
+   ══════════════════════════════════════════════ */
+.figure-overlay {
+  position: fixed; inset: 0;
+  backdrop-filter: blur(6px);
+  z-index: 100;
+  display: none; align-items: center; justify-content: center;
+  padding: 1.5rem;
+  opacity: 0; transition: opacity 0.25s ease;
+}
+.palette-eastertide .figure-overlay { background: rgba(200,190,170,0.6); }
+.palette-pentecost  .figure-overlay { background: rgba(5,3,8,0.78); }
+.figure-overlay.open { display: flex; opacity: 1; }
+.figure-card {
+  background: var(--panel);
+  border: 1px solid var(--accent-soft);
+  max-width: 420px; width: 100%;
+  max-height: 82vh; overflow-y: auto;
+  padding: 2rem 1.8rem 1.8rem;
+  position: relative;
+  box-shadow: 0 16px 50px rgba(0,0,0,0.14);
+}
+.palette-pentecost .figure-card { box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.figure-card .close {
+  position: absolute; top: 0.8rem; right: 1rem;
+  background: none; border: none; color: var(--dim);
+  font-size: 1.5rem; cursor: pointer; line-height: 1; padding: 0.25rem 0.5rem;
+}
+.figure-card .close:hover { color: var(--text); }
+.figure-eyebrow {
+  font-family: 'Raleway', sans-serif; font-size: 0.55rem; font-weight: 500;
+  letter-spacing: 0.35em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem;
+}
+.figure-name {
+  font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; font-weight: 400;
+  letter-spacing: 0.04em; color: var(--text); margin-bottom: 0.3rem; line-height: 1.2;
+}
+.figure-dates {
+  font-family: 'Libre Baskerville', serif; font-size: 0.8rem;
+  font-style: italic; color: var(--dim); margin-bottom: 0.4rem;
+}
+.figure-role {
+  font-family: 'Raleway', sans-serif; font-size: 0.58rem; font-weight: 400;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim);
+  margin-bottom: 1.2rem; opacity: 0.8;
+}
+.figure-divider { width: 32px; height: 1px; background: var(--accent); margin-bottom: 1.2rem; }
+.figure-body {
+  font-family: 'Libre Baskerville', serif; font-size: 0.95rem; line-height: 1.85; color: var(--text);
+}
+
+@media (min-width: 700px) {
+  .screen { padding: 3.8rem 3.5rem 4.5rem 3rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="app palette-eastertide" id="app">
+
+  <div class="top-bar">
+    <div class="brand">Vigil</div>
+    <div class="day-meta-date" id="dayMetaDate"></div>
+  </div>
+
+  <div class="screens-wrapper">
+    <div class="screens-container" id="screens"></div>
+  </div>
+
+  <nav class="nav-dots" id="dots" aria-label="Screen navigation"></nav>
+  <div class="swipe-hint" id="swipeHint">↑ swipe ↓</div>
+  <div class="screen-counter" id="counter">1 / 6</div>
+  <div class="day-picker" id="dayPicker"></div>
+
+  <div class="figure-overlay" id="figureOverlay" role="dialog" aria-modal="true" aria-labelledby="figureName">
+    <div class="figure-card">
+      <button class="close" id="figureClose" aria-label="Close">×</button>
+      <div class="figure-eyebrow">People of the Faith</div>
+      <div class="figure-name" id="figureName"></div>
+      <div class="figure-dates" id="figureDates"></div>
+      <div class="figure-role" id="figureRole"></div>
+      <div class="figure-divider"></div>
+      <div class="figure-body" id="figureBody"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   VIGIL · MAY 2026 · TEST MODEL v3
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── CONTENT DATA ───────────────────────────────────────────── */
+const DAYS = [
+
+  /* 1 MAY · ABIDE */
+  {
+    date: "1 May 2026",
+    palette: "eastertide",
+    screens: {
+      season: {
+        heading: "Easter IV · Friday",
+        subs: [
+          { text: "Eastertide", primary: true },
+          { text: "Optional Memorial" },
+          { text: "St Joseph the Worker" }
+        ],
+        body: `<p>We are deep in Eastertide — the great fifty days between Easter and Pentecost, when the Church lives in the light of the resurrection.</p>
+<p>Today the Church also remembers <button type="button" class="figure-link" data-figure="joseph_worker">St Joseph the Worker</button> — the husband of Mary and earthly father of Jesus — whose feast on this day honours the quiet dignity of labour done faithfully in the presence of God.</p>`
+      },
+      word: {
+        title: "ABIDE",
+        pronunciation: "[uh-byde]",
+        definition: `<p>To remain, to dwell, to make your home in a place. The Greek is <em>menō</em> (μένω) — meaning not merely to stay put, but to take up residence, to live within, to be at home.</p>
+<p>In the vine discourse of <button type="button" class="figure-link" data-figure="john_evangelist">John</button> 15, Jesus says <em>abide in me, and I in you</em> — a mutual indwelling that has no real parallel in ordinary experience. It is more than connection; it is the claim that the life of Christ and the life of the believer can so interpenetrate that the boundary between them becomes, in some sense, porous. The Eastern Christian traditions call this <em>theosis</em> — the life of God shared with the creature, not by the creature's erasure but by the creature's transformation.</p>
+<p>The word has a quietness to it that is easily missed. Abiding is not dramatic. It is the decision, made again each morning, not to walk away.</p>`
+      },
+      scripture: [
+        {
+          ref: `<button type="button" class="figure-link" data-figure="john_evangelist">John</button> 15:4–5`,
+          text: `<p>Abide in me as I abide in you. Just as the branch cannot bear fruit by itself unless it abides in the vine, neither can you unless you abide in me. I am the vine, you are the branches. Those who abide in me and I in them bear much fruit, because apart from me you can do nothing.</p>`,
+          translation: "NRSV"
+        }
+      ],
+      contemplation: {
+        body: `<p>Notice the shape of the invitation.</p>
+<p>Jesus does not say: <em>believe in me</em> or <em>follow me</em> — though he has said both of those before. Instead he says: <em>abide in me</em>. Make your home here. Live in me.</p>
+<p>Abiding is not passive. In the same discourse, Jesus ties it directly to obedience and love: <em>if you keep my commandments, you will abide in my love</em>. The branch that abides is not inert — it is growing, responding, bearing the slow fruit of a life shaped by proximity to Christ. But neither is it self-generated. The branch cannot produce its own life. It receives, and in receiving, it becomes capable of something it could never have been alone.</p>
+<p>Abiding is both gift and discipline, grace and response, something done to us and something we must choose, each day, not to refuse.</p>`,
+        question: "What would it mean, today, not just to believe in Christ but to live in him — and to let him live in you?"
+      },
+      prayer: {
+        body: `<p>Lord,</p>
+<p>You have asked us to abide — to make our home in you, as you make your home in us.</p>
+<p>Where we have settled for connection when you offered indwelling, draw us deeper so we abide in you.</p>
+<p>Where we have tried to live on what we can produce alone, remind us that apart from you we can do nothing — and that with you, we can bear fruit we never imagined.</p>`,
+        amen: "In Christ's name, Amen."
+      },
+      practice: {
+        body: `<p>At some point today, return to a task you do every day — washing up, making tea, walking a familiar route — and as you do it, silently pray: <em>Abide in me, Lord, and let me abide in you.</em> Let the prayer accompany the work, not replace it.</p>`,
+        anchor: `<button type="button" class="figure-link" data-figure="joseph_worker">St Joseph</button> spent his working life shaping wood in the presence of the Word made flesh. Abiding is not the opposite of working. It is working from within a life that is not only your own.`
+      }
+    },
+    figures: {
+      joseph_worker: {
+        name: "St Joseph",
+        dates: "1st century AD",
+        role: "Husband of Mary · Earthly father of Jesus · Venerated across all Christian traditions",
+        body: "In Matthew 13:55, Jesus is described as the son of a tekton (τέκτων) — a craftsman, carpenter or builder. His feast on 1 May celebrates him as patron of workers and honours the dignity of ordinary labour done faithfully in the presence of God; work as a form of abiding."
+      },
+      john_evangelist: {
+        name: "St John the Evangelist",
+        dates: "1st century AD",
+        role: "Apostle · Traditionally identified as author of the fourth Gospel",
+        body: "Author of the fourth Gospel, which is often understood as the most theologically dense of the four, using rich symbolism to reveal Jesus' divine identity. The vine discourse of John 15, from which today's scripture is drawn, is part of Jesus's farewell to the disciples on the night before his death — his most intimate teaching on the nature of the believer's life in Christ."
+      }
+    }
+  },
+
+  /* 2 MAY · BRANCH */
+  {
+    date: "2 May 2026",
+    palette: "eastertide",
+    screens: {
+      season: {
+        heading: "Easter IV · Saturday",
+        subs: [
+          { text: "Eastertide", primary: true },
+          { text: "Memorial" },
+          { text: "St Athanasius, Bishop and Doctor of the Church" }
+        ],
+        body: `<p>We are in the closing days of the fourth week of Easter.</p>
+<p>The Church today keeps the memorial of <button type="button" class="figure-link" data-figure="athanasius">St Athanasius of Alexandria</button>, who defended the full divinity of Christ and understood that if the life flowing through the vine is not the life of God himself, then the promise of transformation is empty.</p>`
+      },
+      word: {
+        title: "BRANCH",
+        pronunciation: "[brahnch]",
+        definition: `<p>The part of the vine that bears the fruit — but only because it is joined to the vine. A branch on its own is a stick. Connected, it is alive.</p>
+<p>In <button type="button" class="figure-link" data-figure="john_evangelist">John</button> 15, Jesus does not compare his followers to vines — self-standing, independently rooted. He compares them to branches: drawn into the life of the vine itself, sharing in what the vine carries, bearing what they could never produce alone.</p>
+<p>It is an extraordinary image — not of diminishment, but of intimacy. The branch is the very place where the hidden life of the vine becomes visible.</p>`
+      },
+      scripture: [
+        {
+          ref: `<button type="button" class="figure-link" data-figure="john_evangelist">John</button> 15:5`,
+          text: `<p>I am the vine, you are the branches. Those who abide in me and I in them bear much fruit, because apart from me you can do nothing.</p>`,
+          translation: "NRSV"
+        }
+      ],
+      contemplation: {
+        body: `<p><em>'Apart from me you can do nothing.'</em></p>
+<p>It is one of the most absolute statements Jesus makes, and one of the easiest to set aside. We can, of course, do a great many things apart from Christ — we can build, earn, organise, even achieve — but what we cannot do, Jesus says, is bear fruit.</p>
+<p>And fruit, in John's Gospel, is not productivity. It is a life that has the character of Christ in it: love, patience, gentleness — the slow evidence that someone has been abiding in something larger than themselves.</p>
+<p>But dependence is not the same as passivity. A branch grows, reaches toward the light, responds to the season, is shaped by wind and weather and the gardener's knife. The life it bears is received, yes — but the bearing of it is real work, done in a real world.</p>`,
+        question: "Where in your life are you trying to bear fruit without being joined to anything — and where is fruit growing that you have not yet recognised, because it came from the vine and not from you?"
+      },
+      prayer: {
+        body: `<p>Lord,</p>
+<p>We are branches — not trees.</p>
+<p>We forget this more often than we admit.</p>
+<p>Where we have been living as though the life were our own, graft us back.</p>
+<p>Where we are withering from a disconnection we cannot quite name, let your life flow through us again.</p>
+<p>We do not need to be more. We need to be joined to you.</p>`,
+        amen: "In Christ's name, Amen."
+      },
+      practice: {
+        body: `<p>Find a tree today — in a garden, on a street, through a window — and look at one of its branches for a moment. You can see where it joins the trunk. You can trace the shape of it. What you cannot see is the life moving through it — and yet everything the branch does depends on that invisible flow.</p>`,
+        anchor: "You are not the tree. You are the branch. And the branch's deepest freedom is not in separating from the vine, but in all that it becomes by remaining part of it."
+      }
+    },
+    figures: {
+      athanasius: {
+        name: "St Athanasius of Alexandria",
+        dates: "c. 296–373",
+        role: "Bishop of Alexandria · Doctor of the Church",
+        body: "One of the most important early theologians of the Church. Exiled five times for his insistence that Christ is fully God — not a lesser or created being — he became the defining voice for the faith the Church holds today. His memorial today places beside the word Branch a man who spent his life insisting that the life in the vine is nothing less than the life of God himself."
+      },
+      john_evangelist: {
+        name: "St John the Evangelist",
+        dates: "1st century AD",
+        role: "Apostle · Traditionally identified as author of the fourth Gospel",
+        body: "The vine discourse of John 15, from which today's scripture is drawn, is part of Jesus's farewell to the disciples on the night before his death — his most intimate teaching on the nature of the believer's dependence on Christ."
+      }
+    }
+  },
+
+  /* 3 MAY · FRUIT */
+  {
+    date: "3 May 2026",
+    palette: "eastertide",
+    screens: {
+      season: {
+        heading: "5th Sunday of Easter",
+        subs: [{ text: "Eastertide", primary: true }],
+        body: `<p>Today is the Fifth Sunday of Easter. The Gospel readings continue to draw from Jesus's farewell discourse in <button type="button" class="figure-link" data-figure="john_evangelist">John</button> — his last, most intimate teaching to the disciples before the cross.</p>
+<p>We have moved through vine, abiding, and branch. Today the image reaches its completion: fruit.</p>`
+      },
+      word: {
+        title: "FRUIT",
+        pronunciation: "[froot]",
+        definition: `<p>What grows when a branch remains joined to the vine and the gardener does his work. The Greek <em>karpos</em> (καρπός) means fruit, yield, the thing that comes forth — but in Scripture it is never a synonym for productivity. Fruit is what grows slowly, in season, and not by force.</p>
+<p>In <button type="button" class="figure-link" data-figure="john_evangelist">John</button> 15, fruit is not an achievement. It is evidence — the visible sign that a life is being lived in union with Christ. <button type="button" class="figure-link" data-figure="paul">Paul</button> names its character in his letter to the Galatians: love, joy, peace, patience, kindness, generosity, faithfulness, gentleness and self-control.</p>
+<p>None of these can be manufactured. All of them can be grown.</p>`
+      },
+      scripture: [
+        {
+          ref: `<button type="button" class="figure-link" data-figure="john_evangelist">John</button> 15:16`,
+          text: `<p>You did not choose me but I chose you. And I appointed you to go and bear fruit, fruit that will last, so that the Father will give you whatever you ask him in my name.</p>`,
+          translation: "NRSV"
+        },
+        {
+          ref: `<button type="button" class="figure-link" data-figure="paul">Galatians</button> 5:22`,
+          text: `<p>By contrast, the fruit of the Spirit is love, joy, peace, patience, kindness, generosity, faithfulness, gentleness and self-control.</p>`,
+          translation: "NRSV"
+        }
+      ],
+      contemplation: {
+        body: `<p>There is a reversal here that is easy to miss. We expect to be told: <em>try harder, do more.</em> Instead, Jesus explains that the initiative was never ours. The vine is the source of the branch, not the other way round.</p>
+<p>If Christ chose us, then the fruit we produce is something else entirely: his life, showing up in ours, often in ways we did not plan and cannot take credit for. The patience we did not know we had. The gentleness that arrived in a season when we had every reason to be harsh. The peace that held when nothing around us was peaceful.</p>
+<p><em>Fruit that will last</em>, Jesus says. Not fruit that will impress, or fruit that will be counted — but fruit that will still be there when everything else has fallen away.</p>`,
+        question: "What fruit is growing in you that you have not yet noticed — because you were too busy looking for something more impressive?"
+      },
+      prayer: {
+        body: `<p>Lord,</p>
+<p>You chose us before we chose you.</p>
+<p>Where we have been striving to produce what only you can grow, forgive us.</p>
+<p>Where fruit is forming in us quietly — in patience, in gentleness, in love we did not manufacture — help us to recognise it and to trust it.</p>
+<p>Let us bear the fruit that lasts, not the fruit that performs.</p>`,
+        amen: "In Christ's name, Amen."
+      },
+      practice: {
+        body: `<p>Eat a piece of fruit today — an apple, a pear, a fig, or whatever is to hand — and eat it slowly. Notice that no part of it was forced. It grew because a tree was rooted, a branch was connected, and a season was given. The fruit did not produce itself. It was borne.</p>`,
+        anchor: "At some point today, ask yourself: is the fruit that lasts in my life what I achieve, or what I allow?"
+      }
+    },
+    figures: {
+      john_evangelist: {
+        name: "St John the Evangelist",
+        dates: "1st century AD",
+        role: "Apostle · Traditionally identified as author of the fourth Gospel",
+        body: "Today's scripture is the culmination of the vine discourse in John 15 — the moment when Jesus reveals that the fruitfulness of the branches rests not on their effort but on his prior choice of them."
+      },
+      paul: {
+        name: "St Paul the Apostle",
+        dates: "c. 5–c. 64/67 AD",
+        role: "Apostle to the Gentiles · Author of major New Testament epistles",
+        body: "His letter to the Galatians names the fruit of the Spirit and has shaped the Church's understanding of what spiritual fruitfulness looks like — not a catalogue of virtues to be achieved, but the harvest of a life lived in the Spirit."
+      }
+    }
+  }
+
+]; /* end DAYS */
+
+/* ── PALETTES ───────────────────────────────────────────────── */
+const PALETTES = {
+  eastertide: {
+    cls: 'palette-eastertide',
+    vars: { '--bg':'#F5F0E8','--panel':'#EDE5D0','--accent':'#8B6914',
+            '--accent-soft':'rgba(139,105,20,0.18)','--text':'#1E1A14',
+            '--dim':'#8A7D65','--gold':'#8B6914','--shell':'#E8E0CC' }
+  },
+  pentecost: {
+    cls: 'palette-pentecost',
+    vars: { '--bg':'#1A0A0A','--panel':'#251010','--accent':'#8B1A1A',
+            '--accent-soft':'rgba(139,26,26,0.3)','--text':'#F0E0D0',
+            '--dim':'#9A7060','--gold':'#C04040','--shell':'#100505' }
+  }
+};
+
+/* ── STATE ──────────────────────────────────────────────────── */
+let currentDay = 0, currentScreen = 0;
+const TOTAL = 6;
+
+/* ── ESCAPE ─────────────────────────────────────────────────── */
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* ── SCREEN BUILDERS ────────────────────────────────────────── */
+function buildSeason(s) {
+  const subs = (s.subs||[]).map(x =>
+    `<div class="season-sub${x.primary?' sub-primary':''}">${esc(x.text)}</div>`
+  ).join('');
+  return `<div class="season-heading">${esc(s.heading)}</div>
+${subs}
+<div class="season-divider"></div>
+<div class="season-body">${s.body}</div>`;
+}
+function buildWord(w) {
+  return `<div class="word-title">${esc(w.title)}</div>
+<div class="word-pronunciation">${esc(w.pronunciation)}</div>
+<div class="word-divider"></div>
+<div class="word-definition">${w.definition}</div>`;
+}
+function buildScripture(passages) {
+  return passages.map(p =>
+    `<div class="scripture-passage">
+  <div class="scripture-ref">${p.ref}</div>
+  <div class="scripture-block"><div class="scripture-text">${p.text}</div></div>
+  <div class="scripture-translation">${esc(p.translation)}</div>
+</div>`).join('');
+}
+function buildContemplation(c) {
+  return `<div class="contemplation-body">${c.body}</div>
+<div class="contemplation-question">${esc(c.question)}</div>`;
+}
+function buildPrayer(p) {
+  return `<div class="prayer-body">${p.body}</div>
+<div class="prayer-amen">${esc(p.amen)}</div>`;
+}
+function buildPractice(p) {
+  return `<div class="practice-body">${p.body}</div>
+<div class="practice-anchor">${p.anchor}</div>`;
+}
+
+/* ── RENDER DAY ─────────────────────────────────────────────── */
+function renderDay(idx) {
+  const day  = DAYS[idx];
+  const app  = document.getElementById('app');
+  const cont = document.getElementById('screens');
+
+  /* Palette */
+  const pal = PALETTES[day.palette || 'eastertide'];
+  app.classList.remove('palette-eastertide','palette-pentecost');
+  app.classList.add(pal.cls);
+  Object.entries(pal.vars).forEach(([k,v]) =>
+    document.documentElement.style.setProperty(k, v)
+  );
+  document.body.style.background = pal.vars['--shell'];
+
+  /* Top bar: date only */
+  document.getElementById('dayMetaDate').textContent = day.date;
+
+  /* Build 6 screens */
+  const s = day.screens;
+  const labels  = ['Season','Word','Scripture','Contemplation','Prayer','Practice'];
+  const classes = ['screen-season','screen-word','screen-scripture',
+                   'screen-contemplation','screen-prayer','screen-practice'];
+  const builders = s ? [
+    buildSeason(s.season),
+    buildWord(s.word),
+    buildScripture(s.scripture),
+    buildContemplation(s.contemplation),
+    buildPrayer(s.prayer),
+    buildPractice(s.practice)
+  ] : labels.map(() => `<div class="placeholder-body">Content for this day is in production.</div>`);
+
+  cont.innerHTML = builders.map((html, i) => `
+    <section class="screen ${classes[i]}" data-screen="${i}" aria-label="${labels[i]}">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">${labels[i]}</div>
+      <div class="screen-inner">${html}</div>
+      <div class="screen-fade-bottom"></div>
+    </section>`).join('');
+
+  /* Bind figure links for this day */
+  cont.querySelectorAll('.figure-link').forEach(el => {
+    el.addEventListener('click', ev => {
+      ev.stopPropagation();
+      openFigure(el.dataset.figure, day.figures || {});
+    });
+  });
+
+  /* Navigate to screen 0, reset all scroll positions (fix #6) */
+  goTo(0, false);
+  cont.querySelectorAll('.screen-inner').forEach(el => { el.scrollTop = 0; });
+  animateScreen(0);
+}
+
+/* ── NAVIGATION ─────────────────────────────────────────────── */
+function goTo(i, doAnim = true) {
+  /* Wrap forward past last screen → screen 0 (fix #7) */
+  if (i >= TOTAL) i = 0;
+  if (i < 0) i = 0;
+  currentScreen = i;
+  document.getElementById('screens').style.transform = `translateY(-${i * 100}vh)`;
+  document.querySelectorAll('.dot').forEach((d, idx) =>
+    d.classList.toggle('active', idx === i)
+  );
+  document.getElementById('counter').textContent = `${i + 1} / ${TOTAL}`;
+  if (i > 0) document.getElementById('swipeHint').style.opacity = '0';
+  if (doAnim) animateScreen(i);
+}
+
+function animateScreen(i) {
+  const sc = document.querySelectorAll('.screen')[i];
+  if (!sc) return;
+  /* Reset inner scroll to top (fix #6) */
+  const inner = sc.querySelector('.screen-inner');
+  if (inner) inner.scrollTop = 0;
+  sc.classList.remove('animating');
+  void sc.offsetWidth;
+  sc.classList.add('animating');
+  sc.addEventListener('animationend', () => sc.classList.remove('animating'), { once: true });
+}
+
+/* ── UI BUILD ───────────────────────────────────────────────── */
+function buildDots() {
+  const el = document.getElementById('dots');
+  const labels = ['Season','Word','Scripture','Contemplation','Prayer','Practice'];
+  el.innerHTML = labels.map((l, i) =>
+    `<button class="dot${i===0?' active':''}" data-index="${i}" aria-label="${l}"></button>`
+  ).join('');
+  el.querySelectorAll('.dot').forEach(d =>
+    d.addEventListener('click', () => goTo(parseInt(d.dataset.index)))
+  );
+}
+
+function buildDayPicker() {
+  const el = document.getElementById('dayPicker');
+  el.innerHTML = DAYS.map((d, i) => {
+    const short = d.date.split(' ').slice(0,2).join('\u00A0');
+    return `<button class="day-btn${i===0?' active':''}" data-day="${i}">${short}</button>`;
+  }).join('');
+  el.querySelectorAll('.day-btn').forEach(btn =>
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.day);
+      if (idx === currentDay) return;
+      currentDay = idx;
+      el.querySelectorAll('.day-btn').forEach(b => b.classList.toggle('active', b === btn));
+      renderDay(idx);
+    })
+  );
+}
+
+/* ── FIGURE MODAL ───────────────────────────────────────────── */
+function openFigure(key, figs) {
+  const fig = figs[key]; if (!fig) return;
+  document.getElementById('figureName').textContent  = fig.name;
+  document.getElementById('figureDates').textContent = fig.dates;
+  document.getElementById('figureRole').textContent  = fig.role || '';
+  document.getElementById('figureBody').textContent  = fig.body;
+  document.getElementById('figureOverlay').classList.add('open');
+}
+function closeFigure() {
+  document.getElementById('figureOverlay').classList.remove('open');
+}
+document.getElementById('figureClose').addEventListener('click', closeFigure);
+document.getElementById('figureOverlay').addEventListener('click', ev => {
+  if (ev.target === document.getElementById('figureOverlay')) closeFigure();
+});
+
+/* ── GESTURE HANDLING (fix #3) ──────────────────────────────── */
+/*
+   Rule: a vertical swipe triggers a screen change ONLY if the
+   screen-inner scroll position is already at its boundary in
+   the direction of the swipe.
+
+   Swipe UP   (finger moves up, dy < 0) → advance screen
+              → only fires if inner.scrollTop is at the BOTTOM
+                (scrollTop >= scrollHeight - clientHeight - tolerance)
+
+   Swipe DOWN (finger moves down, dy > 0) → retreat screen
+              → only fires if inner.scrollTop === 0
+
+   If the boundary condition is not met, the gesture scrolls the
+   inner content instead (native scroll, no JS needed).
+*/
+const SWIPE_THRESH    = 45;   /* min px to register as intentional swipe */
+const SCROLL_TOLERANCE = 4;   /* px slack for "at the bottom" check */
+
+function getActiveInner() {
+  const screens = document.querySelectorAll('.screen');
+  const sc = screens[currentScreen];
+  return sc ? sc.querySelector('.screen-inner') : null;
+}
+
+function isAtBottom(inner) {
+  if (!inner) return true;
+  return inner.scrollTop >= (inner.scrollHeight - inner.clientHeight - SCROLL_TOLERANCE);
+}
+function isAtTop(inner) {
+  if (!inner) return true;
+  return inner.scrollTop <= SCROLL_TOLERANCE;
+}
+
+/* ── Touch ── */
+let touchStartX = 0, touchStartY = 0, touchActive = false;
+
+document.addEventListener('touchstart', ev => {
+  if (document.getElementById('figureOverlay').classList.contains('open')) return;
+  touchStartX = ev.touches[0].clientX;
+  touchStartY = ev.touches[0].clientY;
+  touchActive = true;
+}, { passive: true });
+
+document.addEventListener('touchend', ev => {
+  if (!touchActive) return;
+  touchActive = false;
+  const dx = ev.changedTouches[0].clientX - touchStartX;
+  const dy = ev.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dy) <= Math.abs(dx)) return;   /* horizontal — ignore */
+  if (Math.abs(dy) < SWIPE_THRESH) return;    /* too small — ignore */
+
+  const inner = getActiveInner();
+  if (dy < 0) {
+    /* Swipe UP → advance, but only if inner is scrolled to bottom */
+    if (isAtBottom(inner)) goTo(currentScreen + 1);
+  } else {
+    /* Swipe DOWN → retreat, but only if inner is scrolled to top */
+    if (isAtTop(inner)) goTo(currentScreen - 1);
+  }
+}, { passive: true });
+
+/* ── Mouse drag (desktop testing) ── */
+let mouseStartY = 0, mouseDown = false;
+
+document.addEventListener('mousedown', ev => {
+  if (ev.target.closest('.figure-link,.figure-overlay,.dot,.close,.day-btn,.screen-inner')) return;
+  mouseStartY = ev.clientY;
+  mouseDown = true;
+});
+document.addEventListener('mouseup', ev => {
+  if (!mouseDown) return;
+  mouseDown = false;
+  const dy = ev.clientY - mouseStartY;
+  if (Math.abs(dy) < 55) return;
+  /* Mouse drag on the screen background (not the inner scroll area):
+     always triggers navigation — user is deliberately dragging the frame */
+  goTo(currentScreen + (dy < 0 ? 1 : -1));
+});
+
+/* ── Keyboard ── */
+document.addEventListener('keydown', ev => {
+  if (document.getElementById('figureOverlay').classList.contains('open')) {
+    if (ev.key === 'Escape') closeFigure();
+    return;
+  }
+  if (ev.key === 'ArrowDown' || ev.key === 'ArrowRight') goTo(currentScreen + 1);
+  if (ev.key === 'ArrowUp'   || ev.key === 'ArrowLeft')  goTo(currentScreen - 1);
+});
+
+/* ── INIT ───────────────────────────────────────────────────── */
+buildDots();
+buildDayPicker();
+renderDay(0);
+
+/* ── SERVICE WORKER REGISTRATION ────────────────────────────── */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js')
+      .catch(err => console.warn('Vigil: service worker registration failed:', err));
+  });
+}
+</script>
+</body>
+</html>
