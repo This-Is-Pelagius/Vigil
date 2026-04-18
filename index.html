@@ -4,46 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Vigil</title>
-
-<!-- PWA: manifest and theme -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#F5F0E8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Vigil">
-
-<!-- PWA: icons -->
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
-
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ══════════════════════════════════════════════
-   SEASONAL PALETTES
-   ══════════════════════════════════════════════ */
 :root {
-  /* Eastertide */
-  --et-bg:          #F5F0E8;
-  --et-panel:       #EDE5D0;
-  --et-accent:      #8B6914;
-  --et-accent-soft: rgba(139,105,20,0.18);
-  --et-text:        #1E1A14;
-  --et-dim:         #8A7D65;
-  --et-gold:        #8B6914;
-  --et-shell:       #E8E0CC;
-  /* Pentecost */
-  --pent-bg:          #1A0A0A;
-  --pent-panel:       #251010;
-  --pent-accent:      #8B1A1A;
-  --pent-accent-soft: rgba(139,26,26,0.3);
-  --pent-text:        #F0E0D0;
-  --pent-dim:         #9A7060;
-  --pent-gold:        #C04040;
-  --pent-shell:       #100505;
-  /* Active tokens — set by JS on day load */
   --bg:          #F5F0E8;
   --panel:       #EDE5D0;
   --accent:      #8B6914;
@@ -55,8 +28,7 @@
 }
 
 html, body {
-  height: 100%;
-  margin: 0;
+  height: 100%; margin: 0;
   background: var(--shell);
   font-family: 'Raleway', sans-serif;
   color: var(--text);
@@ -64,192 +36,126 @@ html, body {
 }
 body { overflow: hidden; }
 
-/* ══════════════════════════════════════════════
-   APP SHELL
-   ══════════════════════════════════════════════ */
-.app {
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  position: relative;
-}
+.app { width: 100%; height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative; }
 
-/* ── Top bar: transparent background (fix #4) ── */
 .top-bar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 40;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 40;
   padding: 1rem 1.5rem 0.8rem;
   pointer-events: none;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  /* No background gradient — screen bg shows through cleanly */
+  display: flex; justify-content: space-between; align-items: center;
   background: transparent;
 }
 .top-bar .brand {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 0.95rem;
-  font-weight: 400;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--gold);
+  font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; font-weight: 400;
+  letter-spacing: 0.35em; text-transform: uppercase; color: var(--gold);
 }
-/* Date only — right side (fix #1) */
 .top-bar .day-meta-date {
-  font-family: 'Raleway', sans-serif;
-  font-size: 0.58rem;
-  font-weight: 500;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--dim);
+  font-family: 'Raleway', sans-serif; font-size: 0.58rem; font-weight: 500;
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--dim);
 }
 
-/* ── Screens container: vertical stack ── */
-.screens-wrapper {
-  flex: 1;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-}
+.screens-wrapper { flex: 1; height: 100%; position: relative; overflow: hidden; }
 .screens-container {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+  display: flex; flex-direction: column; width: 100%;
   transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
 }
 
-/* ── Each screen ── */
 .screen {
-  width: 100%;
-  height: 100vh;
-  min-height: 100vh;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  /* top: clear brand bar; right: clear nav dots; bottom: clear day picker */
+  width: 100%; height: 100vh; min-height: 100vh; flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: flex-start;
   padding: 3.8rem 2.8rem 4.5rem 2.2rem;
-  position: relative;
-  overflow: hidden;
+  position: relative; overflow: hidden;
   background: var(--bg);
 }
-.screen-word,
-.screen-contemplation,
-.screen-practice { background: var(--panel); }
+.screen-word, .screen-contemplation, .screen-practice { background: var(--panel); }
 
-/* Noise texture */
 .screen::before {
-  content: '';
-  position: absolute;
-  inset: 0;
+  content: ''; position: absolute; inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 0;
+  pointer-events: none; z-index: 0;
 }
 .screen > * { position: relative; z-index: 1; }
 
-/* Screen label — outside scroll area, always visible at top */
 .screen-label {
-  font-family: 'Raleway', sans-serif;
-  font-size: 0.63rem;
-  font-weight: 600;
-  letter-spacing: 0.46em;
-  text-transform: uppercase;
-  margin-bottom: 1.6rem;
-  color: var(--gold);
-  flex-shrink: 0;
+  font-family: 'Raleway', sans-serif; font-size: 0.63rem; font-weight: 600;
+  letter-spacing: 0.46em; text-transform: uppercase;
+  margin-bottom: 1.6rem; color: var(--gold); flex-shrink: 0;
 }
 
-/* ── Scrollable inner content (fix #6: reset to top on navigate) ── */
 .screen-inner {
-  width: 100%;
-  max-width: 480px;
-  flex: 1;
-  min-height: 0;          /* required for flex-child overflow scroll */
-  overflow-y: scroll;     /* always allow scroll, JS decides gesture intent */
-  overflow-x: hidden;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  /* padding ensures content clears the fade masks */
-  padding-top: 0.5rem;
-  padding-bottom: 5rem;
+  width: 100%; max-width: 480px; flex: 1; min-height: 0;
+  overflow-y: scroll; overflow-x: hidden;
+  scrollbar-width: none; -ms-overflow-style: none;
+  padding-top: 0.5rem; padding-bottom: 5rem;
 }
 .screen-inner::-webkit-scrollbar { display: none; }
 
-/* Scripture screen centres content vertically (fix #5) */
-.screen-scripture {
-  justify-content: center;
-}
-.screen-scripture .screen-inner {
-  flex: 0 1 auto;
-}
+.screen-scripture { justify-content: center; }
+.screen-scripture .screen-inner { flex: 0 1 auto; }
 
-/* ── Fade masks (fix #2 & #4) ──
-   These sit above the screen-inner but within the screen.
-   They match the exact screen background colour — no gradient
-   bleeding into a different shade. The top fade starts AFTER
-   the screen-label, so it never obscures the label. */
-.screen-fade-top,
-.screen-fade-bottom {
-  position: absolute;
-  left: 0; right: 0;
-  z-index: 3;
-  pointer-events: none;
+.screen-fade-top, .screen-fade-bottom {
+  position: absolute; left: 0; right: 0; z-index: 3; pointer-events: none;
 }
-/* Top fade sits just below the screen-label area */
 .screen-fade-top    { top: 0;    height: 3.5rem; }
 .screen-fade-bottom { bottom: 0; height: 5.5rem; }
 
-/* Eastertide — primary bg (Season, Scripture, Prayer) */
-.palette-eastertide .screen-season    .screen-fade-top,
-.palette-eastertide .screen-scripture .screen-fade-top,
-.palette-eastertide .screen-prayer    .screen-fade-top {
-  background: linear-gradient(to bottom, #F5F0E8 50%, rgba(245,240,232,0));
-}
-.palette-eastertide .screen-season    .screen-fade-bottom,
-.palette-eastertide .screen-scripture .screen-fade-bottom,
-.palette-eastertide .screen-prayer    .screen-fade-bottom {
-  background: linear-gradient(to top, #F5F0E8 55%, rgba(245,240,232,0));
-}
-/* Eastertide — panel bg (Word, Contemplation, Practice) */
-.palette-eastertide .screen-word          .screen-fade-top,
-.palette-eastertide .screen-contemplation .screen-fade-top,
-.palette-eastertide .screen-practice      .screen-fade-top {
-  background: linear-gradient(to bottom, #EDE5D0 50%, rgba(237,229,208,0));
-}
-.palette-eastertide .screen-word          .screen-fade-bottom,
-.palette-eastertide .screen-contemplation .screen-fade-bottom,
-.palette-eastertide .screen-practice      .screen-fade-bottom {
-  background: linear-gradient(to top, #EDE5D0 55%, rgba(237,229,208,0));
-}
-/* Pentecost — primary bg */
-.palette-pentecost .screen-season    .screen-fade-top,
-.palette-pentecost .screen-scripture .screen-fade-top,
-.palette-pentecost .screen-prayer    .screen-fade-top {
-  background: linear-gradient(to bottom, #1A0A0A 50%, rgba(26,10,10,0));
-}
-.palette-pentecost .screen-season    .screen-fade-bottom,
-.palette-pentecost .screen-scripture .screen-fade-bottom,
-.palette-pentecost .screen-prayer    .screen-fade-bottom {
-  background: linear-gradient(to top, #1A0A0A 55%, rgba(26,10,10,0));
-}
-/* Pentecost — panel bg */
-.palette-pentecost .screen-word          .screen-fade-top,
-.palette-pentecost .screen-contemplation .screen-fade-top,
-.palette-pentecost .screen-practice      .screen-fade-top {
-  background: linear-gradient(to bottom, #251010 50%, rgba(37,16,16,0));
-}
-.palette-pentecost .screen-word          .screen-fade-bottom,
-.palette-pentecost .screen-contemplation .screen-fade-bottom,
-.palette-pentecost .screen-practice      .screen-fade-bottom {
-  background: linear-gradient(to top, #251010 55%, rgba(37,16,16,0));
-}
+/* Lent fades */
+.palette-lent .screen-season .screen-fade-top,
+.palette-lent .screen-scripture .screen-fade-top,
+.palette-lent .screen-prayer .screen-fade-top    { background: linear-gradient(to bottom, #241E1A 50%, rgba(36,30,26,0)); }
+.palette-lent .screen-season .screen-fade-bottom,
+.palette-lent .screen-scripture .screen-fade-bottom,
+.palette-lent .screen-prayer .screen-fade-bottom { background: linear-gradient(to top, #241E1A 55%, rgba(36,30,26,0)); }
+.palette-lent .screen-word .screen-fade-top,
+.palette-lent .screen-contemplation .screen-fade-top,
+.palette-lent .screen-practice .screen-fade-top    { background: linear-gradient(to bottom, #2E2520 50%, rgba(46,37,32,0)); }
+.palette-lent .screen-word .screen-fade-bottom,
+.palette-lent .screen-contemplation .screen-fade-bottom,
+.palette-lent .screen-practice .screen-fade-bottom { background: linear-gradient(to top, #2E2520 55%, rgba(46,37,32,0)); }
 
-/* ── Fade-up entry animation ── */
+/* Good Friday fades */
+.palette-goodfriday .screen-season .screen-fade-top,
+.palette-goodfriday .screen-scripture .screen-fade-top,
+.palette-goodfriday .screen-prayer .screen-fade-top    { background: linear-gradient(to bottom, #0E0C0B 50%, rgba(14,12,11,0)); }
+.palette-goodfriday .screen-season .screen-fade-bottom,
+.palette-goodfriday .screen-scripture .screen-fade-bottom,
+.palette-goodfriday .screen-prayer .screen-fade-bottom { background: linear-gradient(to top, #0E0C0B 55%, rgba(14,12,11,0)); }
+.palette-goodfriday .screen-word .screen-fade-top,
+.palette-goodfriday .screen-contemplation .screen-fade-top,
+.palette-goodfriday .screen-practice .screen-fade-top    { background: linear-gradient(to bottom, #181412 50%, rgba(24,20,18,0)); }
+.palette-goodfriday .screen-word .screen-fade-bottom,
+.palette-goodfriday .screen-contemplation .screen-fade-bottom,
+.palette-goodfriday .screen-practice .screen-fade-bottom { background: linear-gradient(to top, #181412 55%, rgba(24,20,18,0)); }
+
+/* Eastertide fades */
+.palette-eastertide .screen-season .screen-fade-top,
+.palette-eastertide .screen-scripture .screen-fade-top,
+.palette-eastertide .screen-prayer .screen-fade-top    { background: linear-gradient(to bottom, #F5F0E8 50%, rgba(245,240,232,0)); }
+.palette-eastertide .screen-season .screen-fade-bottom,
+.palette-eastertide .screen-scripture .screen-fade-bottom,
+.palette-eastertide .screen-prayer .screen-fade-bottom { background: linear-gradient(to top, #F5F0E8 55%, rgba(245,240,232,0)); }
+.palette-eastertide .screen-word .screen-fade-top,
+.palette-eastertide .screen-contemplation .screen-fade-top,
+.palette-eastertide .screen-practice .screen-fade-top    { background: linear-gradient(to bottom, #EDE5D0 50%, rgba(237,229,208,0)); }
+.palette-eastertide .screen-word .screen-fade-bottom,
+.palette-eastertide .screen-contemplation .screen-fade-bottom,
+.palette-eastertide .screen-practice .screen-fade-bottom { background: linear-gradient(to top, #EDE5D0 55%, rgba(237,229,208,0)); }
+
+/* Pentecost fades */
+.palette-pentecost .screen-season .screen-fade-top,
+.palette-pentecost .screen-scripture .screen-fade-top,
+.palette-pentecost .screen-prayer .screen-fade-top    { background: linear-gradient(to bottom, #1A0A0A 50%, rgba(26,10,10,0)); }
+.palette-pentecost .screen-season .screen-fade-bottom,
+.palette-pentecost .screen-scripture .screen-fade-bottom,
+.palette-pentecost .screen-prayer .screen-fade-bottom { background: linear-gradient(to top, #1A0A0A 55%, rgba(26,10,10,0)); }
+.palette-pentecost .screen-word .screen-fade-top,
+.palette-pentecost .screen-contemplation .screen-fade-top,
+.palette-pentecost .screen-practice .screen-fade-top    { background: linear-gradient(to bottom, #251010 50%, rgba(37,16,16,0)); }
+.palette-pentecost .screen-word .screen-fade-bottom,
+.palette-pentecost .screen-contemplation .screen-fade-bottom,
+.palette-pentecost .screen-practice .screen-fade-bottom { background: linear-gradient(to top, #251010 55%, rgba(37,16,16,0)); }
+
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -262,348 +168,91 @@ body { overflow: hidden; }
 .screen.animating .screen-inner > *:nth-child(5) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.36s; opacity: 0; }
 .screen.animating .screen-inner > *:nth-child(6) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.43s; opacity: 0; }
 
-/* ══════════════════════════════════════════════
-   SCREEN COMPONENTS
-   ══════════════════════════════════════════════ */
-
-/* Season */
-.season-heading {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(1.5rem, 5.5vw, 2.1rem);
-  font-weight: 300;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  line-height: 1.1;
-  margin-bottom: 0.35rem;
-  color: var(--text);
-  max-width: 420px;
-}
-.season-sub {
-  font-family: 'Raleway', sans-serif;
-  font-size: 0.6rem;
-  font-weight: 400;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--dim);
-  margin-bottom: 0.22rem;
-  opacity: 0.8;
-}
+/* Screen components */
+.season-heading { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.5rem, 5.5vw, 2.1rem); font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; line-height: 1.1; margin-bottom: 0.35rem; color: var(--text); max-width: 420px; }
+.season-sub { font-family: 'Raleway', sans-serif; font-size: 0.6rem; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); margin-bottom: 0.22rem; opacity: 0.8; }
 .season-sub.sub-primary { font-weight: 500; opacity: 0.95; }
-.season-divider {
-  width: 40px; height: 1px;
-  background: var(--accent);
-  margin: 1.6rem 0 2rem;
-}
-.season-body {
-  font-family: 'Libre Baskerville', serif;
-  font-size: 1.05rem;
-  line-height: 2;
-  max-width: 420px;
-  color: var(--text);
-}
+.season-divider { width: 40px; height: 1px; background: var(--accent); margin: 1.6rem 0 2rem; }
+.season-body { font-family: 'Libre Baskerville', serif; font-size: 1.05rem; line-height: 2; max-width: 420px; color: var(--text); }
 .season-body p + p { margin-top: 1.1rem; }
 
-/* Word */
-.word-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(3rem, 12vw, 5rem);
-  font-weight: 300;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  line-height: 0.95;
-  margin-bottom: 0.6rem;
-  color: var(--text);
-}
-.word-pronunciation {
-  font-family: 'Libre Baskerville', serif;
-  font-size: 0.85rem;
-  font-style: normal;
-  margin-bottom: 2rem;
-  color: var(--dim);
-}
-.word-divider {
-  width: 100%;
-  height: 1px;
-  margin-bottom: 2rem;
-  max-width: 420px;
-  background: linear-gradient(to right, var(--accent), transparent);
-}
-.word-definition {
-  font-family: 'Libre Baskerville', serif;
-  font-size: 1.05rem;
-  line-height: 2;
-  max-width: 420px;
-  color: var(--text);
-}
+.word-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(3rem, 12vw, 5rem); font-weight: 300; letter-spacing: 0.18em; text-transform: uppercase; line-height: 0.95; margin-bottom: 0.6rem; color: var(--text); }
+.word-pronunciation { font-family: 'Libre Baskerville', serif; font-size: 0.85rem; font-style: normal; margin-bottom: 2rem; color: var(--dim); }
+.word-divider { width: 100%; height: 1px; margin-bottom: 2rem; max-width: 420px; background: linear-gradient(to right, var(--accent), transparent); }
+.word-definition { font-family: 'Libre Baskerville', serif; font-size: 1.05rem; line-height: 2; max-width: 420px; color: var(--text); }
 .word-definition p + p { margin-top: 1.1rem; }
 
-/* Scripture */
-.scripture-passage + .scripture-passage {
-  margin-top: 3.5rem;
-  padding-top: 3rem;
-  border-top: 1px solid var(--accent-soft);
-}
-.scripture-ref {
-  font-family: 'Raleway', sans-serif;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  margin-bottom: 1.5rem;
-  color: var(--gold);
-}
-.scripture-block {
-  position: relative;
-  padding-left: 1.5rem;
-  border-left: 2px solid var(--accent);
-  max-width: 420px;
-}
-.scripture-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.45rem;
-  font-style: italic;
-  font-weight: 300;
-  line-height: 1.75;
-  color: var(--text);
-}
+.scripture-passage + .scripture-passage { margin-top: 3.5rem; padding-top: 3rem; border-top: 1px solid var(--accent-soft); }
+.scripture-ref { font-family: 'Raleway', sans-serif; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1.5rem; color: var(--gold); }
+.scripture-block { position: relative; padding-left: 1.5rem; border-left: 2px solid var(--accent); max-width: 420px; }
+.scripture-text { font-family: 'Cormorant Garamond', serif; font-size: 1.45rem; font-style: italic; font-weight: 300; line-height: 1.75; color: var(--text); }
 .scripture-text p + p { margin-top: 1rem; }
-.scripture-translation {
-  font-family: 'Raleway', sans-serif;
-  font-size: 0.6rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  margin-top: 1.2rem;
-  color: var(--dim);
-}
+.scripture-translation { font-family: 'Raleway', sans-serif; font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 1.2rem; color: var(--dim); }
 
-/* Contemplation */
-.contemplation-body {
-  font-family: 'Libre Baskerville', serif;
-  font-size: 1.05rem;
-  line-height: 2;
-  max-width: 420px;
-  color: var(--text);
-}
+.contemplation-body { font-family: 'Libre Baskerville', serif; font-size: 1.05rem; line-height: 2; max-width: 420px; color: var(--text); }
 .contemplation-body p + p { margin-top: 1.1rem; }
-.contemplation-question {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.3rem;
-  font-style: italic;
-  font-weight: 300;
-  line-height: 1.6;
-  max-width: 400px;
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--accent-soft);
-  color: var(--text);
-}
+.contemplation-question { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-style: italic; font-weight: 300; line-height: 1.6; max-width: 400px; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--accent-soft); color: var(--text); }
 
-/* Prayer */
-.prayer-body {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.4rem;
-  font-style: italic;
-  font-weight: 300;
-  line-height: 1.85;
-  max-width: 420px;
-  color: var(--text);
-}
+.prayer-body { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-style: italic; font-weight: 300; line-height: 1.85; max-width: 420px; color: var(--text); }
 .prayer-body p + p { margin-top: 1.2rem; }
-.prayer-amen {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.4rem;
-  font-style: italic;
-  font-weight: 300;
-  letter-spacing: 0.05em;
-  margin-top: 1.5rem;
-  color: var(--gold);
-}
+.prayer-amen { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-style: italic; font-weight: 300; letter-spacing: 0.05em; margin-top: 1.5rem; color: var(--gold); }
 
-/* Practice */
-.practice-body {
-  font-family: 'Libre Baskerville', serif;
-  font-size: 1.05rem;
-  line-height: 2;
-  max-width: 420px;
-  color: var(--text);
-}
+.practice-body { font-family: 'Libre Baskerville', serif; font-size: 1.05rem; line-height: 2; max-width: 420px; color: var(--text); }
 .practice-body p + p { margin-top: 1.1rem; }
-.practice-anchor {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.25rem;
-  font-style: italic;
-  font-weight: 300;
-  line-height: 1.65;
-  max-width: 400px;
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--accent-soft);
-  color: var(--text);
-}
+.practice-anchor { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-style: italic; font-weight: 300; line-height: 1.65; max-width: 400px; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--accent-soft); color: var(--text); }
 
-/* Figure links */
-.figure-link {
-  background: none; border: none; padding: 0;
-  font: inherit; color: inherit; cursor: pointer;
-  text-decoration: underline;
-  text-decoration-color: rgba(139,105,20,0.4);
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
-  transition: text-decoration-color 0.2s ease;
-}
-.figure-link:hover, .figure-link:focus-visible {
-  text-decoration-color: var(--gold); outline: none;
-}
+.figure-link { background: none; border: none; padding: 0; font: inherit; color: inherit; cursor: pointer; text-decoration: underline; text-decoration-color: rgba(139,105,20,0.4); text-underline-offset: 3px; text-decoration-thickness: 1px; transition: text-decoration-color 0.2s ease; }
+.figure-link:hover, .figure-link:focus-visible { text-decoration-color: var(--gold); outline: none; }
+.palette-lent .figure-link { text-decoration-color: rgba(196,154,80,0.4); }
+.palette-lent .figure-link:hover { text-decoration-color: #C49A50; }
+.palette-goodfriday .figure-link { text-decoration-color: rgba(160,48,48,0.4); }
+.palette-goodfriday .figure-link:hover { text-decoration-color: #A03030; }
 .palette-pentecost .figure-link { text-decoration-color: rgba(192,64,64,0.4); }
-.palette-pentecost .figure-link:hover { text-decoration-color: var(--pent-gold); }
+.palette-pentecost .figure-link:hover { text-decoration-color: #C04040; }
 
-/* Placeholder */
-.placeholder-body {
-  font-family: 'Libre Baskerville', serif;
-  font-size: 1.05rem; line-height: 2;
-  max-width: 420px; color: var(--dim); font-style: italic;
-}
+.placeholder-body { font-family: 'Libre Baskerville', serif; font-size: 1.05rem; line-height: 2; max-width: 420px; color: var(--dim); font-style: italic; }
 
-/* ══════════════════════════════════════════════
-   NAVIGATION — right edge dots, vertical
-   ══════════════════════════════════════════════ */
-.nav-dots {
-  position: fixed;
-  right: 0.95rem;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 0.62rem;
-  z-index: 30;
-}
-.dot {
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: var(--dim);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: none; padding: 0;
-  opacity: 0.5;
-}
-.palette-eastertide .dot.active { background: var(--et-accent); transform: scale(1.5); opacity: 1; }
-.palette-pentecost  .dot.active { background: var(--pent-gold); transform: scale(1.5); opacity: 1; }
+.nav-dots { position: fixed; right: 0.95rem; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 0.62rem; z-index: 30; }
+.dot { width: 5px; height: 5px; border-radius: 50%; background: var(--dim); cursor: pointer; transition: all 0.3s ease; border: none; padding: 0; opacity: 0.5; }
+.dot.active { background: var(--gold); transform: scale(1.5); opacity: 1; }
 
-.screen-counter {
-  position: fixed;
-  bottom: 1.5rem; right: 1.5rem;
-  font-family: 'Raleway', sans-serif;
-  font-size: 0.52rem; font-weight: 400;
-  letter-spacing: 0.2em;
-  color: var(--dim); z-index: 30; opacity: 0.55;
-}
-.swipe-hint {
-  position: fixed;
-  bottom: 1.5rem; left: 1.5rem;
-  font-family: 'Raleway', sans-serif;
-  font-size: 0.52rem; font-weight: 400;
-  letter-spacing: 0.15em; text-transform: uppercase;
-  color: var(--dim); opacity: 0.4; z-index: 30;
-  transition: opacity 0.5s ease;
-}
+.screen-counter { position: fixed; bottom: 1.5rem; right: 1.5rem; font-family: 'Raleway', sans-serif; font-size: 0.52rem; font-weight: 400; letter-spacing: 0.2em; color: var(--dim); z-index: 30; opacity: 0.55; }
+.swipe-hint { position: fixed; bottom: 1.5rem; left: 1.5rem; font-family: 'Raleway', sans-serif; font-size: 0.52rem; font-weight: 400; letter-spacing: 0.15em; text-transform: uppercase; color: var(--dim); opacity: 0.4; z-index: 30; transition: opacity 0.5s ease; }
 
-/* Day picker */
-.day-picker {
-  position: fixed;
-  bottom: 1.2rem; left: 50%;
-  transform: translateX(-50%);
-  z-index: 35;
-  display: flex; gap: 0.4rem; align-items: center;
-}
-.day-btn {
-  font-family: 'Raleway', sans-serif;
-  font-size: 0.48rem; font-weight: 500;
-  letter-spacing: 0.2em; text-transform: uppercase;
-  border: 1px solid; padding: 0.28rem 0.55rem;
-  cursor: pointer; transition: all 0.25s ease; background: transparent;
-}
-.palette-eastertide .day-btn { color: var(--dim); border-color: rgba(139,105,20,0.22); }
-.palette-eastertide .day-btn.active,
-.palette-eastertide .day-btn:hover { color: var(--et-text); border-color: var(--et-accent); background: rgba(139,105,20,0.08); }
-.palette-pentecost .day-btn { color: var(--dim); border-color: rgba(139,26,26,0.3); }
-.palette-pentecost .day-btn.active,
-.palette-pentecost .day-btn:hover { color: var(--pent-text); border-color: var(--pent-accent); background: rgba(139,26,26,0.12); }
+.day-picker { position: fixed; bottom: 1.2rem; left: 50%; transform: translateX(-50%); z-index: 35; display: flex; gap: 0.4rem; align-items: center; }
+.day-btn { font-family: 'Raleway', sans-serif; font-size: 0.48rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; border: 1px solid; padding: 0.28rem 0.55rem; cursor: pointer; transition: all 0.25s ease; background: transparent; color: var(--dim); border-color: rgba(139,105,20,0.22); }
+.day-btn.active, .day-btn:hover { color: var(--text); border-color: var(--gold); background: rgba(139,105,20,0.08); }
 
-/* ══════════════════════════════════════════════
-   FIGURE MODAL
-   ══════════════════════════════════════════════ */
-.figure-overlay {
-  position: fixed; inset: 0;
-  backdrop-filter: blur(6px);
-  z-index: 100;
-  display: none; align-items: center; justify-content: center;
-  padding: 1.5rem;
-  opacity: 0; transition: opacity 0.25s ease;
-}
-.palette-eastertide .figure-overlay { background: rgba(200,190,170,0.6); }
-.palette-pentecost  .figure-overlay { background: rgba(5,3,8,0.78); }
+.figure-overlay { position: fixed; inset: 0; backdrop-filter: blur(6px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 1.5rem; opacity: 0; transition: opacity 0.25s ease; background: rgba(200,190,170,0.6); }
+.palette-lent .figure-overlay, .palette-goodfriday .figure-overlay, .palette-pentecost .figure-overlay { background: rgba(5,3,8,0.78); }
 .figure-overlay.open { display: flex; opacity: 1; }
-.figure-card {
-  background: var(--panel);
-  border: 1px solid var(--accent-soft);
-  max-width: 420px; width: 100%;
-  max-height: 82vh; overflow-y: auto;
-  padding: 2rem 1.8rem 1.8rem;
-  position: relative;
-  box-shadow: 0 16px 50px rgba(0,0,0,0.14);
-}
-.palette-pentecost .figure-card { box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
-.figure-card .close {
-  position: absolute; top: 0.8rem; right: 1rem;
-  background: none; border: none; color: var(--dim);
-  font-size: 1.5rem; cursor: pointer; line-height: 1; padding: 0.25rem 0.5rem;
-}
+.figure-card { background: var(--panel); border: 1px solid var(--accent-soft); max-width: 420px; width: 100%; max-height: 82vh; overflow-y: auto; padding: 2rem 1.8rem 1.8rem; position: relative; box-shadow: 0 16px 50px rgba(0,0,0,0.14); }
+.figure-card .close { position: absolute; top: 0.8rem; right: 1rem; background: none; border: none; color: var(--dim); font-size: 1.5rem; cursor: pointer; line-height: 1; padding: 0.25rem 0.5rem; }
 .figure-card .close:hover { color: var(--text); }
-.figure-eyebrow {
-  font-family: 'Raleway', sans-serif; font-size: 0.55rem; font-weight: 500;
-  letter-spacing: 0.35em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem;
-}
-.figure-name {
-  font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; font-weight: 400;
-  letter-spacing: 0.04em; color: var(--text); margin-bottom: 0.3rem; line-height: 1.2;
-}
-.figure-dates {
-  font-family: 'Libre Baskerville', serif; font-size: 0.8rem;
-  font-style: italic; color: var(--dim); margin-bottom: 0.4rem;
-}
-.figure-role {
-  font-family: 'Raleway', sans-serif; font-size: 0.58rem; font-weight: 400;
-  letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim);
-  margin-bottom: 1.2rem; opacity: 0.8;
-}
+.figure-eyebrow { font-family: 'Raleway', sans-serif; font-size: 0.55rem; font-weight: 500; letter-spacing: 0.35em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+.figure-name { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; font-weight: 400; letter-spacing: 0.04em; color: var(--text); margin-bottom: 0.3rem; line-height: 1.2; }
+.figure-dates { font-family: 'Libre Baskerville', serif; font-size: 0.8rem; font-style: italic; color: var(--dim); margin-bottom: 0.4rem; }
+.figure-role { font-family: 'Raleway', sans-serif; font-size: 0.58rem; font-weight: 400; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); margin-bottom: 1.2rem; opacity: 0.8; }
 .figure-divider { width: 32px; height: 1px; background: var(--accent); margin-bottom: 1.2rem; }
-.figure-body {
-  font-family: 'Libre Baskerville', serif; font-size: 0.95rem; line-height: 1.85; color: var(--text);
-}
+.figure-body { font-family: 'Libre Baskerville', serif; font-size: 0.95rem; line-height: 1.85; color: var(--text); }
 
-@media (min-width: 700px) {
-  .screen { padding: 3.8rem 3.5rem 4.5rem 3rem; }
-}
+@media (min-width: 700px) { .screen { padding: 3.8rem 3.5rem 4.5rem 3rem; } }
 </style>
 </head>
 <body>
 
 <div class="app palette-eastertide" id="app">
-
   <div class="top-bar">
     <div class="brand">Vigil</div>
     <div class="day-meta-date" id="dayMetaDate"></div>
   </div>
-
   <div class="screens-wrapper">
     <div class="screens-container" id="screens"></div>
   </div>
-
   <nav class="nav-dots" id="dots" aria-label="Screen navigation"></nav>
   <div class="swipe-hint" id="swipeHint">↑ swipe ↓</div>
   <div class="screen-counter" id="counter">1 / 6</div>
   <div class="day-picker" id="dayPicker"></div>
-
   <div class="figure-overlay" id="figureOverlay" role="dialog" aria-modal="true" aria-labelledby="figureName">
     <div class="figure-card">
       <button class="close" id="figureClose" aria-label="Close">×</button>
@@ -615,360 +264,1064 @@ body { overflow: hidden; }
       <div class="figure-body" id="figureBody"></div>
     </div>
   </div>
-
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════════════════
-   VIGIL · MAY 2026 · TEST MODEL v3
-   ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   VIGIL — generated by vigil_build.py
+   ═══════════════════════════════════════════════════════════ */
 
-/* ── CONTENT DATA ───────────────────────────────────────────── */
 const DAYS = [
+  {
+    date: "18 Feb 2026",
+    paletteCls: "palette-lent",
+    paletteVars: {
+      "--bg":          "#241E1A",
+      "--panel":       "#2E2520",
+      "--accent":      "#7A3B28",
+      "--accent-soft": "rgba(122,59,40,0.25)",
+      "--text":        "#EDE0C8",
+      "--dim":         "#9A8A78",
+      "--gold":        "#C49A50",
+      "--shell":       "#1A1612"
+    },
+    topBarLines: ["Lent", "ASH WEDNESDAY"],
+    screens: {
+      season:        `
+    <div class="season-heading">ASH WEDNESDAY</div>
+    <div class="season-sub sub-primary">Lent</div>
 
-  /* 1 MAY · ABIDE */
+    <div class="season-divider"></div>
+    <div class="season-body"><p>Today is Ash Wednesday, the first day of Lent — the Church&#39;s forty days of preparation for Easter. It begins with ash: a mark on the forehead and the slow turning of the season toward the cross.</p></div>`,
+      word:          `
+    <div class="word-title">ASHES</div>
+    <div class="word-pronunciation">[ash-iz]</div>
+    <div class="word-divider"></div>
+    <div class="word-definition"><p>Ashes are what is left when fire has finished its work — grey dust, the trace of what once was.</p><p>On this day, the Church marks our foreheads with ash and speaks two things over us: that we are dust and to dust we shall return, and that we are called to turn back to God.</p><p>The ash carries both at once — a reminder that we are mortal, and a sign that we are asking for mercy.</p></div>`,
+      scripture:     `
+    <div class="scripture-passage">
+      <div class="scripture-ref">Job 42:5–6</div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>I had heard of you by the hearing of the ear, but now my eye sees you; therefore I despise myself, and repent in dust and ashes.</p></div>
+      </div>
+      <div class="scripture-translation">NRSV</div>
+    </div>`,
+      contemplation: `
+    <div class="contemplation-body"><p>Most days of the year, we do not talk about being mortal. We do not have to. Today, the Church says it out loud and writes it on us in ash.</p><p>It is a strange kindness — to be told the truth about ourselves by people who love us, in a place where the truth is safe. The ash does not accuse. It simply says what is already true.</p><p>The Hebrew word translated as &#39;despise myself&#39; is gentler than it sounds: <button type="button" class="figure-link" data-figure="job">Job</button> is not loathing himself; he is taking back what he said. The book of <button type="button" class="figure-link" data-figure="job">Job</button> is a long argument — <button type="button" class="figure-link" data-figure="job">Job</button> protesting his suffering, demanding answers from God — and only at the end, when God finally speaks, does <button type="button" class="figure-link" data-figure="job">Job</button> fall quiet. What is left is dust, and ashes, and a man at peace.</p></div>
+    <div class="contemplation-question">Where might God be inviting you, today, simply to stop protesting?</div>`,
+      prayer:        `
+    <div class="prayer-body"><p>Lord,</p><p>Today we are marked with ash.</p><p>Remind us that we are dust, and remind us that we are loved.</p><p>Where we have wandered, turn us gently back.</p><p>Hold us as Lent begins, and walk with us through the forty days.</p></div>
+    <div class="prayer-amen">In Christ&#39;s name, Amen.</div>`,
+      practice:      `
+    <div class="practice-body"><p>If you can, go to an Ash Wednesday service today and receive the ashes. If you cannot, pause once during the day and say quietly to yourself the words the priest would have said: Remember that you are dust, and to dust you shall return (Genesis 3:19 — NRSV).</p></div>
+    <div class="practice-anchor">Lent begins by hearing the truth, and trusting that God can work with it.</div>`
+    }
+  },
+  {
+    date: "19 Feb 2026",
+    paletteCls: "palette-lent",
+    paletteVars: {
+      "--bg":          "#241E1A",
+      "--panel":       "#2E2520",
+      "--accent":      "#7A3B28",
+      "--accent-soft": "rgba(122,59,40,0.25)",
+      "--text":        "#EDE0C8",
+      "--dim":         "#9A8A78",
+      "--gold":        "#C49A50",
+      "--shell":       "#1A1612"
+    },
+    topBarLines: ["Lent", "Lent I · Thursday", "Ordinary Lenten Weekday"],
+    screens: {
+      season:        `
+    <div class="season-heading">Lent I · Thursday</div>
+    <div class="season-sub sub-primary">Lent</div>
+<div class="season-sub">Ordinary Lenten Weekday</div>
+
+    <div class="season-divider"></div>
+    <div class="season-body"><p>We are in the first days of Lent. Yesterday&#39;s ash has mostly worn off, and the long work of the season begins quietly — the small daily turning back toward God that Lent is for.</p></div>`,
+      word:          `
+    <div class="word-title">RETURN</div>
+    <div class="word-pronunciation">[ri-turn]</div>
+    <div class="word-divider"></div>
+    <div class="word-definition"><p>To return is to come back to a place, or a person, you had left.</p><p>In Scripture, return is the word the prophets use when they call God&#39;s people home. It does not mean to start again from nothing. It means to face once more in the right direction, and to take a step.</p><p>Lent is full of returns — small ones, mostly — because that is how a life is turned around: not all at once, but again and again.</p></div>`,
+      scripture:     `
+    <div class="scripture-passage">
+      <div class="scripture-ref">Joel 2:12-13</div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>Yet even now, says the Lord, return to me with all your heart, with fasting, with weeping, and with mourning; rend your hearts and not your clothing. Return to the Lord, your God, for he is gracious and merciful, slow to anger, and abounding in steadfast love.</p></div>
+      </div>
+      <div class="scripture-translation">NRSV</div>
+    </div>`,
+      contemplation: `
+    <div class="contemplation-body"><p>The remarkable thing about this passage are the words &quot;even now&quot;.</p><p>Whatever has happened, whatever you have done or failed to do, however far away from God you feel right now — even now. The door is still open.</p><p>Return is not dramatic. It is rarely a single moment of decision; it is the willingness, today, to face the right way again. <button type="button" class="figure-link" data-figure="john_wesley">John Wesley</button> used to say that the Christian life was made of countless small repentances — not one great turning, but a thousand quiet ones. Lent is the season that gives us permission to make some of them.</p></div>
+    <div class="contemplation-question">Where, in your life right now, is God whispering &#39;even now&#39; to you?</div>`,
+      prayer:        `
+    <div class="prayer-body"><p>Lord,</p><p>You are the one who waits.</p><p>Wherever we have wandered, however long we have been away, you have not moved.</p><p>Turn us back today — not all at once, but enough.</p><p>Give us courage for the small return, and for the next one after that.</p></div>
+    <div class="prayer-amen">In Christ&#39;s name, Amen.</div>`,
+      practice:      `
+    <div class="practice-body"><p>Choose one small thing today that you have drifted away from — a person you have not replied to, a habit you meant to keep, a prayer you stopped saying. Do not try to fix it. Just take one step back toward it: a message, a minute, an opened door.</p></div>
+    <div class="practice-anchor">Return is rarely dramatic. It is mostly the willingness to face again what you had begun to look away from.</div>`
+    }
+  },
+  {
+    date: "20 Feb 2026",
+    paletteCls: "palette-lent",
+    paletteVars: {
+      "--bg":          "#241E1A",
+      "--panel":       "#2E2520",
+      "--accent":      "#7A3B28",
+      "--accent-soft": "rgba(122,59,40,0.25)",
+      "--text":        "#EDE0C8",
+      "--dim":         "#9A8A78",
+      "--gold":        "#C49A50",
+      "--shell":       "#1A1612"
+    },
+    topBarLines: ["Lent", "Lent I · Friday", "Ordinary Lenten Weekday"],
+    screens: {
+      season:        `
+    <div class="season-heading">Lent I · Friday</div>
+    <div class="season-sub sub-primary">Lent</div>
+<div class="season-sub">Ordinary Lenten Weekday</div>
+
+    <div class="season-divider"></div>
+    <div class="season-body"><p>We are still in the first days of Lent. Friday has long been a day of fasting in the Church — a small weekly remembering of the cross — and in Lent that quiet discipline deepens.</p></div>`,
+      word:          `
+    <div class="word-title">FAST</div>
+    <div class="word-pronunciation">[fahst]</div>
+    <div class="word-divider"></div>
+    <div class="word-definition"><p>To fast is to go without food, or without something we usually rely on, for a set time and for God&#39;s sake.</p><p>In Scripture, fasting is what people do when they are serious — when they want to listen, to repent, to ask, to wait. It is not about earning anything. It is about clearing a space.</p><p><button type="button" class="figure-link" data-figure="st_john_chrysostom">St John Chrysostom</button>, the great preacher of the early Church, used to remind his congregation that the truest fast is not the empty stomach but the disciplined heart: fasting from food is only worth doing if it helps us also fast from anger, from grudges, from the small unkindnesses we carry without noticing.</p></div>`,
+      scripture:     `
+    <div class="scripture-passage">
+      <div class="scripture-ref"></div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>Is not this the fast that I choose: to loose the bonds of injustice, to undo the thongs of the yoke, to let the oppressed go free, and to break every yoke? Is it not to share your bread with the hungry, and bring the homeless poor into your house? Isaiah 58:6-7 —NRSV</p></div>
+      </div>
+      <div class="scripture-translation"></div>
+    </div>`,
+      contemplation: `
+    <div class="contemplation-body"><p><button type="button" class="figure-link" data-figure="isaiah">Isaiah</button> is doing something startling here. The people have been fasting properly — going without food, wearing sackcloth, bowing their heads — and God&#39;s reply is essentially: that is not the fast I want.</p><p>The fast God wants is the one that loosens something. The empty stomach is meant to make space for a different kind of attention: to the people we have stopped seeing, the bonds we could untie if we noticed them, the bread we have and could share. A Lenten fast that leaves us hungry but no kinder has missed the point.</p><p>This is not a rebuke of going without food. It is a reminder of what going without food is for.</p></div>
+    <div class="contemplation-question">Where is your fast asking to become a kindness?</div>`,
+      prayer:        `
+    <div class="prayer-body"><p>Lord,</p><p>Today we fast — in small ways, perhaps, but really.</p><p>Let the hunger we feel turn us outward, not inward.</p><p>Loosen what we have been holding too tightly.</p><p>Make room in us, by what we go without, for what you want to give.</p></div>
+    <div class="prayer-amen">In Christ&#39;s name, Amen.</div>`,
+      practice:      `
+    <div class="practice-body"><p>At one meal today, eat a little less than you want, and do not replace what you&#39;ve left with anything else. Notice the small hollow that follows. Do not rush to fill it.</p></div>
+    <div class="practice-anchor">A fast is not a punishment. It is the practice of letting an emptiness be there long enough to hear what God is asking through it.</div>`
+    }
+  },
+  {
+    date: "21 Feb 2026",
+    paletteCls: "palette-lent",
+    paletteVars: {
+      "--bg":          "#241E1A",
+      "--panel":       "#2E2520",
+      "--accent":      "#7A3B28",
+      "--accent-soft": "rgba(122,59,40,0.25)",
+      "--text":        "#EDE0C8",
+      "--dim":         "#9A8A78",
+      "--gold":        "#C49A50",
+      "--shell":       "#1A1612"
+    },
+    topBarLines: ["Lent", "Lent I · Saturday", "Ordinary Lenten Weekday", "---", "Optional Commemoration", "St. Peter Damian", "Bishop and Doctor of the Church"],
+    screens: {
+      season:        `
+    <div class="season-heading">Lent I · Saturday</div>
+    <div class="season-sub sub-primary">Lent</div>
+<div class="season-sub">Ordinary Lenten Weekday</div>
+<div class="season-sub">---</div>
+<div class="season-sub">Optional Commemoration</div>
+<div class="season-sub">St. Peter Damian</div>
+<div class="season-sub">Bishop and Doctor of the Church</div>
+
+    <div class="season-divider"></div>
+    <div class="season-body"><p>We are nearing the end of the first week of Lent. Tomorrow is the First Sunday, when the Church turns its attention to Christ in the desert. Today is a good day to prepare — to let a little silence in before the reading.</p><p>The Church also remembers today <button type="button" class="figure-link" data-figure="st_peter_damian">St Peter Damian</button>, the eleventh-century hermit and reformer who believed that silence was where the soul learned to hear God again.</p></div>`,
+      word:          `
+    <div class="word-title">SILENCE</div>
+    <div class="word-pronunciation">[sigh-lense]</div>
+    <div class="word-divider"></div>
+    <div class="word-definition"><p>Silence is what is left when sound stops. In the spiritual life it is more than that: it is a made space, chosen and held, where the noise that fills our hours is set down for a little while.</p><p>The Church has always known that God speaks most clearly where we are most quiet. Not because God needs silence, but because we do — we cannot hear when we will not stop. Lent is a season for turning the volume down, so that we can hear again things we have been missing: our own hearts, the people around us, the quiet voice of God.</p></div>`,
+      scripture:     `
+    <div class="scripture-passage">
+      <div class="scripture-ref">1 Kings 19:11–12</div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>Now there was a great wind, so strong that it was splitting mountains and breaking rocks in pieces before the Lord, but the Lord was not in the wind; and after the wind an earthquake, but the Lord was not in the earthquake; and after the earthquake a fire, but the Lord was not in the fire; and after the fire a sound of sheer silence.</p></div>
+      </div>
+      <div class="scripture-translation">NRSV</div>
+    </div>`,
+      contemplation: `
+    <div class="contemplation-body"><p><button type="button" class="figure-link" data-figure="elijah">Elijah</button> had fled to the mountain in fear and exhaustion, expecting God to come in power — in wind, in fire, in the shaking of the earth. And God was not in any of them. God was in the sound of sheer silence.</p><p>It is a strange phrase — the sound of sheer silence. God came in the last place <button type="button" class="figure-link" data-figure="elijah">Elijah</button> was looking. Not in the noise he thought God ought to make, but in the quiet that remained when all the noise had passed.</p><p>Most of us are surrounded by noise of our own making — the notifications, the background music, the second screen, the voice in our own head keeping track of everything. Lent asks us, gently, to let some of it go. Not all at once, and not forever. Just enough to notice what we could not hear before.</p></div>
+    <div class="contemplation-question">What in your day is making too much noise for God to be heard underneath it?</div>`,
+      prayer:        `
+    <div class="prayer-body"><p>Lord,</p><p>We are noisy people.</p><p>Our days are full of sound, and so are our heads.
+Teach us, in this Lenten season, to turn the volume down.</p><p>Meet us in the quiet we are almost afraid to sit in, and speak, if you will, in the sheer silence.</p></div>
+    <div class="prayer-amen">In Christ&#39;s name, Amen.</div>`,
+      practice:      `
+    <div class="practice-body"><p>At some point today, turn off whatever is making sound around you — music, podcast, television, the phone in your pocket — and stay in the quiet for two minutes without reaching for anything else. You will want to fill it almost immediately. Notice the wanting, and stay anyway.</p></div>
+    <div class="practice-anchor">Silence is the one room in the house where God is not competing for your attention.</div>`
+    }
+  },
+  {
+    date: "22 Feb 2026",
+    paletteCls: "palette-lent",
+    paletteVars: {
+      "--bg":          "#241E1A",
+      "--panel":       "#2E2520",
+      "--accent":      "#7A3B28",
+      "--accent-soft": "rgba(122,59,40,0.25)",
+      "--text":        "#EDE0C8",
+      "--dim":         "#9A8A78",
+      "--gold":        "#C49A50",
+      "--shell":       "#1A1612"
+    },
+    topBarLines: ["Lent", "1ST SUNDAY OF LENT"],
+    screens: {
+      season:        `
+    <div class="season-heading">1ST SUNDAY OF LENT</div>
+    <div class="season-sub sub-primary">Lent</div>
+
+    <div class="season-divider"></div>
+    <div class="season-body"><p>Today is the First Sunday of Lent. The Gospel at every altar across the Western Church this morning is the same: the story of Jesus led by the Spirit into the wilderness, where for forty days he fasted and was tempted.</p><p>Our own forty days find their pattern there.</p></div>`,
+      word:          `
+    <div class="word-title">DESERT</div>
+    <div class="word-pronunciation">[dez-urt]</div>
+    <div class="word-divider"></div>
+    <div class="word-definition"><p>A desert is a stripped place — no soft distractions, no easy comforts, only the land and the sky and whatever you have brought with you.</p><p>In the Christian tradition, the desert is where God meets people who have run out of ways to avoid him. Moses met God there. The children of Israel walked through it for forty years. Jesus spent forty days in it before his ministry began.</p><p>The desert is never chosen because it is comfortable. It is chosen — or given — because it is the place where pretending becomes impossible.</p></div>`,
+      scripture:     `
+    <div class="scripture-passage">
+      <div class="scripture-ref">Luke 4:1–2</div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>Jesus, full of the Holy Spirit, returned from the Jordan and was led by the Spirit in the wilderness, where for forty days he was tempted by the devil. He ate nothing at all during those days, and when they were over, he was famished.</p></div>
+      </div>
+      <div class="scripture-translation">NRSV</div>
+    </div>`,
+      contemplation: `
+    <div class="contemplation-body"><p>It is the Holy Spirit who leads Jesus into the wilderness. Not the devil, not chance, not a wrong turning — the Spirit. Whatever else the desert is, it is not a place God has forgotten; it is a place God has chosen.</p><p>Most of us will not go to a literal desert this Lent. But most of us know something of the desert from the inside — the stretch of difficulty, the season of waiting, the quiet stripping-away of what we thought we needed. The witness of Scripture is that these places are not godforsaken. They are, quite often, the places where we finally hear.</p><p><button type="button" class="figure-link" data-figure="st_anthony_of_egypt">St Anthony of Egypt</button> fled to the desert not to escape life but to meet it without anaesthetic. He used to say: go to your cell, and your cell will teach you everything. It is the same instinct. The stripped place is the school.</p></div>
+    <div class="contemplation-question">What is the desert you are in right now — and what might it be trying to teach you?</div>`,
+      prayer:        `
+    <div class="prayer-body"><p>Lord,</p><p>You were led into the wilderness, and you did not refuse it.</p><p>When we find ourselves in stripped places — by choice or by circumstance — remind us that you have been there first.</p><p>Do not let us run from what the desert has to teach us.</p><p>Meet us there, as the Spirit met you, and walk us through the forty days.</p></div>
+    <div class="prayer-amen">In Christ&#39;s name, Amen.</div>`,
+      practice:      `
+    <div class="practice-body"><p>Today, walk somewhere on foot that you would normally drive or take transport to — even a short distance. Leave a few minutes earlier than you need to. Do not listen to anything on the way.</p></div>
+    <div class="practice-anchor">The desert was never empty. It was simply the place stripped of distraction enough that the questions could finally be heard.</div>`
+    }
+  },
+  {
+    date: "23 February 2026",
+    paletteCls: "palette-lent",
+    paletteVars: {
+      "--bg":          "#241E1A",
+      "--panel":       "#2E2520",
+      "--accent":      "#7A3B28",
+      "--accent-soft": "rgba(122,59,40,0.25)",
+      "--text":        "#EDE0C8",
+      "--dim":         "#9A8A78",
+      "--gold":        "#C49A50",
+      "--shell":       "#1A1612"
+    },
+    topBarLines: ["Lent", "Lent I · Monday", "Ordinary Lenten Weekday", "---", "Optional Commemoration", "St. Polycarp of Smyrna,", "Bishop and Martyr"],
+    screens: {
+      season:        `
+    <div class="season-heading">Lent I · Monday</div>
+    <div class="season-sub sub-primary">Lent</div>
+<div class="season-sub">Ordinary Lenten Weekday</div>
+<div class="season-sub">---</div>
+<div class="season-sub">Optional Commemoration</div>
+<div class="season-sub">St. Polycarp of Smyrna,</div>
+<div class="season-sub">Bishop and Martyr</div>
+
+    <div class="season-divider"></div>
+    <div class="season-body"><p>Yesterday the Church heard the story of Jesus led into the wilderness.</p><p>Today that story continues — not with the landscape, but with what met him there.</p><p>The optional commemoration today is <button type="button" class="figure-link" data-figure="st_polycarp">St Polycarp</button> of Smyrna, a disciple of the apostle John, who was martyred in the second century for refusing to renounce Christ. His testing came at the end of a long life; Christ&#39;s came at the beginning of his ministry.</p></div>`,
+      word:          `
+    <div class="word-title">TEMPTATION</div>
+    <div class="word-pronunciation">[temp-tay-shun]</div>
+    <div class="word-divider"></div>
+    <div class="word-definition"><p>A testing that reveals what is really there. The Greek peirasmos (πειρασμός) means both temptation and trial — not because the difference does not matter, but because the same experience can be both: what tests you also shows you what you are made of.</p><p>In the wilderness, the devil does not offer Jesus anything evil. He offers bread to a starving man, authority to one who will one day hold all authority, and a chance of rescue to the one God has promised to protect.</p><p>Each offer is real and reasonable — what makes it a temptation is that it asks Jesus to seize for himself what God has not yet given, on terms that bypass trust entirely.</p></div>`,
+      scripture:     `
+    <div class="scripture-passage">
+      <div class="scripture-ref">Matthew 4:3–4</div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>The tempter came and said to him, &#39;If you are the Son of God, command these stones to become loaves of bread.&#39; But he answered, &#39;It is written, &quot;One does not live by bread alone, but by every word that comes from the mouth of God.&quot;</p></div>
+      </div>
+      <div class="scripture-translation">NRSV</div>
+    </div>`,
+      contemplation: `
+    <div class="contemplation-body"><p>Notice what the devil says: if you are the Son of God. The temptation begins not with desire but with identity — with the quiet question of whether you are really who God says you are, and whether God can really be trusted to provide.</p><p>Jesus had just been baptised. The voice from heaven had just said: This is my beloved Son. And the very first thing that happens afterward is that the claim is tested. Not in a lecture hall, but in a desert, on an empty stomach, with no one watching.</p><p>Most of us are not tempted by spectacular sin. We are tempted by the plausible short cut — the thing we could have, or could be, if we stopped waiting and took it for ourselves. The bread is not wrong. The hunger is real. What is being tested is whether we trust the one who promised to feed us.</p></div>
+    <div class="contemplation-question">What are you reaching for right now that God has not yet given — and what would it cost to wait?</div>`,
+      prayer:        `
+    <div class="prayer-body"><p>Lord,</p><p>You were hungry and you did not take the short cut.</p><p>When we are tested — not by dramatic evil, but by the reasonable thing at the wrong time — give us the grace to wait.</p><p>Teach us to trust your word more than our appetite.</p><p>Where we have already reached for what was not yet ours, forgive us, and set us again on the longer road.</p></div>
+    <div class="prayer-amen">In Christ&#39;s name, Amen.</div>`,
+      practice:      `
+    <div class="practice-body"><p>At some point today, you will want something — a reply, a resolution, a comfort — before it is ready to be had. When you notice the reaching, pause. Do not take it yet. Stay in the wanting for a moment longer than is comfortable.</p></div>
+    <div class="practice-anchor">The wilderness is not where God abandons us to hunger. It is where we learn the difference between what we want and what we need.</div>`
+    }
+  },
+  {
+    date: "24 February 2026",
+    paletteCls: "palette-lent",
+    paletteVars: {
+      "--bg":          "#241E1A",
+      "--panel":       "#2E2520",
+      "--accent":      "#7A3B28",
+      "--accent-soft": "rgba(122,59,40,0.25)",
+      "--text":        "#EDE0C8",
+      "--dim":         "#9A8A78",
+      "--gold":        "#C49A50",
+      "--shell":       "#1A1612"
+    },
+    topBarLines: ["Lent", "Lent I · Tuesday", "Ordinary Lenten Weekday"],
+    screens: {
+      season:        `
+    <div class="season-heading">Lent I · Tuesday</div>
+    <div class="season-sub sub-primary">Lent</div>
+<div class="season-sub">Ordinary Lenten Weekday</div>
+
+    <div class="season-divider"></div>
+    <div class="season-body"><p>We are one week into Lent. The first days have carried the large gestures — ash, fasting, the wilderness. Now the season settles into its quieter work: the daily discipline of going without, and of noticing what the going-without uncovers.</p></div>`,
+      word:          `
+    <div class="word-title">HUNGER</div>
+    <div class="word-pronunciation">[hung-gur]</div>
+    <div class="word-divider"></div>
+    <div class="word-definition"><p>The body&#39;s honest signal that something essential is missing. Hunger is not a failure — it is the way a creature knows it cannot sustain itself.</p><p>In Scripture, hunger is never merely physical. The Hebrew ra&#39;ev (רָעֵב) describes the gut-level emptiness of the genuinely deprived, but the Bible keeps pressing the word further: toward the hunger for God, for justice, for the world to be set right.</p><p>The Beatitudes bless those who hunger and thirst for righteousness — not because wanting is comfortable, but because wanting is the beginning of receiving.</p></div>`,
+      scripture:     `
+    <div class="scripture-passage">
+      <div class="scripture-ref">Matthew 5:6</div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>Blessed are those who hunger and thirst for righteousness, for they will be filled.</p></div>
+      </div>
+      <div class="scripture-translation">NRSV</div>
+    </div>`,
+      contemplation: `
+    <div class="contemplation-body"><p>There is something unsettling about this beatitude. Jesus does not say: blessed are the righteous. He says: blessed are those who hunger for it. The blessing is on the wanting, not the having.</p><p>Most of us are not comfortable with hunger. We eat before we are hungry, answer before we have listened, scroll before we are bored. Our instinct is to close every gap the moment it opens. Lent asks us not to — not because hunger is good in itself, but because it tells the truth about us. We are creatures who cannot fill ourselves.</p><p>Deuteronomy says that God let Israel go hungry in the wilderness so that they would learn that one does not live by bread alone. The hunger was the lesson. It was not a punishment but a revelation: that underneath every physical appetite there is a deeper one, and only God can meet it.</p></div>
+    <div class="contemplation-question">What are you hungry for that no amount of bread has ever touched?</div>`,
+      prayer:        `
+    <div class="prayer-body"><p>Lord,</p><p>We are hungry — for things we can name, and for things we cannot.</p><p>Teach us not to be afraid of the emptiness.</p><p>Where we rush to fill what only you can satisfy, slow us down.</p><p>Give us the courage to stay hungry long enough to discover what we actually need.</p></div>
+    <div class="prayer-amen">In Christ&#39;s name, Amen.</div>`,
+      practice:      `
+    <div class="practice-body"><p>Before your next meal today, wait ten minutes longer than you normally would. Not as a punishment, but as an act of attention. Notice what the hunger feels like in your body — and notice, too, what your mind reaches for when you are not feeding it.</p></div>
+    <div class="practice-anchor">Hunger is the body&#39;s way of telling the truth: that we are not self-sustaining, and were never meant to be.</div>`
+    }
+  },
+  {
+    date: "25 February 2026",
+    paletteCls: "palette-lent",
+    paletteVars: {
+      "--bg":          "#241E1A",
+      "--panel":       "#2E2520",
+      "--accent":      "#7A3B28",
+      "--accent-soft": "rgba(122,59,40,0.25)",
+      "--text":        "#EDE0C8",
+      "--dim":         "#9A8A78",
+      "--gold":        "#C49A50",
+      "--shell":       "#1A1612"
+    },
+    topBarLines: ["Lent", "Lent I · Wednesday", "Ordinary Lenten Weekday"],
+    screens: {
+      season:        `
+    <div class="season-heading">Lent I · Wednesday</div>
+    <div class="season-sub sub-primary">Lent</div>
+<div class="season-sub">Ordinary Lenten Weekday</div>
+
+    <div class="season-divider"></div>
+    <div class="season-body"><p>A full week of Lent has passed. The season is no longer new — the first intensity has settled, and what remains is the daily work of it. This is the part of Lent that most resembles ordinary life: not the dramatic gesture, but the quiet keeping-on.</p></div>`,
+      word:          `
+    <div class="word-title">DUST</div>
+    <div class="word-pronunciation">[dust]</div>
+    <div class="word-divider"></div>
+    <div class="word-definition"><p>The fine, dry earth from which, according to Genesis, we were made. The Hebrew is &#39;aphar (עָפָר) — the loose soil of the ground, the stuff that blows away in the wind.</p><p>On Ash Wednesday the Church told us we are dust. It was not an insult. In Genesis, dust is the raw material God reached for when he wanted to make something beloved. The human creature — adam from adamah, earth-creature from the earth — begins not in heaven but in the dirt, shaped by hands that knew exactly what they were working with.</p><p><button type="button" class="figure-link" data-figure="st_irenaeus_of_lyon">St Irenaeus of Lyon</button>, writing in the second century, saw in this image the whole shape of salvation: God&#39;s hands in the clay, making and remaking us with infinite patience.</p></div>`,
+      scripture:     `
+    <div class="scripture-passage">
+      <div class="scripture-ref">Genesis 2:7</div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>Then the LORD God formed man from the dust of the ground, and breathed into his nostrils the breath of life; and the man became a living being.</p></div>
+      </div>
+      <div class="scripture-translation">NRSV</div>
+    </div>
+    <div class="scripture-passage">
+      <div class="scripture-ref">Psalm 103:14</div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>For he knows how we were made; he remembers that we are dust.</p></div>
+      </div>
+      <div class="scripture-translation">NRSV</div>
+    </div>`,
+      contemplation: `
+    <div class="contemplation-body"><p>There is an extraordinary intimacy in this image. God does not speak the human into existence from a distance. He works with his hands in the dirt.</p><p>And then he breathes his own breath into the nostrils of a figure made of dust. The distance between God and the stuff of the earth is not as great as we imagine. God is not embarrassed by dust. He chose it.</p><p>Psalm 103 says God remembers that we are dust — which means, quietly, that we are the ones who forget. We forget that we are fragile, limited, mortal. We build as though we will last for ever, and are surprised each time we don&#39;t. God is not surprised. He has always known what he was working with, and has not put us down.</p></div>
+    <div class="contemplation-question">What would change if you believed that God is not disappointed by your limitations, but has always known them?</div>`,
+      prayer:        `
+    <div class="prayer-body"><p>Lord,</p><p>You made us from the dust, and you have not forgotten it.</p><p>Where we pretend to be more than we are, humble us gently.</p><p>Where we believe we are less than you made us, remind us whose breath is in us.</p><p>Hold what is fragile in us without despising it, and make of this dust whatever you will.</p></div>
+    <div class="prayer-amen">In Christ&#39;s name, Amen.</div>`,
+      practice:      `
+    <div class="practice-body"><p>If you can, go outside today and touch the ground — soil, grass, earth, whatever is beneath your feet. Hold it for a moment. This is the stuff you are made of.</p></div>
+    <div class="practice-anchor">You are not less for being dust. You are dust that God breathed into, and called good, and has not stopped holding.</div>`
+    }
+  },
+  {
+    date: "26 February 2026",
+    paletteCls: "palette-lent",
+    paletteVars: {
+      "--bg":          "#241E1A",
+      "--panel":       "#2E2520",
+      "--accent":      "#7A3B28",
+      "--accent-soft": "rgba(122,59,40,0.25)",
+      "--text":        "#EDE0C8",
+      "--dim":         "#9A8A78",
+      "--gold":        "#C49A50",
+      "--shell":       "#1A1612"
+    },
+    topBarLines: ["Lent", "Lent I · Thursday", "Ordinary Lenten Weekday"],
+    screens: {
+      season:        `
+    <div class="season-heading">Lent I · Thursday</div>
+    <div class="season-sub sub-primary">Lent</div>
+<div class="season-sub">Ordinary Lenten Weekday</div>
+
+    <div class="season-divider"></div>
+    <div class="season-body"><p>We are nearing the end of the second week of Lent.</p><p>The season has its own rhythm now — the daily returning, the small going-without, the slow attention to what is usually drowned out.</p><p>For many, Lent begins to feel less like a decision and more like a landscape: somewhere we are living, not just visiting.</p></div>`,
+      word:          `
+    <div class="word-title">EXILE</div>
+    <div class="word-pronunciation">[ex-ile]</div>
+    <div class="word-divider"></div>
+    <div class="word-definition"><p>To be separated from the place where you belong. The Hebrew galut (גָּלוּת) carries the weight of forced removal — not wandering by choice, but being taken from home and set down somewhere foreign, with no certainty of return.</p><p>In Scripture, exile is the great catastrophe: the people of God uprooted from the land God gave them, the Temple destroyed, the songs of Zion silenced. But the prophets — <button type="button" class="figure-link" data-figure="jeremiah">Jeremiah</button> above all — insisted that God had not left with the furniture. He was present in the exile itself, working in the place that felt most godforsaken.</p></div>`,
+      scripture:     `
+    <div class="scripture-passage">
+      <div class="scripture-ref">Psalm 137:1–4</div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>By the rivers of Babylon — there we sat down and there we wept when we remembered Zion. On the willows there we hung up our harps. For there our captors asked us for songs, and our tormentors asked for mirth, saying, &#39;Sing us one of the songs of Zion!&#39; How could we sing the LORD&#39;s song in a foreign land?</p></div>
+      </div>
+      <div class="scripture-translation">NRSV</div>
+    </div>`,
+      contemplation: `
+    <div class="contemplation-body"><p>The exiles hung their harps in the trees. It is one of the saddest images in Scripture — not anger, not protest, just the quiet recognition that the music no longer fits. The song of Zion cannot be sung in Babylon. Something has been lost that cannot be performed on demand.</p><p>Most of us know a version of this. Not necessarily a geographical exile, but the interior kind: the season when the familiar places of faith go quiet, when prayer feels like speaking into an empty room, when the practices that once sustained us seem to belong to a life we no longer live. Lent does not pretend this does not happen. It makes room for it.</p></div>
+    <div class="contemplation-question">Where in your life are you trying to sing an old song in a place that no longer fits — and what new song might be waiting to be written?</div>`,
+      prayer:        `
+    <div class="prayer-body"><p>Lord,</p><p>W do not always feel at home — in the world, in the Church, sometimes even in our own prayers.</p><p>Where we are exiled from the places we thought we belonged, do not leave us there alone.</p><p>Teach us to find you in the foreign land, and give us a song we can sing even here.</p></div>
+    <div class="prayer-amen">In Christ&#39;s name, Amen.</div>`,
+      practice:      `
+    <div class="practice-body"><p>At some point today, think of one place in your life where you feel out of place — a relationship, a community, a practice, a prayer that no longer works the way it once did. Do not try to fix it today. Simply name it honestly, to yourself or to God.</p></div>
+    <div class="practice-anchor">Exile is not always a punishment. Sometimes it is the place where the old song ends and a truer one begins.</div>`
+    }
+  },
+  {
+    date: "27 February 2026",
+    paletteCls: "palette-lent",
+    paletteVars: {
+      "--bg":          "#241E1A",
+      "--panel":       "#2E2520",
+      "--accent":      "#7A3B28",
+      "--accent-soft": "rgba(122,59,40,0.25)",
+      "--text":        "#EDE0C8",
+      "--dim":         "#9A8A78",
+      "--gold":        "#C49A50",
+      "--shell":       "#1A1612"
+    },
+    topBarLines: ["Lent", "Lent I · Friday", "Ordinary Lenten Weekday", "---", "Optional Commemoration", "St. Gregory of Narek,", "Abbot and Doctor of the Church"],
+    screens: {
+      season:        `
+    <div class="season-heading">Lent I · Friday</div>
+    <div class="season-sub sub-primary">Lent</div>
+<div class="season-sub">Ordinary Lenten Weekday</div>
+<div class="season-sub">---</div>
+<div class="season-sub">Optional Commemoration</div>
+<div class="season-sub">St. Gregory of Narek,</div>
+<div class="season-sub">Abbot and Doctor of the Church</div>
+
+    <div class="season-divider"></div>
+    <div class="season-body"><p>Today is the second Friday of Lent, and the day the Church has always kept for the remembrance of the cross. Today the optional commemoration is <button type="button" class="figure-link" data-figure="st_gregory_of_narek">St Gregory of Narek</button>, a tenth-century Armenian monk and poet whose ninety-five prayers of lamentation have been called one of the great spiritual works of medieval Christendom.</p></div>`,
+      word:          `
+    <div class="word-title">SORROW</div>
+    <div class="word-pronunciation">[sor-oh]</div>
+    <div class="word-divider"></div>
+    <div class="word-definition"><p>A weight carried in the chest — the soul&#39;s response to what has been lost, or broken, or not yet healed. Sorrow is not the same as despair. Despair believes nothing can change; sorrow grieves because it knows that things matter.</p><p>In the Christian tradition, sorrow has always been given room. The Psalms are full of it. The prophets weep. Jesus himself wept at the grave of his friend, Lazarus.</p><p><button type="button" class="figure-link" data-figure="st_gregory_of_narek">St Gregory of Narek</button>, writing from his monastery in tenth-century, spent the last years of his life composing prayers that begin, again and again, from the depths of honest grief — not to have the grief taken away, but because sorrow brought into the presence of God is no longer sorrow carried alone, and that makes it bearable in a way that solitude never does.</p></div>`,
+      scripture:     `
+    <div class="scripture-passage">
+      <div class="scripture-ref">Psalm 34:18</div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>The LORD is near to the brokenhearted, and saves the crushed in spirit.</p></div>
+      </div>
+      <div class="scripture-translation">NRSV</div>
+    </div>`,
+      contemplation: `
+    <div class="contemplation-body"><p>The psalm does not say that God removes the sorrow. It says that God is near to it. There is a difference, and it matters.</p><p>We are trained to fix things — to solve, resolve, move on, get over it. Lent does not ask us to do any of those things with our sorrow. It asks us to bring it. Not to display it, not to wallow in it, but to set it down honestly in the presence of the one who already knows it is there.</p><p>The brokenhearted are not a special category of unusually afflicted people. They are anyone who has loved something enough to grieve when it is damaged. Lent makes room for this — not as a problem to be solved, but as a kind of prayer.</p></div>
+    <div class="contemplation-question">What sorrow are you carrying that you have not yet set down in front of God — not to have it fixed, but simply to have it known?</div>`,
+      prayer:        `
+    <div class="prayer-body"><p>Lord,</p><p>You are near to the brokenhearted — nearer, perhaps, than to anyone else.</p><p>We bring you what is heavy in us today: the grief we have named and the grief we have not.</p><p>Do not fix it yet, if that is not what is needed.</p><p>Just be near.</p><p>Let that be enough for now.</p></div>
+    <div class="prayer-amen">In Christ&#39;s name, Amen.</div>`,
+      practice:      `
+    <div class="practice-body"><p>At some point today, name one sorrow you are carrying — to yourself, or quietly to God. You do not need to explain it, justify it, or ask for it to be taken away. Simply say what it is.</p></div>
+    <div class="practice-anchor">Sorrow that is named in the presence of God is no longer sorrow carried alone. That is not a solution. It is something older and more honest than a solution.</div>`
+    }
+  },
+  {
+    date: "28 February 2026",
+    paletteCls: "palette-lent",
+    paletteVars: {
+      "--bg":          "#241E1A",
+      "--panel":       "#2E2520",
+      "--accent":      "#7A3B28",
+      "--accent-soft": "rgba(122,59,40,0.25)",
+      "--text":        "#EDE0C8",
+      "--dim":         "#9A8A78",
+      "--gold":        "#C49A50",
+      "--shell":       "#1A1612"
+    },
+    topBarLines: ["Lent", "Lent I · Saturday", "Ordinary Lenten Weekday"],
+    screens: {
+      season:        `
+    <div class="season-heading">Lent I · Saturday</div>
+    <div class="season-sub sub-primary">Lent</div>
+<div class="season-sub">Ordinary Lenten Weekday</div>
+
+    <div class="season-divider"></div>
+    <div class="season-body"><p>Tomorrow is the Second Sunday of Lent — the Transfiguration.</p><p>Today is the pause before it: the last day of the first full week, a Saturday, the day that in the Jewish tradition is made for rest and in the Christian tradition carries the quiet memory of the day Christ lay in the tomb.</p><p>A good day for waiting.</p></div>`,
+      word:          `
+    <div class="word-title">WAITING</div>
+    <div class="word-pronunciation">[way-ting]</div>
+    <div class="word-divider"></div>
+    <div class="word-definition"><p>To remain where you are, without the thing you are waiting for, for longer than you would choose. The Hebrew qavah (קָוָה) means both to wait and to hope — as if the language itself knows that real waiting is not passive but expectant, a kind of taut attention directed at what has not yet come.</p><p><button type="button" class="figure-link" data-figure="simeon">Simeon</button>, the old man in Luke&#39;s Gospel, waited his whole life to see the Messiah. The Holy Spirit had told him he would not die before the promise was fulfilled. But when the moment finally came, it looked nothing like a throne room. It looked like a baby in a temple, placed in the arms of a man who had almost run out of time.</p></div>`,
+      scripture:     `
+    <div class="scripture-passage">
+      <div class="scripture-ref">Luke 2:25–26</div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>Now there was a man in Jerusalem whose name was Simeon; this man was righteous and devout, looking forward to the consolation of Israel, and the Holy Spirit rested on him. It had been revealed to him by the Holy Spirit that he would not see death before he had seen the Lord&#39;s Messiah.</p></div>
+      </div>
+      <div class="scripture-translation">NRSV</div>
+    </div>`,
+      contemplation: `
+    <div class="contemplation-body"><p><button type="button" class="figure-link" data-figure="simeon">Simeon</button> was not waiting for an idea. He was waiting for a person — and he had no way of knowing when, or how, or in what form. All he had was a promise and a lifetime of ordinary days in which to hold it.</p><p>Most of us are waiting for something: a healing, a resolution, a sign that God has not forgotten what he said. Lent does not resolve that waiting. It sanctifies it — it says that the waiting itself is a form of faithfulness, not a failure of it.</p><p>When the moment came, <button type="button" class="figure-link" data-figure="simeon">Simeon</button> recognised it. A lifetime of attention had trained his eyes. That is what faithful waiting does: it does not shorten the delay, but it makes us ready for what comes.</p></div>
+    <div class="contemplation-question">What are you waiting for — and what kind of person is the waiting making you?</div>`,
+      prayer:        `
+    <div class="prayer-body"><p>Lord,</p><p>We are waiting — for things we can name, and for things we cannot.</p><p>Where the waiting is long, keep us faithful.</p><p>Where it is dark, keep us attentive.</p><p>Make us ready, like <button type="button" class="figure-link" data-figure="simeon">Simeon</button>, to recognise you when you come in ways we did not expect.</p></div>
+    <div class="prayer-amen">In Christ&#39;s name, Amen.</div>`,
+      practice:      `
+    <div class="practice-body"><p>Name one thing you are waiting for — something unresolved, unanswered, not yet given. Say it to God simply, without asking for it to be hurried. Then carry it through the day as a prayer rather than a problem: each time it surfaces, let it turn you toward God instead of toward anxiety.</p></div>
+    <div class="practice-anchor"><button type="button" class="figure-link" data-figure="simeon">Simeon</button>&#39;s waiting was not empty. It was the place where his attention was trained, so that when the moment came, he was ready to receive it.</div>`
+    }
+  },
   {
     date: "1 May 2026",
-    palette: "eastertide",
-    screens: {
-      season: {
-        heading: "Easter IV · Friday",
-        subs: [
-          { text: "Eastertide", primary: true },
-          { text: "Optional Memorial" },
-          { text: "St Joseph the Worker" }
-        ],
-        body: `<p>We are deep in Eastertide — the great fifty days between Easter and Pentecost, when the Church lives in the light of the resurrection.</p>
-<p>Today the Church also remembers <button type="button" class="figure-link" data-figure="joseph_worker">St Joseph the Worker</button> — the husband of Mary and earthly father of Jesus — whose feast on this day honours the quiet dignity of labour done faithfully in the presence of God.</p>`
-      },
-      word: {
-        title: "ABIDE",
-        pronunciation: "[uh-byde]",
-        definition: `<p>To remain, to dwell, to make your home in a place. The Greek is <em>menō</em> (μένω) — meaning not merely to stay put, but to take up residence, to live within, to be at home.</p>
-<p>In the vine discourse of <button type="button" class="figure-link" data-figure="john_evangelist">John</button> 15, Jesus says <em>abide in me, and I in you</em> — a mutual indwelling that has no real parallel in ordinary experience. It is more than connection; it is the claim that the life of Christ and the life of the believer can so interpenetrate that the boundary between them becomes, in some sense, porous. The Eastern Christian traditions call this <em>theosis</em> — the life of God shared with the creature, not by the creature's erasure but by the creature's transformation.</p>
-<p>The word has a quietness to it that is easily missed. Abiding is not dramatic. It is the decision, made again each morning, not to walk away.</p>`
-      },
-      scripture: [
-        {
-          ref: `<button type="button" class="figure-link" data-figure="john_evangelist">John</button> 15:4–5`,
-          text: `<p>Abide in me as I abide in you. Just as the branch cannot bear fruit by itself unless it abides in the vine, neither can you unless you abide in me. I am the vine, you are the branches. Those who abide in me and I in them bear much fruit, because apart from me you can do nothing.</p>`,
-          translation: "NRSV"
-        }
-      ],
-      contemplation: {
-        body: `<p>Notice the shape of the invitation.</p>
-<p>Jesus does not say: <em>believe in me</em> or <em>follow me</em> — though he has said both of those before. Instead he says: <em>abide in me</em>. Make your home here. Live in me.</p>
-<p>Abiding is not passive. In the same discourse, Jesus ties it directly to obedience and love: <em>if you keep my commandments, you will abide in my love</em>. The branch that abides is not inert — it is growing, responding, bearing the slow fruit of a life shaped by proximity to Christ. But neither is it self-generated. The branch cannot produce its own life. It receives, and in receiving, it becomes capable of something it could never have been alone.</p>
-<p>Abiding is both gift and discipline, grace and response, something done to us and something we must choose, each day, not to refuse.</p>`,
-        question: "What would it mean, today, not just to believe in Christ but to live in him — and to let him live in you?"
-      },
-      prayer: {
-        body: `<p>Lord,</p>
-<p>You have asked us to abide — to make our home in you, as you make your home in us.</p>
-<p>Where we have settled for connection when you offered indwelling, draw us deeper so we abide in you.</p>
-<p>Where we have tried to live on what we can produce alone, remind us that apart from you we can do nothing — and that with you, we can bear fruit we never imagined.</p>`,
-        amen: "In Christ's name, Amen."
-      },
-      practice: {
-        body: `<p>At some point today, return to a task you do every day — washing up, making tea, walking a familiar route — and as you do it, silently pray: <em>Abide in me, Lord, and let me abide in you.</em> Let the prayer accompany the work, not replace it.</p>`,
-        anchor: `<button type="button" class="figure-link" data-figure="joseph_worker">St Joseph</button> spent his working life shaping wood in the presence of the Word made flesh. Abiding is not the opposite of working. It is working from within a life that is not only your own.`
-      }
+    paletteCls: "palette-eastertide",
+    paletteVars: {
+      "--bg":          "#F5F0E8",
+      "--panel":       "#EDE5D0",
+      "--accent":      "#8B6914",
+      "--accent-soft": "rgba(139,105,20,0.18)",
+      "--text":        "#1E1A14",
+      "--dim":         "#8A7D65",
+      "--gold":        "#8B6914",
+      "--shell":       "#E8E0CC"
     },
-    figures: {
-      joseph_worker: {
-        name: "St Joseph",
-        dates: "1st century AD",
-        role: "Husband of Mary · Earthly father of Jesus · Venerated across all Christian traditions",
-        body: "In Matthew 13:55, Jesus is described as the son of a tekton (τέκτων) — a craftsman, carpenter or builder. His feast on 1 May celebrates him as patron of workers and honours the dignity of ordinary labour done faithfully in the presence of God; work as a form of abiding."
-      },
-      john_evangelist: {
-        name: "St John the Evangelist",
-        dates: "1st century AD",
-        role: "Apostle · Traditionally identified as author of the fourth Gospel",
-        body: "Author of the fourth Gospel, which is often understood as the most theologically dense of the four, using rich symbolism to reveal Jesus' divine identity. The vine discourse of John 15, from which today's scripture is drawn, is part of Jesus's farewell to the disciples on the night before his death — his most intimate teaching on the nature of the believer's life in Christ."
-      }
+    topBarLines: ["Eastertide", "Easter IV · Friday", "Optional Memorial", "St. Joseph the Worker"],
+    screens: {
+      season:        `
+    <div class="season-heading">Easter IV · Friday</div>
+    <div class="season-sub sub-primary">Eastertide</div>
+<div class="season-sub">Optional Memorial</div>
+<div class="season-sub">St. Joseph the Worker</div>
+
+    <div class="season-divider"></div>
+    <div class="season-body"><p>We are deep in Eastertide — the great fifty days between Easter and Pentecost, when the Church lives in the light of the resurrection.</p><p>Today the Catholic Church also remembers <button type="button" class="figure-link" data-figure="st_joseph">St Joseph</button> the Worker — the husband of Mary and earthly father of Jesus — whose memorial on this day honours the quiet dignity of labour done faithfully in the presence of God.</p></div>`,
+      word:          `
+    <div class="word-title">ABIDE</div>
+    <div class="word-pronunciation">[uh-byde]</div>
+    <div class="word-divider"></div>
+    <div class="word-definition"><p>To abide — from the Greek menō (μένω) — means not merely to stay put, but to take up residence. To make a home somewhere. To live within rather than simply near.</p><p>There is a domestic quality to the word that translation tends to smooth away. When Jesus uses it in John 15, he is not issuing a command so much as extending an invitation to a particular kind of closeness: not proximity, but porousness. Not standing at the door, but belonging inside.</p></div>`,
+      scripture:     `
+    <div class="scripture-passage">
+      <div class="scripture-ref">John 15:4–5</div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>Abide in me as I abide in you. Just as the branch cannot bear fruit by itself unless it abides in the vine, neither can you unless you abide in me. I am the vine, you are the branches. Those who abide in me and I in them bear much fruit, because apart from me you can do nothing.</p></div>
+      </div>
+      <div class="scripture-translation">NRSV</div>
+    </div>`,
+      contemplation: `
+    <div class="contemplation-body"><p>Notice what the branch is not asked to do first. Before it bears fruit — before it does anything at all — it abides. The abiding is not the whole of it, but it is the condition for everything else. A branch that has detached from the vine can exert whatever effort it likes; it will produce nothing.</p><p>When you remain in Christ — returning to him, drawing from him, letting his life move through yours — something begins to happen that you did not generate and cannot entirely account for. The capacity to love more freely, to act less from fear, to become, slowly, more than you were: this is not self-improvement. It is what the Christian tradition calls theōsis (θέωσις) — not the erasure of the self, but its transformation from within, by a life greater than your own flowing through it.</p></div>
+    <div class="contemplation-question">What would it mean to let Christ be the source of your capacity to love and act — and not just the inspiration for it? Not the one who motivates you from outside, but the one from whom the ability to bear fruit actually flows — the way sap moves through a branch without the branch deciding to let it.</div>`,
+      prayer:        `
+    <div class="prayer-body"><p>Lord,</p><p>You have asked us to abide — to make our home in you, as you make your home in us.</p><p>Where we have settled for connection when you offered indwelling, draw us deeper so we abide in you.</p><p>Where we have tried to live on what we can produce alone, remind us that apart from you we can do nothing — and that when we abide with you, we can bear fruit we never imagined.</p></div>
+    <div class="prayer-amen">In Christ&#39;s name, Amen.</div>`,
+      practice:      `
+    <div class="practice-body"><p>At some point today, return to a task you do every day — washing up, making coffee or tea, walking a familiar route — and as you do it, pray quietly: Abide in me, Lord, and let me abide in you. Let the prayer accompany the work, not replace it.</p></div>
+    <div class="practice-anchor">We are called to work — to love, to act, to serve. But the fruit of that work grows only when it is drawn from Christ, the vine from whom all fruitfulness flows.</div>`
     }
   },
-
-  /* 2 MAY · BRANCH */
   {
     date: "2 May 2026",
-    palette: "eastertide",
-    screens: {
-      season: {
-        heading: "Easter IV · Saturday",
-        subs: [
-          { text: "Eastertide", primary: true },
-          { text: "Memorial" },
-          { text: "St Athanasius, Bishop and Doctor of the Church" }
-        ],
-        body: `<p>We are in the closing days of the fourth week of Easter.</p>
-<p>The Church today keeps the memorial of <button type="button" class="figure-link" data-figure="athanasius">St Athanasius of Alexandria</button>, who defended the full divinity of Christ and understood that if the life flowing through the vine is not the life of God himself, then the promise of transformation is empty.</p>`
-      },
-      word: {
-        title: "BRANCH",
-        pronunciation: "[brahnch]",
-        definition: `<p>The part of the vine that bears the fruit — but only because it is joined to the vine. A branch on its own is a stick. Connected, it is alive.</p>
-<p>In <button type="button" class="figure-link" data-figure="john_evangelist">John</button> 15, Jesus does not compare his followers to vines — self-standing, independently rooted. He compares them to branches: drawn into the life of the vine itself, sharing in what the vine carries, bearing what they could never produce alone.</p>
-<p>It is an extraordinary image — not of diminishment, but of intimacy. The branch is the very place where the hidden life of the vine becomes visible.</p>`
-      },
-      scripture: [
-        {
-          ref: `<button type="button" class="figure-link" data-figure="john_evangelist">John</button> 15:5`,
-          text: `<p>I am the vine, you are the branches. Those who abide in me and I in them bear much fruit, because apart from me you can do nothing.</p>`,
-          translation: "NRSV"
-        }
-      ],
-      contemplation: {
-        body: `<p><em>'Apart from me you can do nothing.'</em></p>
-<p>It is one of the most absolute statements Jesus makes, and one of the easiest to set aside. We can, of course, do a great many things apart from Christ — we can build, earn, organise, even achieve — but what we cannot do, Jesus says, is bear fruit.</p>
-<p>And fruit, in John's Gospel, is not productivity. It is a life that has the character of Christ in it: love, patience, gentleness — the slow evidence that someone has been abiding in something larger than themselves.</p>
-<p>But dependence is not the same as passivity. A branch grows, reaches toward the light, responds to the season, is shaped by wind and weather and the gardener's knife. The life it bears is received, yes — but the bearing of it is real work, done in a real world.</p>`,
-        question: "Where in your life are you trying to bear fruit without being joined to anything — and where is fruit growing that you have not yet recognised, because it came from the vine and not from you?"
-      },
-      prayer: {
-        body: `<p>Lord,</p>
-<p>We are branches — not trees.</p>
-<p>We forget this more often than we admit.</p>
-<p>Where we have been living as though the life were our own, graft us back.</p>
-<p>Where we are withering from a disconnection we cannot quite name, let your life flow through us again.</p>
-<p>We do not need to be more. We need to be joined to you.</p>`,
-        amen: "In Christ's name, Amen."
-      },
-      practice: {
-        body: `<p>Find a tree today — in a garden, on a street, through a window — and look at one of its branches for a moment. You can see where it joins the trunk. You can trace the shape of it. What you cannot see is the life moving through it — and yet everything the branch does depends on that invisible flow.</p>`,
-        anchor: "You are not the tree. You are the branch. And the branch's deepest freedom is not in separating from the vine, but in all that it becomes by remaining part of it."
-      }
+    paletteCls: "palette-eastertide",
+    paletteVars: {
+      "--bg":          "#F5F0E8",
+      "--panel":       "#EDE5D0",
+      "--accent":      "#8B6914",
+      "--accent-soft": "rgba(139,105,20,0.18)",
+      "--text":        "#1E1A14",
+      "--dim":         "#8A7D65",
+      "--gold":        "#8B6914",
+      "--shell":       "#E8E0CC"
     },
-    figures: {
-      athanasius: {
-        name: "St Athanasius of Alexandria",
-        dates: "c. 296–373",
-        role: "Bishop of Alexandria · Doctor of the Church",
-        body: "One of the most important early theologians of the Church. Exiled five times for his insistence that Christ is fully God — not a lesser or created being — he became the defining voice for the faith the Church holds today. His memorial today places beside the word Branch a man who spent his life insisting that the life in the vine is nothing less than the life of God himself."
-      },
-      john_evangelist: {
-        name: "St John the Evangelist",
-        dates: "1st century AD",
-        role: "Apostle · Traditionally identified as author of the fourth Gospel",
-        body: "The vine discourse of John 15, from which today's scripture is drawn, is part of Jesus's farewell to the disciples on the night before his death — his most intimate teaching on the nature of the believer's dependence on Christ."
-      }
+    topBarLines: ["Eastertide", "Easter IV · Saturday", "Memorial", "St. Athanasius,", "Bishop and Doctor of the Church"],
+    screens: {
+      season:        `
+    <div class="season-heading">Easter IV · Saturday</div>
+    <div class="season-sub sub-primary">Eastertide</div>
+<div class="season-sub">Memorial</div>
+<div class="season-sub">St. Athanasius,</div>
+<div class="season-sub">Bishop and Doctor of the Church</div>
+
+    <div class="season-divider"></div>
+    <div class="season-body"><p>We are in the closing days of the fourth week of Easter.</p><p>The Church today keeps the memorial of <button type="button" class="figure-link" data-figure="st_athanasius_of_alexandria">St Athanasius of Alexandria</button> who defended the full divinity of Christ  and understood that if the life flowing through the vine is not the life of God himself, then the promise of transformation is empty.</p></div>`,
+      word:          `
+    <div class="word-title">BRANCH</div>
+    <div class="word-pronunciation">[brahnch]</div>
+    <div class="word-divider"></div>
+    <div class="word-definition"><p>Here is a strange thing to call someone you love.</p><p>Not a tree — self-standing, independently rooted, drawing its own water. A branch. Something that, separated from what it grows from, is just a stick. The life in it is not its own. It never was.</p><p>In John 15, Jesus doesn&#39;t compare his followers to vines. He compares them to branches — drawn into the life of the vine itself, bearing what they could never produce alone. It sounds, at first, like a diminishment. It isn&#39;t.</p><p>A branch is the place where the hidden life of the vine becomes visible. The fruit doesn&#39;t grow on the trunk. It grows out here, at the ends of things, where the branch has pushed furthest into the world.</p><p>You are not the source. But you are where the source shows up.</p></div>`,
+      scripture:     `
+    <div class="scripture-passage">
+      <div class="scripture-ref">John 15:5</div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>I am the vine, you are the branches. Those who abide in me and I in them bear much fruit, because apart from me you can do nothing.</p></div>
+      </div>
+      <div class="scripture-translation">NRSV</div>
+    </div>`,
+      contemplation: `
+    <div class="contemplation-body"><p>&quot;Apart from me you can do nothing.&quot;</p><p>It is one of the most absolute things Jesus ever says — and one of the easiest to quietly set aside. We can, after all, do a great many things apart from Christ. We can build, earn, organise, achieve. But what we cannot do, Jesus says, is bear fruit.</p><p>And fruit, in St. John&#39;s Gospel, is not productivity. It is a life that has the character of Christ in it — love, patience, gentleness — the slow evidence that someone has been drawing from something larger than themselves. You can be very busy and bear none of it. You can be very quiet and bear a great deal.</p><p>But dependence is not passivity. A branch grows, reaches toward the light, is shaped by the season and the gardener&#39;s knife. The life it bears is received — but the bearing of it is real, done in a real world.</p></div>
+    <div class="contemplation-question">Where in your life are you trying to bear fruit without being joined to anything — and where is fruit growing that you haven&#39;t yet noticed, because it came from the vine and not from you?</div>`,
+      prayer:        `
+    <div class="prayer-body"><p>Lord,</p><p>We are branches — not trees.</p><p>We forget this more often than we admit.</p><p>Where we have been living as though the life were our own, graft us back.</p><p>Where we are withering from a disconnection we cannot quite name, let your life flow through us again.</p><p>We do not need to be more.</p><p>We need to be joined to you.</p></div>
+    <div class="prayer-amen">In Christ&#39;s name, Amen.</div>`,
+      practice:      `
+    <div class="practice-body"><p>Find a tree today — in a garden, on a street, through a window — and look at one of its branches for a moment. You can see where it joins the trunk. You can trace the shape of it. What you cannot see is the life moving through it — and yet everything the branch does depends on that invisible flow.</p></div>
+    <div class="practice-anchor">You are not the tree. You are the branch. And the branch&#39;s deepest freedom is not in separating from the vine, but in all that it becomes by remaining part of it.</div>`
     }
   },
-
-  /* 3 MAY · FRUIT */
   {
     date: "3 May 2026",
-    palette: "eastertide",
-    screens: {
-      season: {
-        heading: "5th Sunday of Easter",
-        subs: [{ text: "Eastertide", primary: true }],
-        body: `<p>Today is the Fifth Sunday of Easter. The Gospel readings continue to draw from Jesus's farewell discourse in <button type="button" class="figure-link" data-figure="john_evangelist">John</button> — his last, most intimate teaching to the disciples before the cross.</p>
-<p>We have moved through vine, abiding, and branch. Today the image reaches its completion: fruit.</p>`
-      },
-      word: {
-        title: "FRUIT",
-        pronunciation: "[froot]",
-        definition: `<p>What grows when a branch remains joined to the vine and the gardener does his work. The Greek <em>karpos</em> (καρπός) means fruit, yield, the thing that comes forth — but in Scripture it is never a synonym for productivity. Fruit is what grows slowly, in season, and not by force.</p>
-<p>In <button type="button" class="figure-link" data-figure="john_evangelist">John</button> 15, fruit is not an achievement. It is evidence — the visible sign that a life is being lived in union with Christ. <button type="button" class="figure-link" data-figure="paul">Paul</button> names its character in his letter to the Galatians: love, joy, peace, patience, kindness, generosity, faithfulness, gentleness and self-control.</p>
-<p>None of these can be manufactured. All of them can be grown.</p>`
-      },
-      scripture: [
-        {
-          ref: `<button type="button" class="figure-link" data-figure="john_evangelist">John</button> 15:16`,
-          text: `<p>You did not choose me but I chose you. And I appointed you to go and bear fruit, fruit that will last, so that the Father will give you whatever you ask him in my name.</p>`,
-          translation: "NRSV"
-        },
-        {
-          ref: `<button type="button" class="figure-link" data-figure="paul">Galatians</button> 5:22`,
-          text: `<p>By contrast, the fruit of the Spirit is love, joy, peace, patience, kindness, generosity, faithfulness, gentleness and self-control.</p>`,
-          translation: "NRSV"
-        }
-      ],
-      contemplation: {
-        body: `<p>There is a reversal here that is easy to miss. We expect to be told: <em>try harder, do more.</em> Instead, Jesus explains that the initiative was never ours. The vine is the source of the branch, not the other way round.</p>
-<p>If Christ chose us, then the fruit we produce is something else entirely: his life, showing up in ours, often in ways we did not plan and cannot take credit for. The patience we did not know we had. The gentleness that arrived in a season when we had every reason to be harsh. The peace that held when nothing around us was peaceful.</p>
-<p><em>Fruit that will last</em>, Jesus says. Not fruit that will impress, or fruit that will be counted — but fruit that will still be there when everything else has fallen away.</p>`,
-        question: "What fruit is growing in you that you have not yet noticed — because you were too busy looking for something more impressive?"
-      },
-      prayer: {
-        body: `<p>Lord,</p>
-<p>You chose us before we chose you.</p>
-<p>Where we have been striving to produce what only you can grow, forgive us.</p>
-<p>Where fruit is forming in us quietly — in patience, in gentleness, in love we did not manufacture — help us to recognise it and to trust it.</p>
-<p>Let us bear the fruit that lasts, not the fruit that performs.</p>`,
-        amen: "In Christ's name, Amen."
-      },
-      practice: {
-        body: `<p>Eat a piece of fruit today — an apple, a pear, a fig, or whatever is to hand — and eat it slowly. Notice that no part of it was forced. It grew because a tree was rooted, a branch was connected, and a season was given. The fruit did not produce itself. It was borne.</p>`,
-        anchor: "At some point today, ask yourself: is the fruit that lasts in my life what I achieve, or what I allow?"
-      }
+    paletteCls: "palette-eastertide",
+    paletteVars: {
+      "--bg":          "#F5F0E8",
+      "--panel":       "#EDE5D0",
+      "--accent":      "#8B6914",
+      "--accent-soft": "rgba(139,105,20,0.18)",
+      "--text":        "#1E1A14",
+      "--dim":         "#8A7D65",
+      "--gold":        "#8B6914",
+      "--shell":       "#E8E0CC"
     },
-    figures: {
-      john_evangelist: {
-        name: "St John the Evangelist",
-        dates: "1st century AD",
-        role: "Apostle · Traditionally identified as author of the fourth Gospel",
-        body: "Today's scripture is the culmination of the vine discourse in John 15 — the moment when Jesus reveals that the fruitfulness of the branches rests not on their effort but on his prior choice of them."
-      },
-      paul: {
-        name: "St Paul the Apostle",
-        dates: "c. 5–c. 64/67 AD",
-        role: "Apostle to the Gentiles · Author of major New Testament epistles",
-        body: "His letter to the Galatians names the fruit of the Spirit and has shaped the Church's understanding of what spiritual fruitfulness looks like — not a catalogue of virtues to be achieved, but the harvest of a life lived in the Spirit."
-      }
+    topBarLines: ["Eastertide", "5th Sunday of Easter"],
+    screens: {
+      season:        `
+    <div class="season-heading">5th Sunday of Easter</div>
+    <div class="season-sub sub-primary">Eastertide</div>
+
+    <div class="season-divider"></div>
+    <div class="season-body"><p>Today is the Fifth Sunday of Easter. The Gospel readings continue to draw from Jesus&#39;s farewell discourse in John — his last, most intimate teaching to the disciples before the cross.</p><p>We have moved through vine, abiding, and branch. Today the image reaches its completion: fruit.</p></div>`,
+      word:          `
+    <div class="word-title">FRUIT</div>
+    <div class="word-pronunciation">[froot]</div>
+    <div class="word-divider"></div>
+    <div class="word-definition"><p>Here is a word the New Testament refuses to let mean what we want it to mean.</p><p>The Greek karpos (καρπός) means fruit, yield, the thing that comes forth — but in Scripture it is never a synonym for productivity. You cannot force fruit. You cannot schedule it. It grows in season, at its own pace, from a root that is not yours.</p><p>In John 15, fruit is not an achievement. It is evidence — the visible sign that a life is being lived in union with Christ. St Paul names its character in his letter to the Galatians: love, joy, peace, patience, kindness, generosity, faithfulness, gentleness, self-control.</p><p>Look at that list. Not one of them can be manufactured. Not one of them shows up because you tried harder. All of them are what happens when a branch stays joined to the vine long enough.</p><p>None of these can be forced. All of them can be grown.</p></div>`,
+      scripture:     `
+    <div class="scripture-passage">
+      <div class="scripture-ref">John 15:16</div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>You did not choose me but I chose you. And I appointed you to go and bear fruit, fruit that will last, so that the Father will give you whatever you ask him in my name.</p></div>
+      </div>
+      <div class="scripture-translation">NRSV</div>
+    </div>
+    <div class="scripture-passage">
+      <div class="scripture-ref">Galatians 5:22</div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>By contrast, the fruit of the Spirit is love, joy, peace, patience, kindness, generosity, faithfulness, gentleness and self-control.</p></div>
+      </div>
+      <div class="scripture-translation">NRSV</div>
+    </div>`,
+      contemplation: `
+    <div class="contemplation-body"><p>There is a reversal here that is easy to miss.</p><p>We expect to be told: try harder, do more. Instead, Jesus says the initiative was never ours to begin with. He chose us. The vine is the source of the branch, not the other way round.</p><p>Which means the fruit we bear is something we cannot take credit for — his life, showing up in ours, often in ways we neither planned nor noticed. The patience we did not know we had. The gentleness that arrived in a season when we had every reason to be harsh. The peace that held when nothing around us was peaceful.</p><p>Fruit that will last, Jesus says. Not fruit that will impress, or fruit that will be counted — but fruit that will still be there when everything else has fallen away.</p></div>
+    <div class="contemplation-question">What fruit is growing in you that you have not yet noticed — because you were too busy looking for something more impressive?</div>`,
+      prayer:        `
+    <div class="prayer-body"><p>Lord,</p><p>You chose us before we chose you.</p><p>Where we have been striving to produce what only you can grow, forgive us.</p><p>Where fruit is forming in us quietly — in patience, in gentleness, in love we did not manufacture — help us to recognise it and to trust it.</p><p>Let us bear the fruit that lasts, not the fruit that performs.</p></div>
+    <div class="prayer-amen">In Christ&#39;s name, Amen.</div>`,
+      practice:      `
+    <div class="practice-body"><p>Eat a piece of fruit today — an apple, a pear, a fig, whatever is to hand — and eat it slowly. Notice that no part of it was forced. It grew because a tree was rooted, a branch was connected, and a season was given. The fruit did not produce itself. It was borne.</p></div>
+    <div class="practice-anchor">The fruit that lasts is never what we manufacture. It is what we allow — by staying joined, staying present, and trusting the vine to do what only the vine can do.</div>`
+    }
+  },
+  {
+    date: "4 May 2026",
+    paletteCls: "palette-eastertide",
+    paletteVars: {
+      "--bg":          "#F5F0E8",
+      "--panel":       "#EDE5D0",
+      "--accent":      "#8B6914",
+      "--accent-soft": "rgba(139,105,20,0.18)",
+      "--text":        "#1E1A14",
+      "--dim":         "#8A7D65",
+      "--gold":        "#8B6914",
+      "--shell":       "#E8E0CC"
+    },
+    topBarLines: ["Eastertide", "Easter V · Monday", "Ordinary Eastertide Weekday"],
+    screens: {
+      season:        `
+    <div class="season-heading">Easter V · Monday</div>
+    <div class="season-sub sub-primary">Eastertide</div>
+<div class="season-sub">Ordinary Eastertide Weekday</div>
+
+    <div class="season-divider"></div>
+    <div class="season-body"><p>We are in the fifth week of Eastertide, the Monday after the Fifth Sunday of Easter. The resurrection light of the season is intensifying — and the readings of this week draw on the First Letter of John, written to a community learning what it means to live in the love that the risen Christ has made possible.</p></div>`,
+      word:          `
+    <div class="word-title">LOVE</div>
+    <div class="word-pronunciation">[luv]</div>
+    <div class="word-divider"></div>
+    <div class="word-definition"><p>Here is something that gets lost in translation. The ancient Greeks had at least four distinct words for love, where we have one. Philia for friendship. Eros for desire. Storgē for the love of family. And agapē (ἀγάπη) — the one the New Testament reaches for again and again — for something that has no real equivalent in everyday English at all.</p><p>Agapē is not a feeling. It is a direction. It moves toward another person — any person, including one you would rather avoid — and seeks their good, at cost to itself if necessary. It does not wait to be deserved. It does not switch off when the other person is difficult. In Greek thought, love moved upward, toward the beautiful and the worthy. Agapē moves the other way entirely.</p><p>This is the word the author of the First Letter of John uses when he writes that God is love. Not that God is loving, or that God loves — but that agapē is what God is. Not a property. A nature.</p></div>`,
+      scripture:     `
+    <div class="scripture-passage">
+      <div class="scripture-ref">1 John 4:7–8</div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>Beloved, let us love one another, because love is from God; everyone who loves is born of God and knows God. Whoever does not love does not know God, for God is love.</p></div>
+      </div>
+      <div class="scripture-translation">NRSV</div>
+    </div>`,
+      contemplation: `
+    <div class="contemplation-body"><p>Here is the thing about agapē that stops you short, once you see it.</p><p>The author of 1 John does not say: love one another, and God will love you back. He says: love one another because love is already from God — because agapē has already been given, and what we are being asked to do is pass on what we have received. The source is not in us. We are not being asked to generate something we do not have. We are being asked to conduct something that is already flowing.</p><p>Which changes the question entirely. The problem is not that we are not loving enough. It is that we keep forgetting where the supply comes from.
+<button type="button" class="figure-link" data-figure="st_julian_of_norwich">St Julian of Norwich</button> spent twenty years sitting with this. Her answer, in the end, was disarmingly simple: the love does not run out. It cannot. Because it is not ours to begin with.</p></div>
+    <div class="contemplation-question">Where are you trying to love someone from your own reserves — and what would it mean to draw from the source instead?</div>`,
+      prayer:        `
+    <div class="prayer-body"><p>Lord,</p><p>You do not love us because we are loveable.</p><p>You love us because you are love, and you cannot be otherwise.</p><p>Where our love runs dry, replenish it from yours.</p><p>Teach us to love not from our own reserves, which are small, but from the inexhaustible source that made us.</p></div>
+    <div class="prayer-amen">In Christ&#39;s name, Amen.</div>`,
+      practice:      `
+    <div class="practice-body"><p>Think of one person today toward whom your love has become effortful or thin — not a stranger, but someone close. Do not try to manufacture feeling. Instead, do one small, concrete act in their direction: a message, a patience, a kindness you would not naturally offer today.</p></div>
+    <div class="practice-anchor">Agapē is always more verb than noun — chosen, willed, and returned to again and again, not from our own reserves, but from the source that does not run dry.</div>`
+    }
+  },
+  {
+    date: "5 May 2026",
+    paletteCls: "palette-eastertide",
+    paletteVars: {
+      "--bg":          "#F5F0E8",
+      "--panel":       "#EDE5D0",
+      "--accent":      "#8B6914",
+      "--accent-soft": "rgba(139,105,20,0.18)",
+      "--text":        "#1E1A14",
+      "--dim":         "#8A7D65",
+      "--gold":        "#8B6914",
+      "--shell":       "#E8E0CC"
+    },
+    topBarLines: ["Eastertide", "Easter V · Tuesday", "Ordinary Eastertide Weekday"],
+    screens: {
+      season:        `
+    <div class="season-heading">Easter V · Tuesday</div>
+    <div class="season-sub sub-primary">Eastertide</div>
+<div class="season-sub">Ordinary Eastertide Weekday</div>
+
+    <div class="season-divider"></div>
+    <div class="season-body"><p>We are still inside the Farewell Discourse — Jesus speaking to the disciples in the upper room, with the cross a matter of hours away. Each day this week the words are given from that conversation, spoken to people who did not yet know they were the last.</p></div>`,
+      word:          `
+    <div class="word-title">FRIEND</div>
+    <div class="word-pronunciation">[frend]</div>
+    <div class="word-divider"></div>
+    <div class="word-definition"><p>In the ancient world, friendship was a moral and political category before it was a sentimental one. The Greek philos (φίλος) described someone bound to you by loyalty and shared life — not merely someone whose company you enjoyed.</p><p>In John 15, Jesus takes this word and overloads it. He calls the disciples no longer servants — who do not know what the master is doing — but friends, because he has told them everything the Father has given him to say. To be a friend of Christ is not a promotion. It is to be let into his confidence, handed his secrets, entrusted with his purposes. It is a weightier word than it sounds.</p></div>`,
+      scripture:     `
+    <div class="scripture-passage">
+      <div class="scripture-ref">John 15:15</div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>I do not call you servants any longer, because the servant does not know what the master is doing; but I have called you friends, because I have made known to you everything that I have heard from my Father.</p></div>
+      </div>
+      <div class="scripture-translation">NRSV</div>
+    </div>`,
+      contemplation: `
+    <div class="contemplation-body"><p>The move from servant to friend is not a relaxation of the relationship. A servant has clear boundaries — a defined role, a safe distance. A friend is let further in, and that is more exposed.</p><p>What Jesus is offering here is intimacy, not ease. He has told them everything. Not a selection, not what he judged they could handle, but everything the Father gave him to say. That is the nature of the friendship: it goes all the way down.</p><p>Aelred of Rievaulx, the twelfth-century Cistercian, built an entire theology of spiritual friendship on this verse. He did not think it was a licence for sentimentality. He thought it was a vision of what human love could become when oriented toward Christ: the place where two people carry something of God toward each other without either of them needing to pretend.</p></div>
+    <div class="contemplation-question">What would it mean to receive the friendship of Christ — not as a comfort, but as a confidence?</div>`,
+      prayer:        `
+    <div class="prayer-body"><p>Lord,</p><p>You called us friends, and meant it.</p><p>Where we keep you at servant&#39;s distance — useful but not too close — draw us nearer.</p><p>Let your friendship make something of us: not merely consoled, but trusted, and changed.</p><p>We receive, in fear and in gratitude, everything you have made known.</p></div>
+    <div class="prayer-amen">In Christ&#39;s name, Amen.</div>`,
+      practice:      `
+    <div class="practice-body"></div>
+    <div class="practice-anchor">Think of one person today toward whom your love has become effortful or thin — not a stranger, but someone close. Do not try to manufacture feeling. Instead, do one small, concrete act in their direction: a message, a patience, a kindness you would not naturally offer today.
+Agapē is always more verb than noun — chosen, willed, and returned to again and again, not from our own reserves, but from the source that does not run dry.</div>`
+    }
+  },
+  {
+    date: "6 May 2026",
+    paletteCls: "palette-eastertide",
+    paletteVars: {
+      "--bg":          "#F5F0E8",
+      "--panel":       "#EDE5D0",
+      "--accent":      "#8B6914",
+      "--accent-soft": "rgba(139,105,20,0.18)",
+      "--text":        "#1E1A14",
+      "--dim":         "#8A7D65",
+      "--gold":        "#8B6914",
+      "--shell":       "#E8E0CC"
+    },
+    topBarLines: ["Eastertide", "Easter V · Wednesday", "Ordinary Eastertide Weekday"],
+    screens: {
+      season:        `
+    <div class="season-heading">Easter V · Wednesday</div>
+    <div class="season-sub sub-primary">Eastertide</div>
+<div class="season-sub">Ordinary Eastertide Weekday</div>
+
+    <div class="season-divider"></div>
+    <div class="season-body"><p>Wednesday, still inside the week following the Fifth Sunday of Easter. The Gospel of John continues to carry the week: the Farewell Discourse, in which Jesus prepares the disciples for a world in which he will no longer be visibly present. The words were first spoken in an upper room; now they are spoken into every season.</p></div>`,
+      word:          `
+    <div class="word-title">CHOOSE</div>
+    <div class="word-pronunciation">[chooz]</div>
+    <div class="word-divider"></div>
+    <div class="word-definition"><p>The Greek eklegomai (ἐκλέγομαι) means to select, to pick out, to set apart — with a deliberateness that implies both preference and purpose. The prefix ek- (out of) carries the sense of drawing one thing from among many.</p><p>In John 15, it is the word Jesus uses of his own initiative toward the disciples: I chose you. You did not choose me. This is not a statement about predestination in the speculative sense. It is a statement about priority and gift: the relationship did not begin with the disciples&#39; seeking. It began with his.</p><p>The same word underlies the New Testament language of election — the sense, throughout Israel&#39;s history, that God&#39;s choice precedes and enables the human response.</p></div>`,
+      scripture:     `
+    <div class="scripture-passage">
+      <div class="scripture-ref">John 15:16</div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>You did not choose me but I chose you. And I appointed you to go and bear fruit, fruit that will last, so that the Father will give you whatever you ask him in my name.</p></div>
+      </div>
+      <div class="scripture-translation">NRSV</div>
+    </div>`,
+      contemplation: `
+    <div class="contemplation-body"><p>There is a kind of spiritual exhaustion that comes from believing the whole thing depends on us — that we are only in relationship with God as long as we keep reaching. The verse today quietly undoes that.</p><p>You did not choose me. It is not that the disciple&#39;s choice does not matter; it is that it was not first. Before any seeking, any turning, any prayer, there was a prior act: Christ&#39;s own movement toward the one he would call. This is not a theological abstraction. It is a pastoral reality — that on the days when we cannot feel that we have chosen God, or chosen well, or chosen at all, the relationship does not therefore end.</p><p><button type="button" class="figure-link" data-figure="jean_calvin">Jean Calvin</button>, commenting on this verse, observed that election is not God&#39;s approval of what we already are. It is God&#39;s determination of what we will become. The fruit is not the condition of being chosen. It is the consequence.</p></div>
+    <div class="contemplation-question">On the days when you have not chosen well, what does it mean that you were chosen before you could?</div>`,
+      prayer:        `
+    <div class="prayer-body"><p>Lord,</p><p>You chose us before we had anything to offer.</p><p>On days when our faithfulness is thin and our love is inconsistent, remind us that the relationship does not rest on our choosing alone.</p><p>What you have appointed, sustain.</p><p>Bear fruit in us that we could not produce ourselves.</p></div>
+    <div class="prayer-amen">In Christ&#39;s name, Amen.</div>`,
+      practice:      `
+    <div class="practice-body"><p>At some point today, recall a moment — recent or long past — when you were aware of being chosen: by a person, for a task, into a community. Notice what that felt like; notice how it changed the way you behaved in that context.</p></div>
+    <div class="practice-anchor">The life of faith is the practice of receiving a prior love — not earning it, but learning to live from it.</div>`
+    }
+  },
+  {
+    date: "7 May 2026",
+    paletteCls: "palette-eastertide",
+    paletteVars: {
+      "--bg":          "#F5F0E8",
+      "--panel":       "#EDE5D0",
+      "--accent":      "#8B6914",
+      "--accent-soft": "rgba(139,105,20,0.18)",
+      "--text":        "#1E1A14",
+      "--dim":         "#8A7D65",
+      "--gold":        "#8B6914",
+      "--shell":       "#E8E0CC"
+    },
+    topBarLines: ["Eastertide", "Easter V · Thursday", "Ordinary Eastertide Weekday"],
+    screens: {
+      season:        `
+    <div class="season-heading">Easter V · Thursday</div>
+    <div class="season-sub sub-primary">Eastertide</div>
+<div class="season-sub">Ordinary Eastertide Weekday</div>
+
+    <div class="season-divider"></div>
+    <div class="season-body"><p>We are at the mid-point of the fifth week of Eastertide, and the Gospel readings continue from the Farewell Discourse and move into the High Priestly Prayer of John 17 — the longest sustained prayer in the Gospels, spoken by Jesus for his disciples on the night he was betrayed.</p></div>`,
+      word:          `
+    <div class="word-title">INTERCEDE</div>
+    <div class="word-pronunciation">[in-ter-seed]</div>
+    <div class="word-divider"></div>
+    <div class="word-definition"><p>To stand between — to speak on behalf of another before someone with the power to help. The Latin intercedere combines inter (between) and cedere (to go): to go into the space between two parties and carry one&#39;s petition there.</p><p>In the New Testament, intercession is what Christ does perpetually. The Letter to the Hebrews says he always lives to make intercession for those who approach God through him. John 17 is the great enacted instance: Jesus, hours before his death, praying not for himself but for those he is about to leave — and for all who will come to faith through their word.</p><p>Prayer for another is participation in what Christ is already doing.</p></div>`,
+      scripture:     `
+    <div class="scripture-passage">
+      <div class="scripture-ref">John 17:20–21a</div>
+      <div class="scripture-block">
+        <div class="scripture-text"><p>I ask not only on behalf of these, but also on behalf of those who will believe in me through their word, that they may all be one.</p></div>
+      </div>
+      <div class="scripture-translation">NRSV</div>
+    </div>`,
+      contemplation: `
+    <div class="contemplation-body"><p>Jesus is praying for people who do not yet exist. &quot;Those who will believe through their word&quot; — that is us, among others, and every believer across the centuries who came to faith through the testimony of those first disciples. We are named, without being named, in this prayer.</p><p>The High Priestly Prayer is not a model for petition in the ordinary sense. It is a window onto what Christ is always doing: standing between us and the Father, speaking our names in a place we cannot reach ourselves. The Letter to the Hebrews says this is his permanent occupation — not just what he did in Gethsemane, but what he does, continuously, at the right hand of the Father.</p><p>To intercede for another, then, is to do something of what Christ is doing: to place yourself between a person and the one who can help them, and to speak. It is not magic and it is not manipulation. It is the act of love made speech.</p></div>
+    <div class="contemplation-question">Whose name are you carrying before God — and what does it cost you to stay in that place?</div>`,
+      prayer:        `
+    <div class="prayer-body"><p>Lord,</p><p>You intercede for us even now, even here.</p><p>Teach us to pray for one another with something of your persistence:</p><p>to carry names before God not once, but as a way of life.
+Hold those we bring today — the ones we are worried for, the ones we have almost given up on.</p><p>Let our intercession be a sharing in yours.</p></div>
+    <div class="prayer-amen">In Christ&#39;s name, Amen.</div>`,
+      practice:      `
+    <div class="practice-body"><p>Choose one person to pray for today — specifically, not generally. Speak their name to God. Do not ask for a list of outcomes; simply bring the person: who they are, what they are carrying, what you cannot fix for them.</p></div>
+    <div class="practice-anchor">Intercession is less about changing God&#39;s mind than about placing someone in the light. You are not their advocate before an unwilling judge. You are bringing a name to a Father who already loves them.</div>`
+    }
+  },
+  {
+    date: "8 May 2026",
+    paletteCls: "palette-eastertide",
+    paletteVars: {
+      "--bg":          "#F5F0E8",
+      "--panel":       "#EDE5D0",
+      "--accent":      "#8B6914",
+      "--accent-soft": "rgba(139,105,20,0.18)",
+      "--text":        "#1E1A14",
+      "--dim":         "#8A7D65",
+      "--gold":        "#8B6914",
+      "--shell":       "#E8E0CC"
+    },
+    topBarLines: ["Eastertide", "Easter V · Friday", "Ordinary Eastertide Weekday"],
+    screens: {
+      season:        `<div class="placeholder-body">Content for this day is in production.</div>`,
+      word:          `<div class="placeholder-body">Content for this day is in production.</div>`,
+      scripture:     `<div class="placeholder-body">Content for this day is in production.</div>`,
+      contemplation: `<div class="placeholder-body">Content for this day is in production.</div>`,
+      prayer:        `<div class="placeholder-body">Content for this day is in production.</div>`,
+      practice:      `<div class="placeholder-body">Content for this day is in production.</div>`
+    }
+  },
+  {
+    date: "9 May 2026",
+    paletteCls: "palette-eastertide",
+    paletteVars: {
+      "--bg":          "#F5F0E8",
+      "--panel":       "#EDE5D0",
+      "--accent":      "#8B6914",
+      "--accent-soft": "rgba(139,105,20,0.18)",
+      "--text":        "#1E1A14",
+      "--dim":         "#8A7D65",
+      "--gold":        "#8B6914",
+      "--shell":       "#E8E0CC"
+    },
+    topBarLines: ["Eastertide", "Easter V · Saturday", "Ordinary Eastertide Weekday"],
+    screens: {
+      season:        `<div class="placeholder-body">Content for this day is in production.</div>`,
+      word:          `<div class="placeholder-body">Content for this day is in production.</div>`,
+      scripture:     `<div class="placeholder-body">Content for this day is in production.</div>`,
+      contemplation: `<div class="placeholder-body">Content for this day is in production.</div>`,
+      prayer:        `<div class="placeholder-body">Content for this day is in production.</div>`,
+      practice:      `<div class="placeholder-body">Content for this day is in production.</div>`
+    }
+  },
+  {
+    date: "10 May 2026",
+    paletteCls: "palette-eastertide",
+    paletteVars: {
+      "--bg":          "#F5F0E8",
+      "--panel":       "#EDE5D0",
+      "--accent":      "#8B6914",
+      "--accent-soft": "rgba(139,105,20,0.18)",
+      "--text":        "#1E1A14",
+      "--dim":         "#8A7D65",
+      "--gold":        "#8B6914",
+      "--shell":       "#E8E0CC"
+    },
+    topBarLines: ["Eastertide", "6th Sunday of Easter", "Supercedes Optional Memorial", "St. John of Ávila,", "Priest and Doctor of the Church"],
+    screens: {
+      season:        `<div class="placeholder-body">Content for this day is in production.</div>`,
+      word:          `<div class="placeholder-body">Content for this day is in production.</div>`,
+      scripture:     `<div class="placeholder-body">Content for this day is in production.</div>`,
+      contemplation: `<div class="placeholder-body">Content for this day is in production.</div>`,
+      prayer:        `<div class="placeholder-body">Content for this day is in production.</div>`,
+      practice:      `<div class="placeholder-body">Content for this day is in production.</div>`
+    }
+  },
+  {
+    date: "11 May 2026",
+    paletteCls: "palette-eastertide",
+    paletteVars: {
+      "--bg":          "#F5F0E8",
+      "--panel":       "#EDE5D0",
+      "--accent":      "#8B6914",
+      "--accent-soft": "rgba(139,105,20,0.18)",
+      "--text":        "#1E1A14",
+      "--dim":         "#8A7D65",
+      "--gold":        "#8B6914",
+      "--shell":       "#E8E0CC"
+    },
+    topBarLines: ["Eastertide", "Easter VI · Monday", "Rogation Monday"],
+    screens: {
+      season:        `<div class="placeholder-body">Content for this day is in production.</div>`,
+      word:          `<div class="placeholder-body">Content for this day is in production.</div>`,
+      scripture:     `<div class="placeholder-body">Content for this day is in production.</div>`,
+      contemplation: `<div class="placeholder-body">Content for this day is in production.</div>`,
+      prayer:        `<div class="placeholder-body">Content for this day is in production.</div>`,
+      practice:      `<div class="placeholder-body">Content for this day is in production.</div>`
     }
   }
+];
 
-]; /* end DAYS */
-
-/* ── PALETTES ───────────────────────────────────────────────── */
-const PALETTES = {
-  eastertide: {
-    cls: 'palette-eastertide',
-    vars: { '--bg':'#F5F0E8','--panel':'#EDE5D0','--accent':'#8B6914',
-            '--accent-soft':'rgba(139,105,20,0.18)','--text':'#1E1A14',
-            '--dim':'#8A7D65','--gold':'#8B6914','--shell':'#E8E0CC' }
-  },
-  pentecost: {
-    cls: 'palette-pentecost',
-    vars: { '--bg':'#1A0A0A','--panel':'#251010','--accent':'#8B1A1A',
-            '--accent-soft':'rgba(139,26,26,0.3)','--text':'#F0E0D0',
-            '--dim':'#9A7060','--gold':'#C04040','--shell':'#100505' }
-  }
+const FIGURES = {
+  "job": {name:"Job",dates:"date uncertain; the book is generally dated between the 6th and 4th centuries BC",role:"Central figure of the Old Testament book that bears his name; venerated as a righteous man and prophet across the Christian traditions, with a feast day in the Eastern Orthodox calendar on 6 May. His closing words \u2014 I repent in dust and ashes \u2014 are the scriptural root of the gesture the Church performs today",body:""},
+  "joel": {name:"Joel",dates:"date uncertain; the book is dated to c. 5th\u20134th century BC",role:"Hebrew prophet whose short book is read across the Church on Ash Wednesday and through the early days of Lent. His call to return to the Lord \u2014 coupled with the assurance that God is gracious and merciful, slow to anger \u2014 is one of Scripture's clearest invitations to repentance as homecoming rather than punishment",body:""},
+  "john_wesley": {name:"John Wesley",dates:"1703\u20131791",role:"Anglican priest and founder of the Methodist movement; commemorated together with his brother Charles in the Anglican Communion. His preaching and writing returned constantly to the theme of repentance as a daily turning of the whole self toward God \u2014 not a single conversion but a lifelong practice of small returns. His doctrine of sanctification gives Lent's slow work its theological shape: that holiness is the cumulative fruit of countless ordinary repentances",body:""},
+  "isaiah": {name:"Isaiah",dates:"8th century BC",role:"Hebrew prophet whose book is the most quoted in the New Testament. His sharpest words on fasting \u2014 Isaiah 58 \u2014 insist that the worship God wants is inseparable from justice and mercy toward one's neighbour, a passage read across the Church through Lent",body:""},
+  "st_john_chrysostom": {name:"St John Chrysostom",dates:"c. 347\u2013407",role:"Archbishop of Constantinople, honoured as a saint and Doctor of the Church. The surname Chrysostom, 'golden-mouthed', was given for his preaching. His Lenten homilies returned again and again to the theme that bodily fasting is only the outward shell of a deeper fast \u2014 from anger, from gossip, from the appetites of the heart \u2014 and that without that inner fast the outer one is wasted",body:""},
+  "st_peter_damian": {name:"St Peter Damian",dates:"1007\u20131072",role:"Benedictine monk, cardinal, and Doctor of the Church; a leading figure in the eleventh-century reform of the Western Church. He withdrew repeatedly to the hermitage at Fonte Avellana, convinced that silence and solitude were the conditions under which the soul learns to hear God again",body:""},
+  "elijah": {name:"Elijah",dates:"9th century BC",role:"Hebrew prophet of the northern kingdom of Israel, venerated as a saint across Christian traditions. His encounter with God on Mount Horeb \u2014 not in wind or earthquake or fire, but in a sound of sheer silence \u2014 is the Old Testament's clearest teaching that God is often found where we are not looking for him",body:""},
+  "st_luke_the_evangelist": {name:"St Luke the Evangelist",dates:"1st century AD",role:"Traditionally held to be a physician and companion of St Paul; author of the third Gospel and of the Acts of the Apostles.  His Gospel has a distinctive care for the poor, the outsider, and the work of the Holy Spirit \u2014 and opens his account of Jesus's public life with the forty days in the wilderness we hear today",body:""},
+  "st_anthony_of_egypt": {name:"St Anthony of Egypt",dates:"c. 251\u2013356",role:"Egyptian hermit and father of Christian monasticism. He gave away his inheritance as a young man and withdrew into the Egyptian desert, where his reputation for holiness drew others into the wilderness after him \u2014 the beginning of the monastic movement. His life, written by St Athanasius, remains one of the most influential biographies in the Christian tradition",body:""},
+  "st_polycarp": {name:"St Polycarp",dates:"c. 69\u2013155",role:"Bishop of Smyrna and martyr; venerated as an Apostolic Father across the Catholic, Orthodox, and Anglican traditions. A disciple of the apostle John, he was martyred at the age of eighty-six for refusing to renounce Christ. His commemoration today places beside the word Temptation a man who, when tested at the end of his life, already knew who he belonged to",body:""},
+  "st_matthew_the_evangelist": {name:"St Matthew the Evangelist",dates:"1st century AD",role:"Traditionally identified as one of the twelve apostles and author of the first Gospel. His account of the temptation in the wilderness \u2014 used today \u2014 is built on a striking pattern: every reply Jesus gives to the devil is a quotation from Deuteronomy, the book in which Moses recalls Israel's forty years of desert testing. Israel, when hungry, grumbled and lost trust; when frightened, demanded proof of God's presence; when comfortable, turned to other gods. Jesus faces the same trials and holds. Matthew is showing us the story done right",body:""},
+  "st_irenaeus_of_lyon": {name:"St Irenaeus of Lyon",dates:"c. 130\u2013202",role:"Bishop of Lyon and Father of the Church; among the most important theologians of the early Church. His great work Against Heresies insists that God made humanity from the earth deliberately, so that his handiwork would have room to be shaped and reshaped \u2014 a theology of the human person built on the dust of Genesis 2",body:""},
+  "jeremiah": {name:"Jeremiah",dates:"c. 650\u2013c. 570 BC",role:"Hebrew prophet who preached in Jerusalem before and during the Babylonian exile; traditionally held to be the author of the book of Lamentations. He warned of exile before it came, lived through the destruction of the Temple, and then wrote to the exiles in Babylon telling them to build houses, plant gardens, and seek the welfare of the city where God had sent them \u2014 insisting that God was present even in the place of displacement",body:""},
+  "st_gregory_of_narek": {name:"St Gregory of Narek",dates:"c. 951\u20131003",role:"Armenian monk, poet, and theologian; he was declared a Doctor of the Church  by Pope Francis in 2015. He spent his life at the Monastery of Narek, where he composed his masterwork, the Book of Lamentations \u2014 ninety-five prayers that begin from the depths of honest grief and discover, not resolution, but the presence of God in the sorrow itself",body:""},
+  "simeon": {name:"Simeon",dates:"1st century AD",role:"A devout man in Jerusalem, described in Luke's Gospel as righteous and waiting for the consolation of Israel. The Holy Spirit had revealed to him that he would not die before he had seen the Messiah. When Mary and Joseph brought the infant Jesus to the Temple, Simeon took the child in his arms and spoke the prayer the Church still uses at the close of day: Nunc Dimittis \u2014 'Lord, now let your servant depart in peace.'",body:""},
+  "st_joseph": {name:"St Joseph",dates:"1st century AD",role:"The husband of Mary and earthly father of Jesus. In Matthew 13:55, Jesus is descrbed as the son of a tekton (\u03c4\u03ad\u03ba\u03c4\u03c9\u03bd ), meaning a craftsman, a carpenter or a builder. His memorial on 1 May honours the dignity of ordinary labour done faithfully in the presence of God",body:""},
+  "st_john_the_evangelist": {name:"St John the Evangelist",dates:"1st century AD",role:"Traditionally identified as one of the twelve apostles and author of the fourth Gospel. The vine discourse of John 15 in today's scripture is among the most theologically concentrated passages in the New Testament",body:""},
+  "st_athanasius_of_alexandria": {name:"St Athanasius of Alexandria",dates:"c. 296\u2013373",role:"Bishop of Alexandria and Doctor of the Church; one of the most important theologians of the early Church. Exiled five times for his insistence that Christ is fully God \u2014 not a lesser or created being \u2014 he became the defining voice for what the Church holds today about the divine nature of Christ. He is featured today because the life flowing through the vine is only transformative if it is the life of God himself \u2014 which is precisely what Athanasius spent his life defending",body:""},
+  "st_paul_the_apostle": {name:"St Paul the Apostle",dates:"c. 5\u2013c. 64/67 AD",role:"Apostle to the Gentiles and author of many of the major epistles of the New Testament. His letter to the Galatians names the fruit of the Spirit \u2014 love, joy, peace, patience, kindness, generosity, faithfulness, gentleness, self-control \u2014 and in doing so gives the Church its most precise account of what a life lived in union with Christ actually looks like from the outside",body:""},
+  "the_author_of_the_first_letter_of_john": {name:"The author of the First Letter of John",dates:"1st century AD",role:"The letter is traditionally attributed to St John the Apostle \u2014 one of the Twelve, and traditionally the author of the fourth Gospel. Following St Papias of Hierapolis, a disciple of St. John the Apostle, it has been suggested the author may  be another figure known as John the Elder. Whether these were the same person or two different people remains debated, but either way, the claim that God is agap\u0113 \u2014 divine nature, not just divine action \u2014 is his",body:""},
+  "st_julian_of_norwich": {name:"St Julian of Norwich",dates:"c. 1342\u2013c. 1416",role:"English anchorite and mystic; the first woman known to have written a book in English. Her Revelations of Divine Love records sixteen visions received during a near-fatal illness, and returns throughout to the claim that love (agap\u0113) is the ground and meaning of everything God does. She is featured today because she spent twenty years asking God what his meaning was. And His answer was always: love",body:""},
+  "st_john_the_evangelist_1st_century_ad_traditionally_identified_as_the_beloved_disciple_one_of_the_twelve_and_the_author_of_the_fourth_gospel_three_epistles_and_the_revelation_his_account_of_the_farewell_discourse_including_the_naming_of_the_disciples_as_friends_is_the_theological_heart_of_the_johannine_writings_he_is_featured_today_because_the_word_comes_from_his_gospel": {name:"St John the Evangelist (1st century AD). Traditionally identified as the Beloved Disciple, one of the Twelve, and the author of the fourth Gospel, three epistles, and the Revelation. His account of the Farewell Discourse \u2014 including the naming of the disciples as friends \u2014 is the theological heart of the Johannine writings. He is featured today because the word comes from his Gospel",dates:"",role:"",body:""},
+  "aelred_of_rievaulx_c_1110_1167_english_cistercian_abbot_and_spiritual_writer_canonised_in_the_catholic_church_and_commemorated_in_the_anglican_calendar_on_12_january_his_treatise_spiritual_friendship_spiritus_amicitia_builds_a_theology_of_christian_friendship_on_john_15_15_arguing_that_friendship_oriented_toward_god_is_a_form_of_participation_in_god_s_own_life_not_an_indulgence_of_sentiment_but_a_school_of_love": {name:"Aelred of Rievaulx (c. 1110\u20131167). English Cistercian abbot and spiritual writer, canonised in the Catholic Church and commemorated in the Anglican calendar on 12 January. His treatise Spiritual Friendship (Spiritus Amicitia) builds a theology of Christian friendship on John 15:15, arguing that friendship oriented toward God is a form of participation in God's own life \u2014 not an indulgence of sentiment but a school of love",dates:"",role:"",body:""},
+  "st_john_the_evangelist_1st_century_ad_traditionally_identified_as_the_beloved_disciple_one_of_the_twelve_and_the_author_of_the_fourth_gospel_three_epistles_and_the_revelation_his_account_of_the_farewell_discourse_including_christ_s_declaration_that_he_chose_his_disciples_before_they_chose_him_is_the_theological_heart_of_the_johannine_writings_he_is_featured_today_because_the_text_comes_from_his_gospel": {name:"St John the Evangelist (1st century AD). Traditionally identified as the Beloved Disciple, one of the Twelve, and the author of the fourth Gospel, three epistles, and the Revelation. His account of the Farewell Discourse \u2014 including Christ's declaration that he chose his disciples before they chose him \u2014 is the theological heart of the Johannine writings. He is featured today because the text comes from his Gospel",dates:"",role:"",body:""},
+  "jean_calvin": {name:"Jean Calvin",dates:"1509\u20131564",role:"French theologian and reformer; principal shaper of the Reformed tradition. His commentaries on the Gospel of John give sustained attention to John 15:16 as a foundation for understanding election not as arbitrary divine preference but as the ground of the disciple's confidence and fruitfulness. He is featured today because his reading of I chose you directly illuminates what the word means",body:""},
+  "st_john_the_evangelist_1st_century_ad_traditionally_identified_as_the_beloved_disciple_one_of_the_twelve_and_the_author_of_the_fourth_gospel_three_epistles_and_the_revelation_the_high_priestly_prayer_of_john_17_the_longest_prayer_in_the_gospels_is_unique_to_his_gospel_and_the_source_for_today_s_scripture_and_word_he_is_featured_today_because_the_text_is_his": {name:"St John the Evangelist (1st century AD). Traditionally identified as the Beloved Disciple, one of the Twelve, and the author of the fourth Gospel, three epistles, and the Revelation. The High Priestly Prayer of John 17 \u2014 the longest prayer in the Gospels \u2014 is unique to his Gospel, and the source for today's scripture and word. He is featured today because the text is his",dates:"",role:"",body:""}
 };
 
-/* ── STATE ──────────────────────────────────────────────────── */
+/* ── State ── */
 let currentDay = 0, currentScreen = 0;
 const TOTAL = 6;
+const LABELS = ['Season','Word','Scripture','Contemplation','Prayer','Practice'];
+const CLASSES = ['screen-season','screen-word','screen-scripture','screen-contemplation','screen-prayer','screen-practice'];
 
-/* ── ESCAPE ─────────────────────────────────────────────────── */
-const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-
-/* ── SCREEN BUILDERS ────────────────────────────────────────── */
-function buildSeason(s) {
-  const subs = (s.subs||[]).map(x =>
-    `<div class="season-sub${x.primary?' sub-primary':''}">${esc(x.text)}</div>`
-  ).join('');
-  return `<div class="season-heading">${esc(s.heading)}</div>
-${subs}
-<div class="season-divider"></div>
-<div class="season-body">${s.body}</div>`;
-}
-function buildWord(w) {
-  return `<div class="word-title">${esc(w.title)}</div>
-<div class="word-pronunciation">${esc(w.pronunciation)}</div>
-<div class="word-divider"></div>
-<div class="word-definition">${w.definition}</div>`;
-}
-function buildScripture(passages) {
-  return passages.map(p =>
-    `<div class="scripture-passage">
-  <div class="scripture-ref">${p.ref}</div>
-  <div class="scripture-block"><div class="scripture-text">${p.text}</div></div>
-  <div class="scripture-translation">${esc(p.translation)}</div>
-</div>`).join('');
-}
-function buildContemplation(c) {
-  return `<div class="contemplation-body">${c.body}</div>
-<div class="contemplation-question">${esc(c.question)}</div>`;
-}
-function buildPrayer(p) {
-  return `<div class="prayer-body">${p.body}</div>
-<div class="prayer-amen">${esc(p.amen)}</div>`;
-}
-function buildPractice(p) {
-  return `<div class="practice-body">${p.body}</div>
-<div class="practice-anchor">${p.anchor}</div>`;
-}
-
-/* ── RENDER DAY ─────────────────────────────────────────────── */
+/* ── Render ── */
 function renderDay(idx) {
-  const day  = DAYS[idx];
-  const app  = document.getElementById('app');
+  const day = DAYS[idx];
+  const app = document.getElementById('app');
   const cont = document.getElementById('screens');
 
-  /* Palette */
-  const pal = PALETTES[day.palette || 'eastertide'];
-  app.classList.remove('palette-eastertide','palette-pentecost');
-  app.classList.add(pal.cls);
-  Object.entries(pal.vars).forEach(([k,v]) =>
+  app.className = 'app ' + day.paletteCls;
+  Object.entries(day.paletteVars).forEach(([k,v]) =>
     document.documentElement.style.setProperty(k, v)
   );
-  document.body.style.background = pal.vars['--shell'];
-
-  /* Top bar: date only */
+  document.body.style.background = day.paletteVars['--shell'];
   document.getElementById('dayMetaDate').textContent = day.date;
 
-  /* Build 6 screens */
   const s = day.screens;
-  const labels  = ['Season','Word','Scripture','Contemplation','Prayer','Practice'];
-  const classes = ['screen-season','screen-word','screen-scripture',
-                   'screen-contemplation','screen-prayer','screen-practice'];
-  const builders = s ? [
-    buildSeason(s.season),
-    buildWord(s.word),
-    buildScripture(s.scripture),
-    buildContemplation(s.contemplation),
-    buildPrayer(s.prayer),
-    buildPractice(s.practice)
-  ] : labels.map(() => `<div class="placeholder-body">Content for this day is in production.</div>`);
+  const screenContents = [s.season, s.word, s.scripture, s.contemplation, s.prayer, s.practice];
 
-  cont.innerHTML = builders.map((html, i) => `
-    <section class="screen ${classes[i]}" data-screen="${i}" aria-label="${labels[i]}">
+  cont.innerHTML = screenContents.map((html, i) => `
+    <section class="screen ${CLASSES[i]}" data-screen="${i}" aria-label="${LABELS[i]}">
       <div class="screen-fade-top"></div>
-      <div class="screen-label">${labels[i]}</div>
+      <div class="screen-label">${LABELS[i]}</div>
       <div class="screen-inner">${html}</div>
       <div class="screen-fade-bottom"></div>
     </section>`).join('');
 
-  /* Bind figure links for this day */
   cont.querySelectorAll('.figure-link').forEach(el => {
     el.addEventListener('click', ev => {
       ev.stopPropagation();
-      openFigure(el.dataset.figure, day.figures || {});
+      openFigure(el.dataset.figure);
     });
   });
 
-  /* Navigate to screen 0, reset all scroll positions (fix #6) */
   goTo(0, false);
   cont.querySelectorAll('.screen-inner').forEach(el => { el.scrollTop = 0; });
   animateScreen(0);
 }
 
-/* ── NAVIGATION ─────────────────────────────────────────────── */
-function goTo(i, doAnim = true) {
-  /* Wrap forward past last screen → screen 0 (fix #7) */
+/* ── Navigation ── */
+function goTo(i, anim=true) {
   if (i >= TOTAL) i = 0;
   if (i < 0) i = 0;
   currentScreen = i;
   document.getElementById('screens').style.transform = `translateY(-${i * 100}vh)`;
-  document.querySelectorAll('.dot').forEach((d, idx) =>
-    d.classList.toggle('active', idx === i)
-  );
-  document.getElementById('counter').textContent = `${i + 1} / ${TOTAL}`;
+  document.querySelectorAll('.dot').forEach((d,idx) => d.classList.toggle('active', idx===i));
+  document.getElementById('counter').textContent = `${i+1} / ${TOTAL}`;
   if (i > 0) document.getElementById('swipeHint').style.opacity = '0';
-  if (doAnim) animateScreen(i);
+  if (anim) animateScreen(i);
 }
 
 function animateScreen(i) {
   const sc = document.querySelectorAll('.screen')[i];
   if (!sc) return;
-  /* Reset inner scroll to top (fix #6) */
   const inner = sc.querySelector('.screen-inner');
   if (inner) inner.scrollTop = 0;
   sc.classList.remove('animating');
   void sc.offsetWidth;
   sc.classList.add('animating');
-  sc.addEventListener('animationend', () => sc.classList.remove('animating'), { once: true });
+  sc.addEventListener('animationend', () => sc.classList.remove('animating'), {once:true});
 }
 
-/* ── UI BUILD ───────────────────────────────────────────────── */
+/* ── UI ── */
 function buildDots() {
   const el = document.getElementById('dots');
-  const labels = ['Season','Word','Scripture','Contemplation','Prayer','Practice'];
-  el.innerHTML = labels.map((l, i) =>
+  el.innerHTML = LABELS.map((l,i) =>
     `<button class="dot${i===0?' active':''}" data-index="${i}" aria-label="${l}"></button>`
   ).join('');
   el.querySelectorAll('.dot').forEach(d =>
@@ -978,8 +1331,9 @@ function buildDots() {
 
 function buildDayPicker() {
   const el = document.getElementById('dayPicker');
-  el.innerHTML = DAYS.map((d, i) => {
-    const short = d.date.split(' ').slice(0,2).join('\u00A0');
+  el.innerHTML = DAYS.map((d,i) => {
+    const parts = d.date.split(' ');
+    const short = parts[0] + '\u00A0' + parts[1];
     return `<button class="day-btn${i===0?' active':''}" data-day="${i}">${short}</button>`;
   }).join('');
   el.querySelectorAll('.day-btn').forEach(btn =>
@@ -987,129 +1341,78 @@ function buildDayPicker() {
       const idx = parseInt(btn.dataset.day);
       if (idx === currentDay) return;
       currentDay = idx;
-      el.querySelectorAll('.day-btn').forEach(b => b.classList.toggle('active', b === btn));
+      el.querySelectorAll('.day-btn').forEach(b => b.classList.toggle('active', b===btn));
       renderDay(idx);
     })
   );
 }
 
-/* ── FIGURE MODAL ───────────────────────────────────────────── */
-function openFigure(key, figs) {
-  const fig = figs[key]; if (!fig) return;
+/* ── Figure modal ── */
+function openFigure(key) {
+  const fig = FIGURES[key]; if (!fig) return;
   document.getElementById('figureName').textContent  = fig.name;
   document.getElementById('figureDates').textContent = fig.dates;
   document.getElementById('figureRole').textContent  = fig.role || '';
   document.getElementById('figureBody').textContent  = fig.body;
   document.getElementById('figureOverlay').classList.add('open');
 }
-function closeFigure() {
-  document.getElementById('figureOverlay').classList.remove('open');
-}
+function closeFigure() { document.getElementById('figureOverlay').classList.remove('open'); }
 document.getElementById('figureClose').addEventListener('click', closeFigure);
 document.getElementById('figureOverlay').addEventListener('click', ev => {
   if (ev.target === document.getElementById('figureOverlay')) closeFigure();
 });
 
-/* ── GESTURE HANDLING (fix #3) ──────────────────────────────── */
-/*
-   Rule: a vertical swipe triggers a screen change ONLY if the
-   screen-inner scroll position is already at its boundary in
-   the direction of the swipe.
-
-   Swipe UP   (finger moves up, dy < 0) → advance screen
-              → only fires if inner.scrollTop is at the BOTTOM
-                (scrollTop >= scrollHeight - clientHeight - tolerance)
-
-   Swipe DOWN (finger moves down, dy > 0) → retreat screen
-              → only fires if inner.scrollTop === 0
-
-   If the boundary condition is not met, the gesture scrolls the
-   inner content instead (native scroll, no JS needed).
-*/
-const SWIPE_THRESH    = 45;   /* min px to register as intentional swipe */
-const SCROLL_TOLERANCE = 4;   /* px slack for "at the bottom" check */
-
-function getActiveInner() {
-  const screens = document.querySelectorAll('.screen');
-  const sc = screens[currentScreen];
+/* ── Gestures ── */
+const SWIPE_THRESH = 45, SCROLL_TOL = 4;
+function getInner() {
+  const sc = document.querySelectorAll('.screen')[currentScreen];
   return sc ? sc.querySelector('.screen-inner') : null;
 }
+function atBottom(el) { return !el || el.scrollTop >= el.scrollHeight - el.clientHeight - SCROLL_TOL; }
+function atTop(el)    { return !el || el.scrollTop <= SCROLL_TOL; }
 
-function isAtBottom(inner) {
-  if (!inner) return true;
-  return inner.scrollTop >= (inner.scrollHeight - inner.clientHeight - SCROLL_TOLERANCE);
-}
-function isAtTop(inner) {
-  if (!inner) return true;
-  return inner.scrollTop <= SCROLL_TOLERANCE;
-}
-
-/* ── Touch ── */
-let touchStartX = 0, touchStartY = 0, touchActive = false;
-
+let tx=0,ty=0,ta=false;
 document.addEventListener('touchstart', ev => {
   if (document.getElementById('figureOverlay').classList.contains('open')) return;
-  touchStartX = ev.touches[0].clientX;
-  touchStartY = ev.touches[0].clientY;
-  touchActive = true;
-}, { passive: true });
-
+  tx=ev.touches[0].clientX; ty=ev.touches[0].clientY; ta=true;
+}, {passive:true});
 document.addEventListener('touchend', ev => {
-  if (!touchActive) return;
-  touchActive = false;
-  const dx = ev.changedTouches[0].clientX - touchStartX;
-  const dy = ev.changedTouches[0].clientY - touchStartY;
-  if (Math.abs(dy) <= Math.abs(dx)) return;   /* horizontal — ignore */
-  if (Math.abs(dy) < SWIPE_THRESH) return;    /* too small — ignore */
+  if (!ta) return; ta=false;
+  const dx=ev.changedTouches[0].clientX-tx, dy=ev.changedTouches[0].clientY-ty;
+  if (Math.abs(dy)<=Math.abs(dx)||Math.abs(dy)<SWIPE_THRESH) return;
+  const inner=getInner();
+  if (dy<0 && atBottom(inner)) goTo(currentScreen+1);
+  else if (dy>0 && atTop(inner)) goTo(currentScreen-1);
+}, {passive:true});
 
-  const inner = getActiveInner();
-  if (dy < 0) {
-    /* Swipe UP → advance, but only if inner is scrolled to bottom */
-    if (isAtBottom(inner)) goTo(currentScreen + 1);
-  } else {
-    /* Swipe DOWN → retreat, but only if inner is scrolled to top */
-    if (isAtTop(inner)) goTo(currentScreen - 1);
-  }
-}, { passive: true });
-
-/* ── Mouse drag (desktop testing) ── */
-let mouseStartY = 0, mouseDown = false;
-
+let my=0,md=false;
 document.addEventListener('mousedown', ev => {
   if (ev.target.closest('.figure-link,.figure-overlay,.dot,.close,.day-btn,.screen-inner')) return;
-  mouseStartY = ev.clientY;
-  mouseDown = true;
+  my=ev.clientY; md=true;
 });
 document.addEventListener('mouseup', ev => {
-  if (!mouseDown) return;
-  mouseDown = false;
-  const dy = ev.clientY - mouseStartY;
-  if (Math.abs(dy) < 55) return;
-  /* Mouse drag on the screen background (not the inner scroll area):
-     always triggers navigation — user is deliberately dragging the frame */
-  goTo(currentScreen + (dy < 0 ? 1 : -1));
+  if (!md) return; md=false;
+  const dy=ev.clientY-my;
+  if (Math.abs(dy)>55) goTo(currentScreen+(dy<0?1:-1));
 });
 
-/* ── Keyboard ── */
 document.addEventListener('keydown', ev => {
   if (document.getElementById('figureOverlay').classList.contains('open')) {
-    if (ev.key === 'Escape') closeFigure();
-    return;
+    if (ev.key==='Escape') closeFigure(); return;
   }
-  if (ev.key === 'ArrowDown' || ev.key === 'ArrowRight') goTo(currentScreen + 1);
-  if (ev.key === 'ArrowUp'   || ev.key === 'ArrowLeft')  goTo(currentScreen - 1);
+  if (ev.key==='ArrowDown'||ev.key==='ArrowRight') goTo(currentScreen+1);
+  if (ev.key==='ArrowUp'  ||ev.key==='ArrowLeft')  goTo(currentScreen-1);
 });
 
-/* ── INIT ───────────────────────────────────────────────────── */
+/* ── Init ── */
 buildDots();
 buildDayPicker();
 renderDay(0);
 
-/* ── SERVICE WORKER REGISTRATION ────────────────────────────── */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('service-worker.js')
-      .catch(err => console.warn('Vigil: service worker registration failed:', err));
+      .catch(err => console.warn('Vigil: SW registration failed:', err));
   });
 }
 </script>
