@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<!-- Vigil build: 2026-04-20 06:41:43 -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Vigil</title>
 <link rel="manifest" href="manifest.json">
@@ -129,7 +133,7 @@ body { overflow: hidden; }
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  padding: 1.4rem 1.4rem 5rem;
+  padding: 1.4rem 1.4rem 12rem;  /* bottom padding must exceed fade height so last line scrolls clear */
   width: 100%;
   scrollbar-width: thin;
   scrollbar-color: var(--accent) transparent;
@@ -505,6 +509,8 @@ body { overflow: hidden; }
   padding: 2rem 1.8rem 1.8rem;
   position: relative;
   box-shadow: 0 16px 48px rgba(28,23,20,0.18);
+  text-transform: none;
+  letter-spacing: normal;
 }
 .figure-card .close {
   position: absolute; top: 0.8rem; right: 1rem;
@@ -538,7 +544,7 @@ body { overflow: hidden; }
   background: var(--gold); margin-bottom: 1.1rem;
 }
 .figure-body {
-  font-family: 'Libre Baskerville', serif; font-size: 1.05rem;
+  font-family: 'Libre Baskerville', serif; font-size: 1.15rem;
   line-height: 1.9; color: var(--text);
   text-transform: none; letter-spacing: normal;
 }
