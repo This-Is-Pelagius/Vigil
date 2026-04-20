@@ -76,10 +76,11 @@ body { overflow: hidden; }
 
 /* ── Screens: horizontal layout ── */
 .screens-container {
-  flex: 1;
+  position: absolute;
+  top: 0; left: 0;
   display: flex;
   flex-direction: row;
-  width: 100vw;
+  width: 100%;
   height: 100%;
   transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
@@ -231,13 +232,14 @@ body { overflow: hidden; }
 /* ── Screen 1: Season ── */
 .season-name {
   font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(2.6rem, 14vw, 3.8rem);
+  font-size: clamp(1.8rem, 9vw, 3rem);
   font-weight: 300;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   line-height: 1.0;
   color: var(--text);
   margin-bottom: 0.75rem;
+  white-space: nowrap;
 }
 .season-position {
   font-family: 'Raleway', sans-serif;
@@ -275,13 +277,14 @@ body { overflow: hidden; }
 /* ── Screen 2: Word ── */
 .word-title {
   font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(2.6rem, 14vw, 3.8rem);
+  font-size: clamp(2.4rem, 14vw, 4.5rem);
   font-weight: 300;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   line-height: 1.0;
   color: var(--text);
   margin-bottom: 0.75rem;
+  white-space: nowrap;
 }
 .word-pronunciation {
   font-family: 'Raleway', sans-serif;
@@ -522,11 +525,11 @@ body { overflow: hidden; }
   color: var(--text); margin-bottom: 0.3rem; line-height: 1.2;
 }
 .figure-dates {
-  font-family: 'Libre Baskerville', serif; font-size: 0.8rem;
+  font-family: 'Libre Baskerville', serif; font-size: 0.9rem;
   font-style: italic; color: var(--dim); margin-bottom: 0.4rem;
 }
 .figure-role {
-  font-family: 'Raleway', sans-serif; font-size: 0.58rem;
+  font-family: 'Raleway', sans-serif; font-size: 0.65rem;
   font-weight: 400; letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--dim); margin-bottom: 1.1rem; opacity: 0.8;
 }
@@ -535,8 +538,9 @@ body { overflow: hidden; }
   background: var(--gold); margin-bottom: 1.1rem;
 }
 .figure-body {
-  font-family: 'Libre Baskerville', serif; font-size: 0.95rem;
-  line-height: 1.85; color: var(--text);
+  font-family: 'Libre Baskerville', serif; font-size: 1.05rem;
+  line-height: 1.9; color: var(--text);
+  text-transform: none; letter-spacing: normal;
 }
 
 @media (min-width: 700px) {
