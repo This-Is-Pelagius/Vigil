@@ -30,6 +30,7 @@
 
 html {
   font-size: 16px;
+  overflow: hidden;
 }
 
 html, body {
@@ -38,6 +39,7 @@ html, body {
   font-family: 'Raleway', sans-serif;
   color: var(--text);
   overscroll-behavior: none;
+  overflow: hidden;
 }
 body { overflow: hidden; }
 
@@ -77,13 +79,15 @@ body { overflow: hidden; }
   flex: 1;
   display: flex;
   flex-direction: row;
+  width: 100vw;
   height: 100%;
   transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
 }
 
 .screen {
-  min-width: 100%;
+  min-width: 100vw;
+  width: 100vw;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -587,9 +591,9 @@ const DAYS = [
       season:        `
     <div class="season-name">Eastertide</div>
     <div class="season-position">Friday · Week Four · 1 May 2026</div>
-    <div class="season-feast">Optional Memorial  · <button type="button" class="figure-link" data-figure="st_joseph">St Joseph</button> the Worker</div>
+    <div class="season-feast">Optional Memorial  · <button type="button" class="figure-link" data-figure="st_joseph_the_worker">St Joseph the Worker</button></div>
 <div class="season-divider"></div>
-    <div class="season-body"><p>We are deep in Eastertide — the great fifty days between Easter and Pentecost, when the Church lives in the light of the resurrection.</p><p>Today the Catholic Church also remembers <button type="button" class="figure-link" data-figure="st_joseph">St Joseph</button> the Worker — the husband of Mary and earthly father of Jesus — whose memorial on this day honours the quiet dignity of labour done faithfully in the presence of God.</p></div>`,
+    <div class="season-body"><p>We are deep in Eastertide — the great fifty days between Easter and Pentecost, when the Church lives in the light of the resurrection.</p><p>Today the Catholic Church also remembers <button type="button" class="figure-link" data-figure="st_joseph_the_worker">St Joseph the Worker</button> — the husband of Mary and earthly father of Jesus — whose memorial on this day honours the quiet dignity of labour done faithfully in the presence of God.</p></div>`,
       word:          `
     <div class="word-title">ABIDE</div>
     <div class="word-pronunciation">[uh-byde]</div>
@@ -630,10 +634,9 @@ const DAYS = [
     },
     screens: {
       season:        `
-    <div class="season-name">Eastertide</div>
-    <div class="season-position">Saturday · Week Four · 2 May 2026</div>
-    <div class="season-feast">Memorial  ·  St. Athanasius, Bishop and Doctor of the Church</div>
-<div class="season-divider"></div>
+    <div class="season-name">ß</div>
+    <div class="season-position">2 May 2026</div>
+    <div class="season-divider"></div>
     <div class="season-body"><p>We are in the closing days of the fourth week of Easter.</p><p>The Church today keeps the memorial of <button type="button" class="figure-link" data-figure="st_athanasius_of_alexandria">St Athanasius of Alexandria</button> who defended the full divinity of Christ  and understood that if the life flowing through the vine is not the life of God himself, then the promise of transformation is empty.</p></div>`,
       word:          `
     <div class="word-title">BRANCH</div>
@@ -980,7 +983,7 @@ Hold those we bring today — the ones we are worried for, the ones we have almo
 ];
 
 const FIGURES = {
-  "st_joseph": {name:"St Joseph",dates:"1st century AD",role:"The husband of Mary and earthly father of Jesus. In Matthew 13:55, Jesus is descrbed as the son of a tekton (\u03c4\u03ad\u03ba\u03c4\u03c9\u03bd ), meaning a craftsman, a carpenter or a builder. His memorial on 1 May honours the dignity of ordinary labour done faithfully in the presence of God",body:""},
+  "st_joseph_the_worker": {name:"St Joseph the Worker",dates:"1st century AD",role:"The husband of Mary and earthly father of Jesus. In Matthew 13:55, Jesus is descrbed as the son of a tekton (\u03c4\u03ad\u03ba\u03c4\u03c9\u03bd ), meaning a craftsman, a carpenter or a builder. His memorial on 1 May honours the dignity of ordinary labour done faithfully in the presence of God",body:""},
   "st_john_the_evangelist": {name:"St John the Evangelist",dates:"1st century AD",role:"Traditionally identified as one of the twelve apostles and author of the fourth Gospel. The vine discourse of John 15 in today's scripture is among the most theologically concentrated passages in the New Testament",body:""},
   "st_athanasius_of_alexandria": {name:"St Athanasius of Alexandria",dates:"c. 296\u2013373",role:"Bishop of Alexandria and Doctor of the Church; one of the most important theologians of the early Church. Exiled five times for his insistence that Christ is fully God \u2014 not a lesser or created being \u2014 he became the defining voice for what the Church holds today about the divine nature of Christ. He is featured today because the life flowing through the vine is only transformative if it is the life of God himself \u2014 which is precisely what Athanasius spent his life defending",body:""},
   "st_paul_the_apostle": {name:"St Paul the Apostle",dates:"c. 5\u2013c. 64/67 AD",role:"Apostle to the Gentiles and author of many of the major epistles of the New Testament. His letter to the Galatians names the fruit of the Spirit \u2014 love, joy, peace, patience, kindness, generosity, faithfulness, gentleness, self-control \u2014 and in doing so gives the Church its most precise account of what a life lived in union with Christ actually looks like from the outside",body:""},
