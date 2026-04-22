@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Generated 2026-04-22 11:57 · 9 day(s) -->
+<!-- Vigil · Generated 2026-04-22 15:22 · 7 day(s) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Vigil</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -167,7 +167,7 @@ body { overflow: hidden; }
   font-size: 0.85rem; font-weight: 600;
   letter-spacing: 0.38em; text-transform: uppercase;
   color: var(--dim);
-  padding: 6.5rem 1.4rem 0;
+  padding: 7.2rem 1.4rem 1.2rem;
   width: 100%; flex-shrink: 0;
 }
 
@@ -353,8 +353,14 @@ body { overflow: hidden; }
   font-family: 'Raleway', sans-serif;
   font-size: 0.85rem; font-weight: 400;
   letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--dim); margin-top: 1.3rem;
+  color: var(--dim); margin-top: 0.6rem;
 }
+
+/* Increase spacing between label and body on screens 3–6 */
+.screen-scripture .screen-inner > *:first-child { margin-top: 1.2rem; }
+.screen-contemplation .screen-inner > *:first-child { margin-top: 1.2rem; }
+.screen-prayer .screen-inner > *:first-child { margin-top: 1.2rem; }
+.screen-practice .screen-inner > *:first-child { margin-top: 1.2rem; }
 
 /* ── Screen 4: Contemplation ── */
 .contemplation-body {
@@ -369,7 +375,7 @@ body { overflow: hidden; }
   line-height: 1.6; max-width: 420px;
   margin-top: 2rem; padding-top: 1.5rem;
   border-top: 1px solid transparent;
-  border-image: linear-gradient(to right, var(--accent-soft), transparent) 1;
+  border-image: linear-gradient(to right, var(--gold), transparent) 1;
   color: var(--text);
 }
 
@@ -384,6 +390,7 @@ body { overflow: hidden; }
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.3rem; font-style: italic; font-weight: 300;
   line-height: 2.0; color: var(--text);
+  margin-top: 1.2rem;
 }
 .prayer-body p + p { margin-top: 0.6rem; }
 .prayer-amen {
@@ -405,7 +412,7 @@ body { overflow: hidden; }
   line-height: 1.6; max-width: 420px;
   margin-top: 2rem; padding-top: 1.5rem;
   border-top: 1px solid transparent;
-  border-image: linear-gradient(to right, var(--accent-soft), transparent) 1;
+  border-image: linear-gradient(to right, var(--gold), transparent) 1;
   color: var(--text);
 }
 
@@ -487,7 +494,10 @@ body { overflow: hidden; }
 }
 .figure-dates {
   font-family: 'Libre Baskerville', serif; font-size: 0.9rem;
-  font-style: italic; color: var(--dim); margin-bottom: 0.4rem;
+  font-style: italic; color: var(--dim); margin-bottom: 0.8rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(to right, var(--gold), transparent) 1;
 }
 .figure-role {
   font-family: 'Raleway', sans-serif; font-size: 0.65rem;
@@ -504,7 +514,7 @@ body { overflow: hidden; }
 }
 
 @media (min-width: 700px) {
-  .screen-label { padding: 6.5rem 3rem 0; }
+  .screen-label { padding: 7.2rem 3rem 1.2rem; }
   .screen-inner { padding: 1.8rem 3rem 6rem; }
 }
 
@@ -534,66 +544,6 @@ body { overflow: hidden; }
   <!-- All days, each containing 6 screens -->
   <div class="screens-container" id="screens">
   <div class="day-screens" data-day="0">
-    <section class="screen screen-season" data-screen="0" aria-label="Season">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Season</div>
-      <div class="screen-inner">
-    <div class="season-name">Eastertide</div>
-    <div class="season-position">Friday · Week Four · 1 May 2026</div>
-    <div class="season-feast">Optional Memorial · <button type="button" class="figure-link" data-figure="st_joseph_the_worker">St Joseph the Worker</button></div><div class="season-divider"></div>
-    <div class="season-body"><p>We are deep in Eastertide — the great fifty days between Easter and Pentecost, when the Church lives in the light of the resurrection.</p><p>Today the Church also remembers <button type="button" class="figure-link" data-figure="st_joseph_the_worker">St Joseph the Worker</button> — the husband of Mary and earthly father of Jesus — whose memorial on this day honours the quiet dignity of labour done faithfully in the presence of God.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-word" data-screen="1" aria-label="Word">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Word</div>
-      <div class="screen-inner">
-    <div class="word-title">ABIDE</div>
-    <div class="word-pronunciation">[uh-byde]</div>
-    <div class="word-divider"></div>
-    <div class="word-definition"><p>To abide — from the Greek menō (μένω) — means not merely to stay put, but to take up residence. To make a home somewhere. To live within rather than simply near.</p><p>There is a domestic quality to the word that translation tends to smooth away. When Jesus uses it in <button type="button" class="figure-link" data-figure="st_john">John</button> 15, he is not issuing a command so much as extending an invitation to a particular kind of closeness: not proximity, but porousness. Not standing at the door, but belonging inside.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Scripture</div>
-      <div class="screen-inner">
-    <div class="scripture-passage">
-      <div class="scripture-block">
-        <div class="scripture-text"><p>Abide in me as I abide in you. Just as the branch cannot bear fruit by itself unless it abides in the vine, neither can you unless you abide in me. I am the vine, you are the branches. Those who abide in me and I in them bear much fruit, because apart from me you can do nothing.</p></div>
-      </div>
-      <div class="scripture-translation">John 15:4–5 — NRSV</div>
-    </div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-contemplation" data-screen="3" aria-label="Contemplation">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Contemplation</div>
-      <div class="screen-inner">
-    <div class="contemplation-body"><p>Notice what the branch is not asked to do first. Before it bears fruit — before it does anything at all — it abides. The abiding is not the whole of it, but it is the condition for everything else. A branch that has detached from the vine can exert whatever effort it likes; it will produce nothing.</p><p>When you remain in Christ — returning to him, drawing from him, letting his life move through yours — something begins to happen that you did not generate and cannot entirely account for. The capacity to love more freely, to act less from fear, to become, slowly, more than you were: this is not self-improvement. It is what the Christian tradition calls theōsis (θέωσις) — not the erasure of the self, but its transformation from within, by a life greater than your own flowing through it.</p></div>
-    <div class="contemplation-question">What would it mean to let Christ be the source of your capacity to love and act — and not just the inspiration for it? Not the one who motivates you from outside, but the one from whom the ability to bear fruit actually flows — the way sap moves through a branch without the branch deciding to let it.</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-prayer" data-screen="4" aria-label="Prayer">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Prayer</div>
-      <div class="screen-inner">
-    <div class="prayer-block">
-      <div class="prayer-body"><p>Lord,</p><p>You have asked us to abide — to make our home in you, as you make your home in us.</p><p>Where we have settled for connection when you offered indwelling, draw us deeper so we abide in you.</p><p>Where we have tried to live on what we can produce alone, remind us that apart from you we can do nothing — and that when we abide with you, we can bear fruit we never imagined.</p></div>
-      <div class="prayer-amen">In Christ&#39;s name, Amen.</div>
-    </div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-practice" data-screen="5" aria-label="Practice">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Practice</div>
-      <div class="screen-inner">
-    <div class="practice-body"><p>At some point today, return to a task you do every day — washing up, making coffee or tea, walking a familiar route — and as you do it, pray quietly: Abide in me, Lord, and let me abide in you. Let the prayer accompany the work, not replace it.</p></div>
-    <div class="practice-anchor">We are called to work — to love, to act, to serve. But the fruit of that work grows only when it is drawn from Christ, the vine from whom all fruitfulness flows.</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-  </div>
-  <div class="day-screens" data-day="1" style="display:none">
     <section class="screen screen-season" data-screen="0" aria-label="Season">
       <div class="screen-fade-top"></div>
       <div class="screen-label">Season</div>
@@ -659,67 +609,7 @@ body { overflow: hidden; }
       <div class="screen-fade-bottom"></div>
     </section>
   </div>
-  <div class="day-screens" data-day="2" style="display:none">
-    <section class="screen screen-season" data-screen="0" aria-label="Season">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Season</div>
-      <div class="screen-inner">
-    <div class="season-name">Eastertide</div>
-    <div class="season-position">Saturday · Easter IV · 2 May 2026</div>
-    <div class="season-feast">Memorial · <button type="button" class="figure-link" data-figure="st_athanasius_of_alexandria">St Athanasius of Alexandria</button>, Bishop and Doctor of the Church</div><div class="season-divider"></div>
-    <div class="season-body"><p>We are in the closing days of the fourth week of Eastertide, the great fifty days between Easter and Pentecost when the Church lives in the light of the resurrection.</p><p>Today the Church keeps the memorial of <button type="button" class="figure-link" data-figure="st_athanasius_of_alexandria">St Athanasius of Alexandria</button>, whose long defence of the full divinity of Christ makes him, perhaps more than any other figure, the reason the Church still says what it says about who Jesus is.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-word" data-screen="1" aria-label="Word">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Word</div>
-      <div class="screen-inner">
-    <div class="word-title">BRANCH</div>
-    <div class="word-pronunciation">[brahnch]</div>
-    <div class="word-divider"></div>
-    <div class="word-definition"><p>The word Jesus uses for branch in <button type="button" class="figure-link" data-figure="st_john">John</button> 15 is the Greek klēma (κλῆμα) — not the main branch of a vine but a cutting: a slender shoot taken from the parent plant and grafted into the stock, wholly dependent on its new source for every drop of life it carries. It is not self-standing. It was never designed to be.</p><p>There is something deliberately chosen about the image. <button type="button" class="figure-link" data-figure="st_john">St John</button>&#39;s Jesus does not say his disciples are like trees that happen to grow near him. He says they are shoots that have been grafted onto him — and that without that union, whatever they manage to produce, it will not be fruit.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Scripture</div>
-      <div class="screen-inner">
-    <div class="scripture-passage">
-      <div class="scripture-block">
-        <div class="scripture-text"><p>I am the vine, you are the branches. Those who abide in me and I in them bear much fruit, because apart from me you can do nothing.</p></div>
-      </div>
-      <div class="scripture-translation">John 15:5 — NRSV</div>
-    </div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-contemplation" data-screen="3" aria-label="Contemplation">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Contemplation</div>
-      <div class="screen-inner">
-    <div class="contemplation-body"><p>Apart from me, Jesus says, you can do nothing.</p><p>It is easy to quietly renegotiate that word, &quot;nothing&quot;. Surely he means nothing that lasts, nothing of real significance — because we can obviously do a great many things.</p><p>But the fruit Jesus has in mind — a life that gradually comes to look like his, that loves with something larger than its own capacity — cannot be self-generated. It has to be drawn from the vine, the way sap moves through a branch: not because the branch has decided to let it, but because the branch is joined.</p></div>
-    <div class="contemplation-question">Where are you trying to produce that kind of fruit as though it were yours to generate — rather than the vine&#39;s to give?</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-prayer" data-screen="4" aria-label="Prayer">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Prayer</div>
-      <div class="screen-inner">
-    <div class="prayer-block">
-      <div class="prayer-body"><p>Lord,</p><p>You have called us branches — dependent on you for everything that matters, unable to produce by ourselves what we most want to give.</p><p>Where we have been acting as though the life were our own — as though we were the vine rather than something grafted into it — bring us back.</p><p>Where we are trying hard and producing nothing, and we don&#39;t understand why, help us see what we have quietly disconnected from.</p><p>Teach us that depending on you is not a weakness. It is how the fruit grows.</p></div>
-      <div class="prayer-amen">In Christ&#39;s name, Amen.</div>
-    </div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-practice" data-screen="5" aria-label="Practice">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Practice</div>
-      <div class="screen-inner">
-    <div class="practice-body"><p>Find a tree today — in a garden, on a street, through a window — and look at one of its branches for a moment. You can see where it joins the trunk or stem. You can trace the shape of it.  The join is quiet, unremarkable. But everything the branch does depends on what is flowing from the tree.</p></div>
-    <div class="practice-anchor">You are not the tree. You are the branch. And the branch&#39;s life is not its own.  Its deepest freedom is not in separating from the vine, but in all that it becomes by remaining part of it.</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-  </div>
-  <div class="day-screens" data-day="3" style="display:none">
+  <div class="day-screens" data-day="1" style="display:none">
     <section class="screen screen-season" data-screen="0" aria-label="Season">
       <div class="screen-fade-top"></div>
       <div class="screen-label">Season</div>
@@ -785,7 +675,7 @@ body { overflow: hidden; }
       <div class="screen-fade-bottom"></div>
     </section>
   </div>
-  <div class="day-screens" data-day="4" style="display:none">
+  <div class="day-screens" data-day="2" style="display:none">
     <section class="screen screen-season" data-screen="0" aria-label="Season">
       <div class="screen-fade-top"></div>
       <div class="screen-label">Season</div>
@@ -851,7 +741,7 @@ body { overflow: hidden; }
       <div class="screen-fade-bottom"></div>
     </section>
   </div>
-  <div class="day-screens" data-day="5" style="display:none">
+  <div class="day-screens" data-day="3" style="display:none">
     <section class="screen screen-season" data-screen="0" aria-label="Season">
       <div class="screen-fade-top"></div>
       <div class="screen-label">Season</div>
@@ -911,7 +801,7 @@ body { overflow: hidden; }
       <div class="screen-fade-bottom"></div>
     </section>
   </div>
-  <div class="day-screens" data-day="6" style="display:none">
+  <div class="day-screens" data-day="4" style="display:none">
     <section class="screen screen-season" data-screen="0" aria-label="Season">
       <div class="screen-fade-top"></div>
       <div class="screen-label">Season</div>
@@ -972,7 +862,7 @@ Agapē is always more verb than noun — chosen, willed, and returned to again a
       <div class="screen-fade-bottom"></div>
     </section>
   </div>
-  <div class="day-screens" data-day="7" style="display:none">
+  <div class="day-screens" data-day="5" style="display:none">
     <section class="screen screen-season" data-screen="0" aria-label="Season">
       <div class="screen-fade-top"></div>
       <div class="screen-label">Season</div>
@@ -1032,7 +922,7 @@ Agapē is always more verb than noun — chosen, willed, and returned to again a
       <div class="screen-fade-bottom"></div>
     </section>
   </div>
-  <div class="day-screens" data-day="8" style="display:none">
+  <div class="day-screens" data-day="6" style="display:none">
     <section class="screen screen-season" data-screen="0" aria-label="Season">
       <div class="screen-fade-top"></div>
       <div class="screen-label">Season</div>
@@ -1115,7 +1005,7 @@ Hold those we bring today — the ones we are worried for, the ones we have almo
 </div>
 
 <script>
-const DAYS    = [{"palette": "palette-eastertide", "label": "Friday 1 May 2026", "date": "1 May 2026"}, {"palette": "palette-eastertide", "label": "Friday 1 May 2026", "date": "1 May 2026"}, {"palette": "palette-eastertide", "label": "Saturday 2 May 2026", "date": "2 May 2026"}, {"palette": "palette-eastertide", "label": "Saturday 2 May 2026", "date": "2 May 2026"}, {"palette": "palette-eastertide", "label": "Eastertide 3 May 2026", "date": "3 May 2026"}, {"palette": "palette-eastertide", "label": "Monday 4 May 2026", "date": "4 May 2026"}, {"palette": "palette-eastertide", "label": "Tuesday 5 May 2026", "date": "5 May 2026"}, {"palette": "palette-eastertide", "label": "Wednesday 6 May 2026", "date": "6 May 2026"}, {"palette": "palette-eastertide", "label": "Thursday 7 May 2026", "date": "7 May 2026"}];
+const DAYS    = [{"palette": "palette-eastertide", "label": "Friday 1 May 2026", "date": "1 May 2026"}, {"palette": "palette-eastertide", "label": "Saturday 2 May 2026", "date": "2 May 2026"}, {"palette": "palette-eastertide", "label": "Eastertide 3 May 2026", "date": "3 May 2026"}, {"palette": "palette-eastertide", "label": "Monday 4 May 2026", "date": "4 May 2026"}, {"palette": "palette-eastertide", "label": "Tuesday 5 May 2026", "date": "5 May 2026"}, {"palette": "palette-eastertide", "label": "Wednesday 6 May 2026", "date": "6 May 2026"}, {"palette": "palette-eastertide", "label": "Thursday 7 May 2026", "date": "7 May 2026"}];
 const FIGURES = {"st_joseph_the_worker": {"name": "St Joseph the Worker", "dates": "1st century AD", "role": "", "body": "Husband of Mary and earthly father of Jesus. In the Gospels, Jesus is known as the son of a tekton (τέκτων) — a craftsman or builder — and Joseph’s memorial on 1 May honours the dignity of ordinary work done faithfully before God."}, "st_john": {"name": "St John", "dates": "1st century AD", "role": "", "body": "Traditionally identified as one of the Twelve Apostles and as the author of the fourth Gospel, three letters and the book of Revelation. He is featured today because John 14 does not offer knowledge of God as information, but as encounter: in knowing Christ, the disciples come to know the Father."}, "st_athanasius_of_alexandria": {"name": "St Athanasius of Alexandria", "dates": "c. 296–373 AD", "role": "", "body": "Bishop of Alexandria and Doctor of the Church. He is featured today because he defended the full divinity of Christ, helping the Church speak clearly about the mystery at the heart of today’s Gospel: that to know Jesus is truly to know the Father."}, "bishop_of_alexandria_and_a_doctor_of_the_church_he_was_one_of_the_most_important_early_theologians_who_argued_that_jesus_was_fully_god_equal_to_the_father_and_not_a_created_being_however_exalted_he_is_featured_today_because_the_promise_of_the_vine_only_holds_if_the_life_flowing_through_it_is_actually_divine": {"name": "Bishop of Alexandria and a Doctor of the Church. He was one of the most important early theologians who argued that Jesus was fully God — equal to the Father — and not a created being, however exalted. He is featured today because the promise of the vine only holds if the life flowing through it is actually divine", "dates": "", "role": "", "body": ""}};
 const TOTAL_SCREENS = 6;
 const LABELS  = ["Season", "Word", "Scripture", "Contemplation", "Prayer", "Practice"];
