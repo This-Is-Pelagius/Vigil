@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Generated 2026-04-26 21:45 · 6 day(s) -->
+<!-- Vigil · Production MVP · Generated 2026-04-26 22:09 · 6 day(s) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -879,30 +879,25 @@ body { overflow: hidden; }
 .palette-pentecost .screen-amen .screen-fade-bottom
   { background: linear-gradient(to top, #1A0A0A 50%, rgba(26,10,10,0)); }
 
+/* Production-mode top bar: centred, no chevron space */
+.top-bar-inner--prod {
+  justify-content: center;
+}
 </style>
 </head>
 <body>
 <div class="app" id="app">
 
-  <!-- Top bar: brand + day navigation -->
   <div class="top-bar">
-    <div class="top-bar-inner">
-      <div class="day-nav-group" id="prevNav">
-        <button class="day-nav day-prev" aria-label="Previous day">&#8249;</button>
-        <div class="nav-date" id="prevDate"></div>
-      </div>
+    <div class="top-bar-inner top-bar-inner--prod">
       <div class="brand-wrap">
         <div class="brand">Vigil</div>
         <div class="day-label" id="dayLabel"></div>
       </div>
-      <div class="day-nav-group" id="nextNav">
-        <button class="day-nav day-next" aria-label="Next day">&#8250;</button>
-        <div class="nav-date" id="nextDate"></div>
-      </div>
     </div>
   </div>
 
-  <!-- All days, each containing 6 screens -->
+  <!-- All days, each containing 7 screens -->
   <div class="screens-container" id="screens">
   <div class="day-screens" data-day="0">
     <section class="screen screen-season" data-screen="0" aria-label="Season">
@@ -1783,10 +1778,10 @@ Or where might your life already be telling the truth about Christ before you fi
   </div>
   </div>
 
-  <!-- Navigation dots (6 per day) -->
+  <!-- Navigation dots -->
   <nav class="nav-dots" id="dots" aria-label="Screen navigation"></nav>
   <div class="swipe-hint" id="swipeHint">&#8592; swipe &#8594;</div>
-  <div class="screen-counter" id="counter">1 / 6</div>
+  <div class="screen-counter" id="counter">1 / 7</div>
 
   <!-- Figure modal -->
   <div class="figure-overlay" id="figureOverlay" role="dialog" aria-modal="true" aria-labelledby="figureName">
@@ -1804,6 +1799,7 @@ Or where might your life already be telling the truth about Christ before you fi
   <!-- Desktop screen navigation arrows (hidden on mobile via CSS) -->
   <button class="desktop-nav-arrow desktop-nav-prev" id="desktopPrev" aria-label="Previous screen">&#8249;</button>
   <button class="desktop-nav-arrow desktop-nav-next" id="desktopNext" aria-label="Next screen">&#8250;</button>
+
 </div>
 
 <script>
@@ -1820,84 +1816,42 @@ const totalDays   = DAYS.length;
 
 function applyPalette(dayIndex) {
   const app = document.getElementById('app');
-  // Remove all palette classes
   app.className = app.className.replace(/palette-\S+/g, '').trim();
   app.classList.add(DAYS[dayIndex].palette);
 }
 
 function showDay(dayIndex, screenIndex=0) {
-  // Hide all day blocks
   document.querySelectorAll('.day-screens').forEach(el => el.style.display = 'none');
   const dayEl = document.querySelector(`.day-screens[data-day="${dayIndex}"]`);
   if (dayEl) dayEl.style.display = '';
-
   currentDay    = dayIndex;
   currentScreen = screenIndex;
-
   applyPalette(dayIndex);
   buildDots();
   updateDayLabel();
-  updateDayNavButtons();
+  if (typeof updateDayNavButtons === 'function') updateDayNavButtons();
   goTo(screenIndex, false);
 }
 
 function updateDayLabel() {
-  document.getElementById('dayLabel').textContent = DAYS[currentDay].label;
+  const el = document.getElementById('dayLabel');
+  if (el) el.textContent = DAYS[currentDay].label;
 }
 
 function formatDateForNav(dateStr) {
-  // dateStr format: "1 May 2026" or similar
   if (!dateStr) return '';
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const monthMap = {
-    'January': 'Jan', 'February': 'Feb', 'March': 'Mar', 'April': 'Apr', 'May': 'May', 'June': 'Jun',
-    'July': 'Jul', 'August': 'Aug', 'September': 'Sep', 'October': 'Oct', 'November': 'Nov', 'December': 'Dec'
+    'January':'Jan','February':'Feb','March':'Mar','April':'Apr','May':'May','June':'Jun',
+    'July':'Jul','August':'Aug','September':'Sep','October':'Oct','November':'Nov','December':'Dec'
   };
-  
-  let formatted = dateStr;
-  for (const [full, abbr] of Object.entries(monthMap)) {
-    formatted = formatted.replace(full, abbr);
-  }
-  // Remove year (2026) to keep it short
-  formatted = formatted.replace(/\s\d{4}/, '').trim();
-  return formatted;
+  let f = dateStr;
+  for (const [full, abbr] of Object.entries(monthMap)) f = f.replace(full, abbr);
+  return f.replace(/\s\d{4}/, '').trim();
 }
 
-function updateDayNavButtons() {
-  const prevBtn = document.querySelector('.day-prev');
-  const nextBtn = document.querySelector('.day-next');
-  const prevDateEl = document.getElementById('prevDate');
-  const nextDateEl = document.getElementById('nextDate');
-  
-  // Update previous button
-  if (currentDay === 0) {
-    prevBtn.style.opacity = '0.25';
-    prevBtn.style.cursor = 'default';
-    prevDateEl.textContent = '';
-  } else {
-    prevBtn.style.opacity = '1';
-    prevBtn.style.cursor = 'pointer';
-    prevDateEl.textContent = formatDateForNav(DAYS[currentDay - 1].date);
-  }
-  
-  // Update next button
-  if (currentDay === totalDays - 1) {
-    nextBtn.style.opacity = '0.25';
-    nextBtn.style.cursor = 'default';
-    nextDateEl.textContent = '';
-  } else {
-    nextBtn.style.opacity = '1';
-    nextBtn.style.cursor = 'pointer';
-    nextDateEl.textContent = formatDateForNav(DAYS[currentDay + 1].date);
-  }
-}
 
-document.querySelector('.day-prev').addEventListener('click', () => {
-  if (currentDay > 0) showDay(currentDay - 1, 0);
-});
-document.querySelector('.day-next').addEventListener('click', () => {
-  if (currentDay < totalDays - 1) showDay(currentDay + 1, 0);
-});
+</script>
+<script>
 
 // ── Screen navigation ─────────────────────────────────────────────────────
 
@@ -1906,28 +1860,20 @@ function getCurrentScreens() {
 }
 
 function getScreenWidth() {
-  // On desktop the app is constrained to 480px; on mobile it's full viewport width.
   const appEl = document.getElementById('app');
   return appEl ? appEl.offsetWidth : window.innerWidth;
 }
 
 function goTo(i, anim=true) {
-  // On Screen 7, a left swipe wraps to Screen 1 of the same day.
-  if (i >= TOTAL_SCREENS) {
-    wrapAmenToScreen1();
-    return;
-  }
+  if (i >= TOTAL_SCREENS) { wrapAmenToScreen1(); return; }
   if (i < 0) i = 0;
   currentScreen = i;
-
   const dayEl = document.querySelector(`.day-screens[data-day="${currentDay}"]`);
   if (!dayEl) return;
   const sw = getScreenWidth();
   dayEl.style.transform = `translateX(-${i * sw}px)`;
-
   document.querySelectorAll('.dot').forEach((d, idx) => d.classList.toggle('active', idx === i));
   document.getElementById('counter').textContent = `${i + 1} / ${TOTAL_SCREENS}`;
-
   const hint = document.getElementById('swipeHint');
   if (hint && i > 0) hint.style.opacity = '0';
   if (anim) animateScreen(i);
@@ -1936,33 +1882,19 @@ function goTo(i, anim=true) {
 function wrapAmenToScreen1() {
   const dayEl = document.querySelector(`.day-screens[data-day="${currentDay}"]`);
   if (!dayEl) return;
-
   const screens = dayEl.querySelectorAll('.screen');
   const s1 = screens[0];
   const sw = getScreenWidth();
-
   const overlay = document.createElement('div');
-  overlay.style.cssText = `
-    position:fixed;inset:0;z-index:50;pointer-events:none;overflow:hidden;
-  `;
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:50;pointer-events:none;overflow:hidden;';
   const clone = s1.cloneNode(true);
-  clone.style.cssText = `
-    position:absolute;top:0;left:0;width:100%;height:100%;
-    transform:translateX(100%);
-    transition:transform 0.42s cubic-bezier(0.4,0,0.2,1);
-  `;
+  clone.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;
+    transform:translateX(100%);transition:transform 0.42s cubic-bezier(0.4,0,0.2,1);`;
   overlay.appendChild(clone);
   document.body.appendChild(overlay);
-
   dayEl.style.transition = 'transform 0.42s cubic-bezier(0.4,0,0.2,1)';
   dayEl.style.transform  = `translateX(-${TOTAL_SCREENS * sw}px)`;
-
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      clone.style.transform = 'translateX(0)';
-    });
-  });
-
+  requestAnimationFrame(() => requestAnimationFrame(() => { clone.style.transform = 'translateX(0)'; }));
   setTimeout(() => {
     overlay.remove();
     dayEl.style.transition = 'none';
@@ -2056,67 +1988,35 @@ document.addEventListener('keydown', ev => {
 });
 
 // ── Word title auto-fit ───────────────────────────────────────────────────
-// Ensures the word always fits on one line regardless of length.
+
 function fitWordTitle(dayIndex) {
   const dayEl = document.querySelector(`.day-screens[data-day="${dayIndex}"]`);
   if (!dayEl) return;
-  const titles = dayEl.querySelectorAll('.word-title');
-  titles.forEach(el => {
+  dayEl.querySelectorAll('.word-title').forEach(el => {
     el.style.fontSize = '';
     const container = el.closest('.screen-inner') || el.parentElement;
     if (!container) return;
-    // Measure the actual usable width from the container's computed padding
     const style = getComputedStyle(container);
-    const usable = container.clientWidth
-      - parseFloat(style.paddingLeft)
-      - parseFloat(style.paddingRight);
-    // Binary-search the largest font-size that keeps el.scrollWidth ≤ usable
+    const usable = container.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
     let lo = 14, hi = 128;
     for (let iter = 0; iter < 14; iter++) {
       const mid = (lo + hi) / 2;
       el.style.fontSize = mid + 'px';
-      if (el.scrollWidth <= usable) lo = mid;
-      else hi = mid;
+      if (el.scrollWidth <= usable) lo = mid; else hi = mid;
     }
     el.style.fontSize = Math.floor(lo) + 'px';
   });
 }
 
-// ── Initialise ────────────────────────────────────────────────────────────
-showDay(0, 0);
-// Fit all word titles after initial render
-setTimeout(() => {
-  for (let d = 0; d < totalDays; d++) fitWordTitle(d);
-}, 100);
-
-// Recalculate slide position on resize (e.g. browser window resized on desktop)
-window.addEventListener('resize', () => {
-  const dayEl = document.querySelector(`.day-screens[data-day="${currentDay}"]`);
-  if (!dayEl) return;
-  const sw = getScreenWidth();
-  dayEl.style.transition = 'none';
-  dayEl.style.transform = `translateX(-${currentScreen * sw}px)`;
-  setTimeout(() => { dayEl.style.transition = ''; }, 50);
-  // Re-fit word titles on resize
-  for (let d = 0; d < totalDays; d++) fitWordTitle(d);
-});
-
 // ── Desktop navigation arrows ─────────────────────────────────────────────
+
 const desktopPrev = document.getElementById('desktopPrev');
 const desktopNext = document.getElementById('desktopNext');
 
 function updateDesktopArrows() {
   if (!desktopPrev || !desktopNext) return;
-  if (currentScreen <= 0) {
-    desktopPrev.classList.add('disabled');
-  } else {
-    desktopPrev.classList.remove('disabled');
-  }
-  if (currentScreen >= TOTAL_SCREENS - 1) {
-    desktopNext.classList.add('disabled');
-  } else {
-    desktopNext.classList.remove('disabled');
-  }
+  desktopPrev.classList.toggle('disabled', currentScreen <= 0);
+  desktopNext.classList.toggle('disabled', currentScreen >= TOTAL_SCREENS - 1);
 }
 
 if (desktopPrev) desktopPrev.addEventListener('click', () => {
@@ -2127,71 +2027,36 @@ if (desktopNext) desktopNext.addEventListener('click', () => {
   else wrapAmenToScreen1();
 });
 
-// Patch goTo to also update desktop arrows
-const _origGoTo = goTo;
-// Already patched inline — call updateDesktopArrows after each navigation
-document.addEventListener('vigil:screenchange', updateDesktopArrows);
-updateDesktopArrows();
-
-// ── Scroll overflow indicator ─────────────────────────────────────────────
-// Shows a subtle animated chevron when screen content extends below the fold.
-// Works on both mobile and desktop; on mobile the fade already hints at more.
 // ── Scroll overflow indicator ─────────────────────────────────────────────
 
-// Returns the pixel height of the bottom fade overlay on a given screen element.
 function getFadeHeight(sc) {
   const fade = sc.querySelector('.screen-fade-bottom');
   return fade ? fade.offsetHeight : 0;
 }
-
-// Returns the bottom position of the last meaningful content element in screen-inner,
-// relative to the top of screen-inner's scroll container.
 function getContentBottom(inner) {
   const children = Array.from(inner.children);
   if (!children.length) return 0;
   const last = children[children.length - 1];
   return last.offsetTop + last.offsetHeight;
 }
-
-// True if, at the current scroll position, the last content element is obscured by the fade.
-function isLastLineInFade(inner, sc) {
-  const fadeH     = getFadeHeight(sc);
-  const viewBottom = inner.scrollTop + inner.clientHeight; // bottom of visible area
-  const contentBottom = getContentBottom(inner);
-  // The last line is in the fade zone if its bottom sits within fadeH of viewBottom
-  return contentBottom > viewBottom - fadeH;
-}
-
-// True if there is any content hidden below the current scroll position (ignoring fade).
 function hasHiddenContent(inner, sc) {
   const fadeH = getFadeHeight(sc);
   const contentBottom = getContentBottom(inner);
   const viewBottom = inner.scrollTop + inner.clientHeight;
-  // Content is hidden if its bottom would be below the clear zone (above the fade)
   return contentBottom > viewBottom - fadeH + 4;
 }
-
-// Scroll screen-inner so the last content element clears the bottom fade.
 function scrollToClearFade(inner, sc, behavior) {
   behavior = behavior || 'smooth';
   const fadeH = getFadeHeight(sc);
-  const contentBottom = getContentBottom(inner);
-  // Target: last element bottom is 16px above the fade zone
-  const targetScrollTop = contentBottom - inner.clientHeight + fadeH + 16;
-  if (targetScrollTop > inner.scrollTop) {
-    inner.scrollTo({ top: targetScrollTop, behavior: behavior });
-  }
+  const targetScrollTop = getContentBottom(inner) - inner.clientHeight + fadeH + 16;
+  if (targetScrollTop > inner.scrollTop) inner.scrollTo({top: targetScrollTop, behavior});
 }
-
-// Scroll so a specific element clears the bottom fade.
 function scrollElementClearFade(inner, sc, el, behavior) {
   behavior = behavior || 'smooth';
   const fadeH = getFadeHeight(sc);
   const elBottom = el.offsetTop + el.offsetHeight;
   const targetScrollTop = elBottom - inner.clientHeight + fadeH + 16;
-  if (targetScrollTop > inner.scrollTop) {
-    inner.scrollTo({ top: targetScrollTop, behavior: behavior });
-  }
+  if (targetScrollTop > inner.scrollTop) inner.scrollTo({top: targetScrollTop, behavior});
 }
 
 function updateScrollIndicator(screenIndex) {
@@ -2200,28 +2065,21 @@ function updateScrollIndicator(screenIndex) {
   if (!sc) return;
   const inner = sc.querySelector('.screen-inner');
   if (!inner) return;
-
   let ind = sc.querySelector('.scroll-indicator');
   if (!ind) {
     ind = document.createElement('div');
     ind.className = 'scroll-indicator';
-    ind.innerHTML = '<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><polyline points="5,8 11,14 17,8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    ind.innerHTML = '<svg width="22" height="22" viewBox="0 0 22 22" fill="none"><polyline points="5,8 11,14 17,8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     sc.appendChild(ind);
   }
-
-  function check() {
-    // Show arrow only if actual content is hidden below the fade zone
-    const show = hasHiddenContent(inner, sc);
-    ind.classList.toggle('visible', show);
-  }
-
+  function check() { ind.classList.toggle('visible', hasHiddenContent(inner, sc)); }
   check();
   inner.removeEventListener('scroll', inner._scrollCheck);
   inner._scrollCheck = check;
-  inner.addEventListener('scroll', check, { passive: true });
+  inner.addEventListener('scroll', check, {passive: true});
 }
 
-// Hook scroll indicator into goTo
+// Hook scroll indicator and desktop arrows into goTo
 const _goToOrig = goTo;
 goTo = function(i, anim=true) {
   _goToOrig(i, anim);
@@ -2229,18 +2087,30 @@ goTo = function(i, anim=true) {
   const idx = i < 0 ? 0 : i >= TOTAL_SCREENS ? 0 : i;
   setTimeout(() => updateScrollIndicator(idx), 350);
 };
-// Initialise on load
-setTimeout(() => updateScrollIndicator(0), 500);
 
-// ── Screen 7: Amen — interaction functions ────────────────────────────────
+// Initialise: fit word titles, update arrows, start scroll indicator
+setTimeout(() => {
+  for (let d = 0; d < totalDays; d++) fitWordTitle(d);
+  updateDesktopArrows();
+  updateScrollIndicator(0);
+}, 300);
 
-// Counter configuration.
-// Set VIGIL_COUNTER_URL to your endpoint when the backend is ready.
-// The counter block appears only when the live count reaches VIGIL_COUNT_THRESHOLD.
-const VIGIL_COUNTER_URL     = null;   // e.g. 'https://your-project.supabase.co/rest/v1/rpc/vigil_count'
-const VIGIL_COUNT_THRESHOLD = 500;    // ← set to your chosen minimum before revealing the count
+// Recalculate on resize
+window.addEventListener('resize', () => {
+  const dayEl = document.querySelector(`.day-screens[data-day="${currentDay}"]`);
+  if (!dayEl) return;
+  const sw = getScreenWidth();
+  dayEl.style.transition = 'none';
+  dayEl.style.transform = `translateX(-${currentScreen * sw}px)`;
+  setTimeout(() => { dayEl.style.transition = ''; }, 50);
+  for (let d = 0; d < totalDays; d++) fitWordTitle(d);
+});
 
-// Fetch count on load (no-op until VIGIL_COUNTER_URL is set)
+// ── Screen 7: Amen ────────────────────────────────────────────────────────
+
+const VIGIL_COUNTER_URL     = null;
+const VIGIL_COUNT_THRESHOLD = 500;
+
 (async function fetchAmenCount() {
   if (!VIGIL_COUNTER_URL) return;
   try {
@@ -2251,9 +2121,8 @@ const VIGIL_COUNT_THRESHOLD = 500;    // ← set to your chosen minimum before r
         el.textContent = data.count.toLocaleString('en-GB');
       });
       document.querySelectorAll('[id^="amen-count-"]').forEach(el => {
-        if (el.id.startsWith('amen-count-b') || el.classList.contains('amen-count-block')) {
+        if (el.id.startsWith('amen-count-b') || el.classList.contains('amen-count-block'))
           el.classList.add('amen-count-visible');
-        }
       });
     }
   } catch(e) {}
@@ -2264,7 +2133,6 @@ async function amenIncrementCount() {
   try { await fetch(VIGIL_COUNTER_URL + '/increment', { method: 'POST' }); } catch(e) {}
 }
 
-// Tracks which days have had their completion counted this session
 const amenCounted = {};
 
 function amenCheck(row) {
@@ -2274,26 +2142,18 @@ function amenCheck(row) {
   const comm    = document.getElementById('amen-commission-' + uid);
   const share   = document.getElementById('amen-share-' + uid);
   const checked = box.classList.toggle('amen-checked');
-
   row.setAttribute('aria-checked', String(checked));
   word.classList.toggle('amen-visible', checked);
-
   if (checked) {
-    if (!amenCounted[uid]) {
-      amenCounted[uid] = true;
-      amenIncrementCount();
-    }
-    // Commission phrase after word echo settles
+    if (!amenCounted[uid]) { amenCounted[uid] = true; amenIncrementCount(); }
     setTimeout(() => comm.classList.add('amen-visible'), 700);
-    // Share block after commission phrase
     setTimeout(() => share.classList.add('amen-visible'), 1200);
   } else {
     comm.classList.remove('amen-visible');
     share.classList.remove('amen-visible');
-    // Reset share block to initial state
     const initial   = document.getElementById('amen-share-initial-' + uid);
     const confirmed = document.getElementById('amen-share-confirmed-' + uid);
-    if (initial)   initial.style.display   = '';
+    if (initial)   initial.style.display = '';
     if (confirmed) { confirmed.textContent = ''; confirmed.classList.remove('amen-share-confirmed-visible'); }
   }
 }
@@ -2302,7 +2162,7 @@ function amenDoShare(uid, rawText) {
   const text = rawText.replace(/\\n/g, '\n');
   amenTriggerShare(text, 'https://dailyvigil.app',
     () => amenShowShareConfirmed(uid, 'Thank you for sharing.'),
-    () => amenShowShareConfirmed(uid, 'Copied to clipboard &#8212; ready to share.')
+    () => amenShowShareConfirmed(uid, 'Copied to clipboard — ready to share.')
   );
 }
 
@@ -2310,22 +2170,17 @@ function amenShowShareConfirmed(uid, msg) {
   const initial   = document.getElementById('amen-share-initial-' + uid);
   const confirmed = document.getElementById('amen-share-confirmed-' + uid);
   if (initial)   initial.style.display = 'none';
-  if (confirmed) {
-    confirmed.innerHTML = msg;
-    confirmed.classList.add('amen-share-confirmed-visible');
-  }
+  if (confirmed) { confirmed.innerHTML = msg; confirmed.classList.add('amen-share-confirmed-visible'); }
 }
 
 function amenNotNow(uid) {
   const share = document.getElementById('amen-share-' + uid);
   if (!share) return;
-  share.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+  share.style.transition = 'opacity 0.3s ease';
   share.style.opacity    = '0';
-  share.style.transform  = 'translateY(-4px)';
   setTimeout(() => {
     share.classList.remove('amen-visible');
-    share.style.opacity   = '';
-    share.style.transform = '';
+    share.style.opacity = '';
   }, 320);
 }
 
@@ -2338,13 +2193,11 @@ function amenToggleInvitation(uid) {
   if (panel) panel.classList.toggle('amen-inv-open', amenInvOpen[uid]);
   if (arrow) arrow.classList.toggle('amen-inv-arrow-open', amenInvOpen[uid]);
   if (amenInvOpen[uid] && panel) {
-    // Wait for the panel's max-height transition (450ms) then scroll its bottom clear of the fade
     setTimeout(() => {
       const inner = panel.closest('.screen-inner');
       const sc    = panel.closest('.screen');
       if (inner && sc) {
-        const panelInner = panel.querySelector('.amen-invitation-panel-inner');
-        const target = panelInner || panel;
+        const target = panel.querySelector('.amen-invitation-panel-inner') || panel;
         scrollElementClearFade(inner, sc, target, 'smooth');
       }
     }, 480);
@@ -2363,15 +2216,12 @@ function amenShowInvConfirmed(uid, msg) {
   const actions   = document.getElementById('amen-inv-actions-' + uid);
   const confirmed = document.getElementById('amen-inv-confirmed-' + uid);
   if (actions)   actions.style.display = 'none';
-  if (confirmed) {
-    confirmed.textContent = msg;
-    confirmed.classList.add('amen-inv-confirmed-visible');
-  }
+  if (confirmed) { confirmed.textContent = msg; confirmed.classList.add('amen-inv-confirmed-visible'); }
 }
 
 function amenTriggerShare(text, url, onSuccess, onCopy) {
   if (typeof navigator.share === 'function') {
-    navigator.share({ title: 'Vigil', text: text, url: url })
+    navigator.share({ title: 'Vigil', text, url })
       .then(onSuccess)
       .catch(err => { if (err.name !== 'AbortError') amenCopyText(text + '\n\n' + url, onCopy); });
   } else {
@@ -2394,6 +2244,85 @@ function amenExecCopy(text, cb) {
   try { document.execCommand('copy'); } catch(e) {}
   document.body.removeChild(ta); if (cb) cb();
 }
+
+
+// ── Production mode: today only ───────────────────────────────────────────
+// Parse a date string like "1 May 2026" into a comparable YYYY-MM-DD string.
+function parseDayDate(dateStr) {
+  if (!dateStr) return null;
+  const months = {
+    'January':'01','February':'02','March':'03','April':'04','May':'05','June':'06',
+    'July':'07','August':'08','September':'09','October':'10','November':'11','December':'12'
+  };
+  const m = dateStr.match(/^(\d{1,2})\s+(\w+)\s+(\d{4})$/);
+  if (!m) return null;
+  const mon = months[m[2]];
+  if (!mon) return null;
+  return m[3] + '-' + mon + '-' + m[1].padStart(2,'0');
+}
+
+function todayISO() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth()+1).padStart(2,'0');
+  const d = String(now.getDate()).padStart(2,'0');
+  return y + '-' + m + '-' + d;
+}
+
+function findTodayIndex() {
+  const today = todayISO();
+  for (let i = 0; i < DAYS.length; i++) {
+    if (parseDayDate(DAYS[i].date) === today) return i;
+  }
+  return -1;
+}
+
+function showNoContentMessage(msg) {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div style="
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      height:100svh; padding:2rem; text-align:center; font-family:'Raleway',sans-serif;
+      color:var(--dim);">
+      <div style="font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:300;
+        letter-spacing:0.4em; text-transform:uppercase; color:var(--gold); margin-bottom:2rem;">
+        Vigil
+      </div>
+      <div style="font-size:1rem; line-height:1.8; max-width:280px;">${msg}</div>
+    </div>`;
+}
+
+const todayIdx = findTodayIndex();
+
+if (todayIdx === -1) {
+  // No content for today — either before launch or a gap in the spreadsheet
+  const today = todayISO();
+  const firstDate = parseDayDate(DAYS[0] && DAYS[0].date);
+  if (firstDate && today < firstDate) {
+    // Before the first day of content
+    showNoContentMessage('Vigil begins on ' + DAYS[0].date + '.<br>Come back then.');
+  } else {
+    showNoContentMessage('Today’s word is on its way.<br>Come back soon.');
+  }
+} else {
+  showDay(todayIdx, 0);
+
+  // Advance to next day at local midnight
+  function msUntilMidnight() {
+    const now  = new Date();
+    const next = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1, 0, 0, 0, 0);
+    return next - now;
+  }
+  function scheduleMidnightAdvance() {
+    setTimeout(() => {
+      // Reload the page at midnight — the simplest and most reliable approach.
+      // The newly loaded page will recalculate today's index.
+      window.location.reload();
+    }, msUntilMidnight());
+  }
+  scheduleMidnightAdvance();
+}
+
 </script>
 </body>
 </html>
