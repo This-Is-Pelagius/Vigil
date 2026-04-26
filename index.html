@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Generated 2026-04-26 15:53 · MVP — today's date only -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<!-- Vigil · Generated 2026-04-26 21:45 · 6 day(s) -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -83,9 +83,9 @@ body { overflow: hidden; }
 }
 .day-label {
   font-family: 'Raleway', sans-serif;
-  font-size: 0.65rem; font-weight: 400;
-  letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--dim); margin-top: 0.2rem;
+  font-size: 0.78rem; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--dim); margin-top: 0.25rem;
   line-height: 1;
 }
 
@@ -164,7 +164,7 @@ body { overflow: hidden; }
 /* Screen label */
 .screen-label {
   font-family: 'Raleway', sans-serif;
-  font-size: 0.85rem; font-weight: 600;
+  font-size: 1.05rem; font-weight: 600;
   letter-spacing: 0.38em; text-transform: uppercase;
   color: var(--dim);
   padding: 7.2rem 1.4rem 1.2rem;
@@ -175,7 +175,7 @@ body { overflow: hidden; }
 .screen-inner {
   flex: 1; overflow-y: auto; overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  padding: 1.4rem 1.4rem 12rem;
+  padding: 1.4rem 1.4rem 14rem;
   width: 100%;
   scrollbar-width: thin;
   scrollbar-color: var(--accent) transparent;
@@ -263,7 +263,9 @@ body { overflow: hidden; }
 .palette-pentecost .screen-practice .screen-fade-bottom
   { background: linear-gradient(to top, #251010 50%, rgba(37,16,16,0)); }
 
-/* ── Animations ── */
+/* Desktop nav arrows — hidden by default, shown on desktop via media query */
+.desktop-nav-arrow { display: none; }
+
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -285,13 +287,13 @@ body { overflow: hidden; }
 }
 .season-position {
   font-family: 'Raleway', sans-serif;
-  font-size: 0.85rem; font-weight: 400;
-  letter-spacing: 0.18em; color: var(--dim);
+  font-size: 0.95rem; font-weight: 400;
+  letter-spacing: 0.15em; color: var(--dim);
   margin-bottom: 0.4rem; line-height: 1.6;
 }
 .season-feast {
   font-family: 'Raleway', sans-serif;
-  font-size: 0.82rem; font-weight: 400;
+  font-size: 0.95rem; font-weight: 400;
   letter-spacing: 0.14em; color: var(--gold); line-height: 1.6;
 }
 .season-divider {
@@ -309,21 +311,26 @@ body { overflow: hidden; }
 /* ── Screen 2: Word ── */
 .word-title {
   font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(2.4rem, 14vw, 4.5rem); font-weight: 300;
-  letter-spacing: 0.22em; text-transform: uppercase;
-  line-height: 1.2; color: var(--text);
-  margin-bottom: 0.75rem; white-space: normal; word-break: break-word; max-width: 90vw;
+  font-size: 2rem; font-weight: 300;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  line-height: 1.1; color: var(--text);
+  margin-bottom: 0.75rem;
+  white-space: nowrap;
+  display: block; max-width: 100%;
 }
 .word-pronunciation {
   font-family: 'Raleway', sans-serif;
-  font-size: 0.85rem; font-weight: 400; font-style: normal;
+  font-size: 0.95rem; font-weight: 700; font-style: normal;
   letter-spacing: 0.18em; color: var(--dim);
-  margin-bottom: 0; line-height: 1.6;
+  margin-bottom: 1.8rem; line-height: 1.6;
 }
+/* Collapse the divider's own top margin when pronunciation is present,
+   because pronunciation now carries the spacing */
+.word-pronunciation + .word-divider { margin-top: 0; }
 .word-divider {
   width: 100%; max-width: 420px; height: 1px;
   background: linear-gradient(to right, var(--gold), transparent);
-  margin: 1.8rem 0; flex-shrink: 0;
+  margin: 0 0 1.8rem 0; flex-shrink: 0;
 }
 .word-definition {
   font-family: 'Libre Baskerville', serif;
@@ -334,26 +341,30 @@ body { overflow: hidden; }
 .word-definition em { font-style: italic; }
 
 /* ── Screen 3: Scripture ── */
-.scripture-passage + .scripture-passage {
-  margin-top: 3.5rem; padding-top: 3rem;
+.scripture-inter-verse {
+  height: 1.8rem;
 }
 .scripture-block {
   position: relative; padding-left: 1.5rem; max-width: 420px;
-  background-image: linear-gradient(to bottom, var(--gold), transparent);
-  background-size: 2px 100%; background-repeat: no-repeat;
-  background-position: left top;
+}
+.scripture-block::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  pointer-events: none;
 }
 .scripture-text {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.3rem; font-style: italic; font-weight: 300;
-  line-height: 2.0; color: var(--text);
+  font-size: 1.35rem; font-style: italic; font-weight: 300;
+  line-height: 2.1; color: var(--text);
 }
 .scripture-text p + p { margin-top: 1rem; }
 .scripture-translation {
   font-family: 'Raleway', sans-serif;
   font-size: 0.85rem; font-weight: 400;
   letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--dim); margin-top: 0.6rem;
+  color: var(--dim); margin-top: 1.8rem;
 }
 
 /* Increase spacing between label and body on screens 3–6 */
@@ -371,8 +382,8 @@ body { overflow: hidden; }
 .contemplation-body p + p { margin-top: 1.1rem; }
 .contemplation-question {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.3rem; font-style: italic; font-weight: 300;
-  line-height: 1.6; max-width: 420px;
+  font-size: 1.3rem; font-style: italic; font-weight: 500;
+  line-height: 1.65; max-width: 420px;
   margin-top: 2rem; padding-top: 1.5rem;
   border-top: 1px solid transparent;
   border-image: linear-gradient(to right, var(--gold), transparent) 1;
@@ -382,21 +393,25 @@ body { overflow: hidden; }
 /* ── Screen 5: Prayer ── */
 .prayer-block {
   position: relative; padding-left: 1.5rem; max-width: 420px;
-  background-image: linear-gradient(to bottom, var(--gold), transparent);
-  background-size: 2px 100%; background-repeat: no-repeat;
-  background-position: left top;
+}
+.prayer-block::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  pointer-events: none;
 }
 .prayer-body {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.3rem; font-style: italic; font-weight: 300;
-  line-height: 2.0; color: var(--text);
+  line-height: 1.75; color: var(--text);
   margin-top: 1.2rem;
 }
-.prayer-body p + p { margin-top: 0.6rem; }
+.prayer-body p + p { margin-top: 0.8rem; }
 .prayer-amen {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.3rem; font-style: italic; font-weight: 300;
-  letter-spacing: 0.05em; color: var(--gold); margin-top: 1.2rem;
+  letter-spacing: 0.05em; color: var(--text); margin-top: 1.2rem;
 }
 
 /* ── Screen 6: Practice ── */
@@ -408,8 +423,8 @@ body { overflow: hidden; }
 .practice-body p + p { margin-top: 1.1rem; }
 .practice-anchor {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.3rem; font-style: italic; font-weight: 300;
-  line-height: 1.6; max-width: 420px;
+  font-size: 1.3rem; font-style: italic; font-weight: 500;
+  line-height: 1.65; max-width: 420px;
   margin-top: 2rem; padding-top: 1.5rem;
   border-top: 1px solid transparent;
   border-image: linear-gradient(to right, var(--gold), transparent) 1;
@@ -434,25 +449,25 @@ body { overflow: hidden; }
 /* ── Navigation dots ── */
 .nav-dots {
   position: fixed; bottom: 1.8rem; left: 50%; transform: translateX(-50%);
-  display: flex; flex-direction: row; gap: 0.55rem; z-index: 30;
+  display: flex; flex-direction: row; gap: 0.7rem; z-index: 30;
 }
 .dot {
-  width: 5px; height: 5px; border-radius: 50%;
+  width: 8px; height: 8px; border-radius: 50%;
   background: var(--dim); cursor: pointer;
-  transition: all 0.3s ease; border: none; padding: 0; opacity: 0.5;
+  transition: all 0.3s ease; border: none; padding: 0; opacity: 0.6;
 }
-.dot.active { background: var(--gold); transform: scale(1.4); opacity: 1; }
+.dot.active { background: var(--gold); transform: scale(1.5); opacity: 1; }
 
 .screen-counter {
   position: fixed; bottom: 1.9rem; right: 1.5rem;
-  font-family: 'Raleway', sans-serif; font-size: 0.55rem;
+  font-family: 'Raleway', sans-serif; font-size: 0.65rem;
   font-weight: 400; letter-spacing: 0.2em; color: var(--dim); z-index: 30;
 }
 .swipe-hint {
-  position: fixed; bottom: 1.9rem; left: 1.5rem;
-  font-family: 'Raleway', sans-serif; font-size: 0.55rem;
-  font-weight: 400; letter-spacing: 0.15em; text-transform: uppercase;
-  color: var(--dim); opacity: 0.5; z-index: 30;
+  position: fixed; bottom: 1.85rem; left: 1.5rem;
+  font-family: 'Raleway', sans-serif; font-size: 0.7rem;
+  font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--dim); opacity: 0.7; z-index: 30;
   transition: opacity 0.5s ease;
 }
 
@@ -515,7 +530,105 @@ body { overflow: hidden; }
 
 @media (min-width: 700px) {
   .screen-label { padding: 7.2rem 3rem 1.2rem; }
-  .screen-inner { padding: 1.8rem 3rem 6rem; }
+  .screen-inner { padding-left: 3rem; padding-right: 3rem; }
+}
+
+/* ── Desktop layout ─────────────────────────────────────────────────────────
+   On wide screens the app is constrained to a centred column,
+   with the shell colour visible either side.
+   ─────────────────────────────────────────────────────────────────────────── */
+/* ── Scroll overflow indicator (all viewports) ── */
+.scroll-indicator {
+  display: flex;
+  position: absolute;
+  bottom: 4.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  animation: scrollBounce 1.6s ease-in-out infinite;
+}
+.scroll-indicator.visible { opacity: 1; }
+.scroll-indicator svg { color: var(--gold); }
+@keyframes scrollBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(5px); }
+}
+
+@media (min-width: 680px) {
+  /* Allow the html/body to scroll so Safari desktop doesn't trap content */
+  html { overflow: auto; overflow-x: hidden; }
+  body { overflow: auto; overflow-x: hidden; }
+
+  /* Constrain the app to a phone-width column */
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    height: 100svh;
+    position: relative;
+    box-shadow: 0 0 0 100vmax var(--shell);
+  }
+
+  /* On desktop, each screen fills the 480px column rather than 100vw */
+  .screen {
+    min-width: 100%; width: 100%;
+  }
+
+  /* Top bar should stay within the column, not stretch full-width */
+  .top-bar {
+    max-width: 480px;
+    left: 50%; transform: translateX(-50%);
+  }
+
+  /* Nav dots: larger on desktop */
+  .nav-dots { gap: 0.9rem; }
+  .dot { width: 10px; height: 10px; }
+  .dot.active { transform: scale(1.5); }
+
+  /* Swipe hint: hidden on desktop (replaced by arrow nav) */
+  .swipe-hint { display: none; }
+
+  /* Desktop screen-nav arrows — left and right of the column */
+  .desktop-nav-arrow {
+    display: flex;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 35;
+    background: none;
+    border: none;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.5rem;
+    font-weight: 300;
+    line-height: 1;
+    padding: 0.5rem 1rem;
+    opacity: 0.55;
+    transition: opacity 0.2s ease, color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .desktop-nav-arrow:hover { opacity: 1; color: var(--accent); }
+  .desktop-nav-arrow.disabled { opacity: 0.15; cursor: default; pointer-events: none; }
+  .desktop-nav-prev {
+    left: calc(50% - 240px - 4rem);
+  }
+  .desktop-nav-next {
+    right: calc(50% - 240px - 4rem);
+  }
+
+  /* Screen 7 Amen: ensure inner scrolls freely on desktop */
+  .screen-amen .screen-inner {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Improve bottom fade for desktop: taller and more prominent */
+  .screen-fade-bottom { height: 28%; }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -588,7 +701,7 @@ body { overflow: hidden; }
   margin-bottom: 0.5rem;
 }
 .amen-word-preposition {
-  font-family: 'Raleway', sans-serif; font-size: 0.7rem; font-weight: 400;
+  font-family: 'Raleway', sans-serif; font-size: 0.85rem; font-weight: 400;
   letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim);
 }
 .amen-word-name {
@@ -598,36 +711,39 @@ body { overflow: hidden; }
   color: var(--text); line-height: 1;
 }
 .amen-word-date {
-  font-family: 'Raleway', sans-serif; font-size: 0.75rem; font-weight: 400;
+  font-family: 'Raleway', sans-serif; font-size: 0.9rem; font-weight: 400;
   letter-spacing: 0.12em; color: var(--dim); margin-top: 0.1rem;
 }
 .amen-word-season {
-  font-family: 'Libre Baskerville', serif; font-size: 0.9rem; font-style: italic;
+  font-family: 'Libre Baskerville', serif; font-size: 1.05rem; font-style: italic;
   color: var(--dim); line-height: 1.5;
 }
 
 /* ── Commission phrase ── */
 .amen-commission {
   width: 100%; text-align: center;
-  padding: 1.6rem 0 1.4rem;
-  border-top: 1px solid var(--accent-soft);
-  border-bottom: 1px solid var(--accent-soft);
-  margin-bottom: 1.6rem;
-  opacity: 0; transform: translateY(5px);
-  transition: opacity 0.55s ease, transform 0.55s ease;
+  padding: 0; max-height: 0; overflow: visible;
+  border-top: 0px solid var(--accent-soft);
+  border-bottom: 0px solid var(--accent-soft);
+  margin-bottom: 0;
+  opacity: 0;
+  transition: opacity 0.55s ease, max-height 0.55s ease, padding 0.55s ease,
+              margin-bottom 0.55s ease, border-top-width 0.3s ease, border-bottom-width 0.3s ease;
 }
-.amen-commission.amen-visible { opacity: 1; transform: translateY(0); }
+.amen-commission.amen-visible {
+  opacity: 1; max-height: 300px;
+  padding: 1.6rem 0 1.4rem;
+  border-top-width: 1px; border-bottom-width: 1px;
+  margin-bottom: 1.6rem;
+}
 .amen-commission-line1 {
   font-family: 'Cormorant Garamond', serif;
   font-size: clamp(1.2rem, 5vw, 1.45rem);
   font-weight: 400; font-style: italic;
-  color: var(--text); line-height: 1.4; margin-bottom: 0.35rem;
+  color: var(--text); line-height: 1.5;
 }
-.amen-commission-line2 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(1.2rem, 5vw, 1.45rem);
-  font-weight: 300; font-style: italic;
-  color: var(--dim); line-height: 1.4;
+.amen-commission-line1 + .amen-commission-line1 {
+  margin-top: 0.2rem;
 }
 
 /* ── Counter block (hidden until threshold) ── */
@@ -648,12 +764,12 @@ body { overflow: hidden; }
 /* ── Share block ── */
 .amen-share-block {
   width: 100%; text-align: center;
-  opacity: 0; transform: translateY(8px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
-  pointer-events: none; margin-bottom: 1.6rem;
+  opacity: 0; max-height: 0; overflow: hidden;
+  transition: opacity 0.4s ease, max-height 0.4s ease, margin-bottom 0.4s ease;
+  pointer-events: none; margin-bottom: 0;
 }
 .amen-share-block.amen-visible {
-  opacity: 1; transform: translateY(0); pointer-events: all;
+  opacity: 1; max-height: 400px; pointer-events: all; margin-bottom: 1.6rem;
 }
 .amen-share-prompt {
   font-family: 'Libre Baskerville', serif; font-size: 1rem; font-style: italic;
@@ -771,12 +887,18 @@ body { overflow: hidden; }
   <!-- Top bar: brand + day navigation -->
   <div class="top-bar">
     <div class="top-bar-inner">
-      
+      <div class="day-nav-group" id="prevNav">
+        <button class="day-nav day-prev" aria-label="Previous day">&#8249;</button>
+        <div class="nav-date" id="prevDate"></div>
+      </div>
       <div class="brand-wrap">
         <div class="brand">Vigil</div>
         <div class="day-label" id="dayLabel"></div>
       </div>
-      
+      <div class="day-nav-group" id="nextNav">
+        <button class="day-nav day-next" aria-label="Next day">&#8250;</button>
+        <div class="nav-date" id="nextDate"></div>
+      </div>
     </div>
   </div>
 
@@ -790,7 +912,7 @@ body { overflow: hidden; }
     <div class="season-name">Eastertide</div>
     <div class="season-position">Saturday · Week Three · 25 April 2026</div>
     <div class="season-feast">Feast · <button type="button" class="figure-link" data-figure="st_mark_evangelist">St Mark, Evangelist</button></div><div class="season-divider"></div>
-    <div class="season-body"><p>We are in Eastertide, and today the Church keeps the feast of St <button type="button" class="figure-link" data-figure="st_mark_evangelist">Mark</button> the Evangelist — traditionally the author of the earliest written Gospel.</p><p>The feast turns us towards one of the earliest tellings of the good news: brief, urgent and still <button type="button" class="figure-link" data-figure="st_mark_evangelist">mark</button>ed by the astonishment of resurrection.</p></div></div>
+    <div class="season-body"><p>We are in Eastertide, and today the Church keeps the feast of St <button type="button" class="figure-link" data-figure="st_mark_evangelist">Mark</button> the Evangelist — traditionally the author of the earliest written Gospel.</p><p>The feast turns us towards one of the earliest tellings of the good news: brief, urgent and still marked by the astonishment of resurrection.</p></div></div>
       <div class="screen-fade-bottom"></div>
     </section>
     <section class="screen screen-word" data-screen="1" aria-label="Word">
@@ -798,9 +920,8 @@ body { overflow: hidden; }
       <div class="screen-label">Word</div>
       <div class="screen-inner">
     <div class="word-title">PROCLAIM</div>
-    <div class="word-pronunciation">[]</div>
-    <div class="word-divider"></div>
-    <div class="word-definition"><p>[proh-klaym]</p><p>To proclaim is to make something known because it is not yours to keep private.</p><p>The Greek kēryssō (κηρύσσω) means to herald, to announce, to make known. In <button type="button" class="figure-link" data-figure="st_mark_evangelist">Mark</button> 16, the disciples are sent not to explain a private experience, but to proclaim good news — to speak as people whose world has been altered by resurrection.</p></div></div>
+    <div class="word-pronunciation">[proh-klaym]</div><div class="word-divider"></div>
+    <div class="word-definition"><p>To proclaim is to make something known because it is not yours to keep private.</p><p>The Greek kēryssō (κηρύσσω) means to herald, to announce, to make known. In <button type="button" class="figure-link" data-figure="st_mark_evangelist">Mark</button> 16, the disciples are sent not to explain a private experience, but to proclaim good news — to speak as people whose world has been altered by resurrection.</p></div></div>
       <div class="screen-fade-bottom"></div>
     </section>
     <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
@@ -809,19 +930,7 @@ body { overflow: hidden; }
       <div class="screen-inner">
     <div class="scripture-passage">
       <div class="scripture-block">
-        <div class="scripture-text"><p>And he said to them, “Go into all the world and proclaim the good news to the whole creation.</p></div>
-      </div>
-      
-    </div>
-    <div class="scripture-passage">
-      <div class="scripture-block">
-        <div class="scripture-text"><p>And they went out and proclaimed the good news everywhere, while the Lord worked with them and confirmed the message by the signs that accompanied it.</p></div>
-      </div>
-      
-    </div>
-    <div class="scripture-passage">
-      <div class="scripture-block">
-        <div class="scripture-text"></div>
+        <div class="scripture-text"><p>And he said to them, “Go into all the world and proclaim the good news to the whole creation.</p><div class="scripture-inter-verse"></div><p>And they went out and proclaimed the good news everywhere, while the Lord worked with them and confirmed the message by the signs that accompanied it.</p></div>
       </div>
       <div class="scripture-translation">Mark 16:15, 20 — NRSV</div>
     </div></div>
@@ -881,8 +990,7 @@ Or where might your life already be telling the truth about Christ before you fi
         <div class="amen-word-rule"></div>
         <div class="amen-word-preposition">The word was</div>
         <div class="amen-word-name">Proclaim</div>
-        <div class="amen-word-date">25 April 2026</div>
-        <div class="amen-word-season">Eastertide</div>
+        <div class="amen-word-date">Eastertide · 25 Apr</div>
       </div>
 
     </div>
@@ -890,7 +998,7 @@ Or where might your life already be telling the truth about Christ before you fi
     <!-- Commission phrase -->
     <div class="amen-commission" id="amen-commission-d1">
       <div class="amen-commission-line1">Go in peace.</div>
-      <div class="amen-commission-line2">Carry the Word in your heart.</div>
+      <div class="amen-commission-line1">And carry the Word with you.</div>
     </div>
 
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
@@ -959,9 +1067,8 @@ Or where might your life already be telling the truth about Christ before you fi
       <div class="screen-label">Word</div>
       <div class="screen-inner">
     <div class="word-title">RETURN</div>
-    <div class="word-pronunciation">[]</div>
-    <div class="word-divider"></div>
-    <div class="word-definition"><p>[ri-turn]</p><p>To return is not simply to go backwards. It is to come back towards the place, person or truth from which you have drifted.</p><p>In Greek, epistrephō (ἐπιστρέφω) means to turn back or turn towards. In the First Letter of <button type="button" class="figure-link" data-figure="st_peter">Peter</button>, return is not a heroic recovery of direction. It is the movement of someone who has been found before they fully knew they were lost.</p></div></div>
+    <div class="word-pronunciation">[ri-turn]</div><div class="word-divider"></div>
+    <div class="word-definition"><p>To return is not simply to go backwards. It is to come back towards the place, person or truth from which you have drifted.</p><p>In Greek, epistrephō (ἐπιστρέφω) means to turn back or turn towards. In the First Letter of <button type="button" class="figure-link" data-figure="st_peter">Peter</button>, return is not a heroic recovery of direction. It is the movement of someone who has been found before they fully knew they were lost.</p></div></div>
       <div class="screen-fade-bottom"></div>
     </section>
     <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
@@ -971,12 +1078,6 @@ Or where might your life already be telling the truth about Christ before you fi
     <div class="scripture-passage">
       <div class="scripture-block">
         <div class="scripture-text"><p>For you were going astray like sheep, but now you have returned to the shepherd and guardian of your souls.</p></div>
-      </div>
-      
-    </div>
-    <div class="scripture-passage">
-      <div class="scripture-block">
-        <div class="scripture-text"></div>
       </div>
       <div class="scripture-translation">1 Peter 2:25 — NRSV</div>
     </div></div>
@@ -1035,8 +1136,7 @@ Or where might your life already be telling the truth about Christ before you fi
         <div class="amen-word-rule"></div>
         <div class="amen-word-preposition">The word was</div>
         <div class="amen-word-name">Return</div>
-        <div class="amen-word-date">26 April 2026</div>
-        <div class="amen-word-season">Eastertide</div>
+        <div class="amen-word-date">Eastertide · 26 Apr</div>
       </div>
 
     </div>
@@ -1044,7 +1144,7 @@ Or where might your life already be telling the truth about Christ before you fi
     <!-- Commission phrase -->
     <div class="amen-commission" id="amen-commission-d2">
       <div class="amen-commission-line1">Go in peace.</div>
-      <div class="amen-commission-line2">Carry the Word in your heart.</div>
+      <div class="amen-commission-line1">And carry the Word with you.</div>
     </div>
 
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
@@ -1113,9 +1213,8 @@ Or where might your life already be telling the truth about Christ before you fi
       <div class="screen-label">Word</div>
       <div class="screen-inner">
     <div class="word-title">RECEIVE</div>
-    <div class="word-pronunciation">[]</div>
-    <div class="word-divider"></div>
-    <div class="word-definition"><p>[ri-seev]</p><p>To receive is not only to be given something. It is to let what is given come close enough to change you.</p><p>In scripture, to accept the word of God is more than agreement from a distance. It is reception: the word is heard, welcomed and allowed to become the beginning of a new life.</p></div></div>
+    <div class="word-pronunciation">[ri-seev]</div><div class="word-divider"></div>
+    <div class="word-definition"><p>To receive is not only to be given something. It is to let what is given come close enough to change you.</p><p>In scripture, to accept the word of God is more than agreement from a distance. It is reception: the word is heard, welcomed and allowed to become the beginning of a new life.</p></div></div>
       <div class="screen-fade-bottom"></div>
     </section>
     <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
@@ -1125,12 +1224,6 @@ Or where might your life already be telling the truth about Christ before you fi
     <div class="scripture-passage">
       <div class="scripture-block">
         <div class="scripture-text"><p>Now the apostles and the believers who were in Judea heard that the Gentiles had also accepted the word of God.</p></div>
-      </div>
-      
-    </div>
-    <div class="scripture-passage">
-      <div class="scripture-block">
-        <div class="scripture-text"></div>
       </div>
       <div class="scripture-translation">Acts 11:1 — NRSV</div>
     </div></div>
@@ -1189,8 +1282,7 @@ Or where might your life already be telling the truth about Christ before you fi
         <div class="amen-word-rule"></div>
         <div class="amen-word-preposition">The word was</div>
         <div class="amen-word-name">Receive</div>
-        <div class="amen-word-date">27 April 2026</div>
-        <div class="amen-word-season">Eastertide</div>
+        <div class="amen-word-date">Eastertide · 27 Apr</div>
       </div>
 
     </div>
@@ -1198,7 +1290,7 @@ Or where might your life already be telling the truth about Christ before you fi
     <!-- Commission phrase -->
     <div class="amen-commission" id="amen-commission-d3">
       <div class="amen-commission-line1">Go in peace.</div>
-      <div class="amen-commission-line2">Carry the Word in your heart.</div>
+      <div class="amen-commission-line1">And carry the Word with you.</div>
     </div>
 
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
@@ -1267,9 +1359,8 @@ Or where might your life already be telling the truth about Christ before you fi
       <div class="screen-label">Word</div>
       <div class="screen-inner">
     <div class="word-title">BORN</div>
-    <div class="word-pronunciation">[]</div>
-    <div class="word-divider"></div>
-    <div class="word-definition"><p>[bawrn]</p><p>To be born is to begin a life you did not make for yourself. Before it is an achievement, identity or belonging, it is gift.</p><p>The word comes from a psalm the Church hears in Eastertide, where birth becomes a way of speaking about God’s welcome. People from beyond the expected borders are recorded as belonging to Zion, the holy city of God, not as visitors at the edge, but as those whose life is counted as beginning there.</p></div></div>
+    <div class="word-pronunciation">[bawrn]</div><div class="word-divider"></div>
+    <div class="word-definition"><p>To be born is to begin a life you did not make for yourself. Before it is an achievement, identity or belonging, it is gift.</p><p>The word comes from a psalm the Church hears in Eastertide, where birth becomes a way of speaking about God’s welcome. People from beyond the expected borders are recorded as belonging to Zion, the holy city of God, not as visitors at the edge, but as those whose life is counted as beginning there.</p></div></div>
       <div class="screen-fade-bottom"></div>
     </section>
     <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
@@ -1279,12 +1370,6 @@ Or where might your life already be telling the truth about Christ before you fi
     <div class="scripture-passage">
       <div class="scripture-block">
         <div class="scripture-text"><p>And of Zion it shall be said,</p><p>‘This one and that one were born in it’;</p><p>for the Most High himself will establish it.</p><p>The Lord records, as he registers the peoples,</p><p>‘This one was born there.’</p></div>
-      </div>
-      
-    </div>
-    <div class="scripture-passage">
-      <div class="scripture-block">
-        <div class="scripture-text"></div>
       </div>
       <div class="scripture-translation">Psalm 87:5–6 — NRSV</div>
     </div></div>
@@ -1343,8 +1428,7 @@ Or where might your life already be telling the truth about Christ before you fi
         <div class="amen-word-rule"></div>
         <div class="amen-word-preposition">The word was</div>
         <div class="amen-word-name">Born</div>
-        <div class="amen-word-date">28 April 2026</div>
-        <div class="amen-word-season">Eastertide</div>
+        <div class="amen-word-date">Eastertide · 28 Apr</div>
       </div>
 
     </div>
@@ -1352,7 +1436,7 @@ Or where might your life already be telling the truth about Christ before you fi
     <!-- Commission phrase -->
     <div class="amen-commission" id="amen-commission-d4">
       <div class="amen-commission-line1">Go in peace.</div>
-      <div class="amen-commission-line2">Carry the Word in your heart.</div>
+      <div class="amen-commission-line1">And carry the Word with you.</div>
     </div>
 
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
@@ -1421,9 +1505,8 @@ Or where might your life already be telling the truth about Christ before you fi
       <div class="screen-label">Word</div>
       <div class="screen-inner">
     <div class="word-title">LIGHT</div>
-    <div class="word-pronunciation">[]</div>
-    <div class="word-divider"></div>
-    <div class="word-definition"><p>[lyt]</p><p>Light is what makes sight possible. It does not invent what is there; it reveals it.</p><p>The word comes from a Gospel passage the Church hears in Eastertide, where Jesus speaks of himself as light coming into the world. This is not light as mood or atmosphere, but light as mercy: the presence that keeps us from having to remain hidden in the dark.</p></div></div>
+    <div class="word-pronunciation">[lyt]</div><div class="word-divider"></div>
+    <div class="word-definition"><p>Light is what makes sight possible. It does not invent what is there; it reveals it.</p><p>The word comes from a Gospel passage the Church hears in Eastertide, where Jesus speaks of himself as light coming into the world. This is not light as mood or atmosphere, but light as mercy: the presence that keeps us from having to remain hidden in the dark.</p></div></div>
       <div class="screen-fade-bottom"></div>
     </section>
     <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
@@ -1433,12 +1516,6 @@ Or where might your life already be telling the truth about Christ before you fi
     <div class="scripture-passage">
       <div class="scripture-block">
         <div class="scripture-text"><p>I have come as light into the world, so that everyone who believes in me should not remain in the darkness.</p></div>
-      </div>
-      
-    </div>
-    <div class="scripture-passage">
-      <div class="scripture-block">
-        <div class="scripture-text"></div>
       </div>
       <div class="scripture-translation">John 12:46 — NRSV</div>
     </div></div>
@@ -1497,8 +1574,7 @@ Or where might your life already be telling the truth about Christ before you fi
         <div class="amen-word-rule"></div>
         <div class="amen-word-preposition">The word was</div>
         <div class="amen-word-name">Light</div>
-        <div class="amen-word-date">29 April 2026</div>
-        <div class="amen-word-season">Eastertide</div>
+        <div class="amen-word-date">Eastertide · 29 Apr</div>
       </div>
 
     </div>
@@ -1506,7 +1582,7 @@ Or where might your life already be telling the truth about Christ before you fi
     <!-- Commission phrase -->
     <div class="amen-commission" id="amen-commission-d5">
       <div class="amen-commission-line1">Go in peace.</div>
-      <div class="amen-commission-line2">Carry the Word in your heart.</div>
+      <div class="amen-commission-line1">And carry the Word with you.</div>
     </div>
 
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
@@ -1575,9 +1651,8 @@ Or where might your life already be telling the truth about Christ before you fi
       <div class="screen-label">Word</div>
       <div class="screen-inner">
     <div class="word-title">STEADFAST</div>
-    <div class="word-pronunciation">[]</div>
-    <div class="word-divider"></div>
-    <div class="word-definition"><p>[sted-fast]</p><p>To be steadfast is not simply to be stubborn. It is to remain true when pressure, fear or time would make it easier to drift.</p><p>The word comes from a psalm the Church hears in Eastertide, where God’s love is described as established for ever. Steadfastness is love with staying power: not a passing warmth, but a faithfulness firm enough to be lived from.</p></div></div>
+    <div class="word-pronunciation">[sted-fast]</div><div class="word-divider"></div>
+    <div class="word-definition"><p>To be steadfast is not simply to be stubborn. It is to remain true when pressure, fear or time would make it easier to drift.</p><p>The word comes from a psalm the Church hears in Eastertide, where God’s love is described as established for ever. Steadfastness is love with staying power: not a passing warmth, but a faithfulness firm enough to be lived from.</p></div></div>
       <div class="screen-fade-bottom"></div>
     </section>
     <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
@@ -1587,12 +1662,6 @@ Or where might your life already be telling the truth about Christ before you fi
     <div class="scripture-passage">
       <div class="scripture-block">
         <div class="scripture-text"><p>I declare that your steadfast love is established forever; your faithfulness is as firm as the heavens.</p></div>
-      </div>
-      
-    </div>
-    <div class="scripture-passage">
-      <div class="scripture-block">
-        <div class="scripture-text"></div>
       </div>
       <div class="scripture-translation">Psalm 89:2 — NRSV</div>
     </div></div>
@@ -1651,8 +1720,7 @@ Or where might your life already be telling the truth about Christ before you fi
         <div class="amen-word-rule"></div>
         <div class="amen-word-preposition">The word was</div>
         <div class="amen-word-name">Steadfast</div>
-        <div class="amen-word-date">30 April 2026</div>
-        <div class="amen-word-season">Eastertide</div>
+        <div class="amen-word-date">Eastertide · 30 Apr</div>
       </div>
 
     </div>
@@ -1660,7 +1728,7 @@ Or where might your life already be telling the truth about Christ before you fi
     <!-- Commission phrase -->
     <div class="amen-commission" id="amen-commission-d6">
       <div class="amen-commission-line1">Go in peace.</div>
-      <div class="amen-commission-line2">Carry the Word in your heart.</div>
+      <div class="amen-commission-line1">And carry the Word with you.</div>
     </div>
 
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
@@ -1713,1062 +1781,6 @@ Or where might your life already be telling the truth about Christ before you fi
       <div class="screen-fade-bottom"></div>
     </section>
   </div>
-  <div class="day-screens" data-day="6" style="display:none">
-    <section class="screen screen-season" data-screen="0" aria-label="Season">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Season</div>
-      <div class="screen-inner">
-    <div class="season-name">Eastertide</div>
-    <div class="season-position">Friday · Week Four · 1 May 2026</div>
-    <div class="season-feast">Optional Memorial · <button type="button" class="figure-link" data-figure="st_joseph_the_worker">St Joseph the Worker</button></div><div class="season-divider"></div>
-    <div class="season-body"><p>We are deep in Eastertide — the great fifty days between Easter and Pentecost, when the Church lives in the light of the resurrection.</p><p>Today the Church remembers <button type="button" class="figure-link" data-figure="st_joseph_the_worker">St Joseph the Worker</button> — husband of Mary and earthly father of Jesus — whose memorial honours the quiet dignity of work done faithfully before God.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-word" data-screen="1" aria-label="Word">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Word</div>
-      <div class="screen-inner">
-    <div class="word-title">ABIDE</div>
-    <div class="word-pronunciation">[uh-byd]</div>
-    <div class="word-divider"></div>
-    <div class="word-definition"><p>To abide — from the Greek menō (μένω) — means more than staying put. It means remaining, dwelling, making a home. To abide is to make a home somewhere: the difference between being nearby and belonging within.</p><p>The word carries a domestic kind of closeness that English can miss. In <button type="button" class="figure-link" data-figure="st_john">John</button> 15, Jesus is not only telling his disciples where to stay. He is inviting them into a life lived from within his own — not standing at the threshold, but belonging in the house.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Scripture</div>
-      <div class="screen-inner">
-    <div class="scripture-passage">
-      <div class="scripture-block">
-        <div class="scripture-text"><p>Abide in me as I abide in you. Just as the branch cannot bear fruit by itself unless it abides in the vine, neither can you unless you abide in me. I am the vine, you are the branches. Those who abide in me and I in them bear much fruit, because apart from me you can do nothing.</p></div>
-      </div>
-      
-    </div>
-    <div class="scripture-passage">
-      <div class="scripture-block">
-        <div class="scripture-text"></div>
-      </div>
-      <div class="scripture-translation">John 15:4–5 (NRSV)</div>
-    </div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-contemplation" data-screen="3" aria-label="Contemplation">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Contemplation</div>
-      <div class="screen-inner">
-    <div class="contemplation-body"><p>Notice what the branch is not asked to do first. Before it bears fruit — before it does anything at all — it abides. Abiding is not the whole of the Christian life, but it is where the rest of it begins. A branch cut off from the vine may still look alive for a while. But it will not bear fruit. To remain in Christ is to receive a life that is not self-made. Something begins to grow in you that you did not invent and cannot fully explain.</p></div>
-    <div class="contemplation-question">What would change if Christ were not only the one you admire, but the source of the life you live?</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-prayer" data-screen="4" aria-label="Prayer">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Prayer</div>
-      <div class="screen-inner">
-    <div class="prayer-block">
-      <div class="prayer-body"><p>Lord,</p><p>You ask us to abide in you, and you promise to abide in us.</p><p>Draw us deeper than mere nearness, into the kind of closeness that can bear your life.</p><p>Where we are trying to live on what we can produce alone, remind us that apart from you we can do nothing.</p><p>Let your life in us bear the fruit we cannot make by ourselves.</p></div>
-      <div class="prayer-amen">In Christ’s name, Amen.</div>
-    </div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-practice" data-screen="5" aria-label="Practice">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Practice</div>
-      <div class="screen-inner">
-    <div class="practice-body"><p>At some point today, return to an ordinary task — washing up, making a coffee or tea, walking a familiar route — and pray quietly as you do it: abide in me, Lord, and let me abide in you. Let the prayer accompany the work, not replace it.</p></div>
-    <div class="practice-anchor">Fruit grows where life is received, not forced.</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-amen" data-screen="6" aria-label="Amen">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Amen</div>
-      <div class="screen-inner">
-    
-    <!-- Completion hero -->
-    <div class="amen-hero" id="amen-hero-d7">
-
-      <div class="amen-checkbox-row"
-           role="checkbox" aria-checked="false" tabindex="0"
-           data-uid="d7"
-           onclick="amenCheck(this)"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenCheck(this)}">
-        <div class="amen-checkbox-outer" id="amen-box-d7">
-          <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <polyline points="3,9 7,13 15,4.5"
-              stroke="currentColor" stroke-width="1.5"
-              stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="amen-checkbox-label">I kept Vigil today.</div>
-      </div>
-
-      <div class="amen-word-block" id="amen-word-d7">
-        <div class="amen-word-rule"></div>
-        <div class="amen-word-preposition">The word was</div>
-        <div class="amen-word-name">Abide</div>
-        <div class="amen-word-date">1 May 2026</div>
-        <div class="amen-word-season">Eastertide</div>
-      </div>
-
-    </div>
-
-    <!-- Commission phrase -->
-    <div class="amen-commission" id="amen-commission-d7">
-      <div class="amen-commission-line1">Go in peace.</div>
-      <div class="amen-commission-line2">Carry the Word in your heart.</div>
-    </div>
-
-    <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
-    <div class="amen-count-block" id="amen-count-d7">
-      <div class="amen-count-number" id="amen-count-num-d7">—</div>
-      <div class="amen-count-label">people have kept vigil since Vigil began.<br>Invite someone to keep Vigil with you.</div>
-    </div>
-
-    <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-d7">
-
-      <div id="amen-share-initial-d7">
-        <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
-        <button class="amen-share-btn-primary"
-                onclick="amenDoShare('d7','I kept Vigil today. The word was ABIDE.\\n\\nFriday · Week Four · 1 May 2026\\n\\ndailyvigil.app')">Share now</button>
-        <button class="amen-not-now-btn"
-                onclick="amenNotNow('d7')">Not now</button>
-      </div>
-
-      <div class="amen-share-confirmed" id="amen-share-confirmed-d7"></div>
-
-    </div>
-
-    <!-- Standing invitation — always visible -->
-    <div class="amen-invitation-section">
-
-      <div class="amen-invitation-trigger"
-           onclick="amenToggleInvitation('d7')"
-           role="button" tabindex="0"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenToggleInvitation('d7')}">
-        <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
-        <span class="amen-invitation-arrow" id="amen-inv-arrow-d7">&#8250;</span>
-      </div>
-
-      <div class="amen-invitation-panel" id="amen-inv-panel-d7">
-        <div class="amen-invitation-panel-inner">
-          <div class="amen-invitation-message">
-            I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.<br><br>dailyvigil.app
-          </div>
-          <div id="amen-inv-actions-d7" style="width:100%;text-align:center;">
-            <button class="amen-invitation-send"
-                    onclick="amenSendInvitation('d7')">Send invitation</button>
-          </div>
-          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d7"></div>
-        </div>
-      </div>
-
-    </div>
-    <div class="amen-spacer"></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-  </div>
-  <div class="day-screens" data-day="7" style="display:none">
-    <section class="screen screen-season" data-screen="0" aria-label="Season">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Season</div>
-      <div class="screen-inner">
-    <div class="season-name">Eastertide</div>
-    <div class="season-position">Saturday · Easter IV · 2 May 2026</div>
-    <div class="season-feast">Memorial · <button type="button" class="figure-link" data-figure="st_athanasius_of_alexandria">St Athanasius of Alexandria</button>, Bishop and Doctor of the Church</div><div class="season-divider"></div>
-    <div class="season-body"><p>We are in Eastertide — the season in which the Church learns what it is to live in the light of the risen Christ.</p><p>Today the Church remembers <button type="button" class="figure-link" data-figure="st_athanasius_of_alexandria">St Athanasius of Alexandria</button>, whose defence of Christ’s full divinity still helps us hear the force of Jesus’ words: “Whoever has seen me has seen the Father.”</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-word" data-screen="1" aria-label="Word">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Word</div>
-      <div class="screen-inner">
-    <div class="word-title">KNOW</div>
-    <div class="word-pronunciation">[noh]</div>
-    <div class="word-divider"></div>
-    <div class="word-definition"><p>In scripture, to know is often more than to understand. It is to recognise, to encounter, to stand in living relation to what is real.</p><p>In <button type="button" class="figure-link" data-figure="st_john">John</button> 14, Jesus is not speaking of knowledge as information. He is saying that to know him is to know the Father — not by collecting ideas about God, but by meeting the Father in the life, words and presence of Christ.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Scripture</div>
-      <div class="screen-inner">
-    <div class="scripture-passage">
-      <div class="scripture-block">
-        <div class="scripture-text"><p>If you know me, you will know my Father also. From now on you do know him and have seen him.</p></div>
-      </div>
-      
-    </div>
-    <div class="scripture-passage">
-      <div class="scripture-block">
-        <div class="scripture-text"></div>
-      </div>
-      <div class="scripture-translation">John 14:7 (NRSV)</div>
-    </div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-contemplation" data-screen="3" aria-label="Contemplation">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Contemplation</div>
-      <div class="screen-inner">
-    <div class="contemplation-body"><p>We often behave as though knowing God meant getting the picture clearer: better concepts, better language, fewer mistakes. Some of that matters. But Jesus says something stranger here.</p><p>He does not give the disciples a fuller description of the Father. He gives them himself.</p><p>To know Christ is not only to think about him rightly, but to remain near enough that his life begins to teach you what God is like from within.</p></div>
-    <div class="contemplation-question">Where have you been asking God for a clearer explanation, when Christ is offering you himself?</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-prayer" data-screen="4" aria-label="Prayer">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Prayer</div>
-      <div class="screen-inner">
-    <div class="prayer-block">
-      <div class="prayer-body"><p>Lord,</p><p>You do not leave us with ideas about God, but bring us to the Father through yourself.</p><p>Where our faith has become distant, draw us nearer.</p><p>Where we want certainty more than communion, teach us to receive your presence.</p><p>Let our knowledge of you become more than thought: let it become trust, likeness and love.</p></div>
-      <div class="prayer-amen">In Christ’s name, Amen.</div>
-    </div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-practice" data-screen="5" aria-label="Practice">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Practice</div>
-      <div class="screen-inner">
-    <div class="practice-body"><p>At one point today, when you feel the urge to demand a clear answer from God, stay quiet for a moment instead. Let that silence be a way of remaining with Christ until your need to master the moment begins to loosen.</p></div>
-    <div class="practice-anchor">Sometimes knowledge begins not with explanation, but with staying near.</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-amen" data-screen="6" aria-label="Amen">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Amen</div>
-      <div class="screen-inner">
-    
-    <!-- Completion hero -->
-    <div class="amen-hero" id="amen-hero-d8">
-
-      <div class="amen-checkbox-row"
-           role="checkbox" aria-checked="false" tabindex="0"
-           data-uid="d8"
-           onclick="amenCheck(this)"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenCheck(this)}">
-        <div class="amen-checkbox-outer" id="amen-box-d8">
-          <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <polyline points="3,9 7,13 15,4.5"
-              stroke="currentColor" stroke-width="1.5"
-              stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="amen-checkbox-label">I kept Vigil today.</div>
-      </div>
-
-      <div class="amen-word-block" id="amen-word-d8">
-        <div class="amen-word-rule"></div>
-        <div class="amen-word-preposition">The word was</div>
-        <div class="amen-word-name">Know</div>
-        <div class="amen-word-date">2 May 2026</div>
-        <div class="amen-word-season">Eastertide</div>
-      </div>
-
-    </div>
-
-    <!-- Commission phrase -->
-    <div class="amen-commission" id="amen-commission-d8">
-      <div class="amen-commission-line1">Go in peace.</div>
-      <div class="amen-commission-line2">Carry the Word in your heart.</div>
-    </div>
-
-    <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
-    <div class="amen-count-block" id="amen-count-d8">
-      <div class="amen-count-number" id="amen-count-num-d8">—</div>
-      <div class="amen-count-label">people have kept vigil since Vigil began.<br>Invite someone to keep Vigil with you.</div>
-    </div>
-
-    <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-d8">
-
-      <div id="amen-share-initial-d8">
-        <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
-        <button class="amen-share-btn-primary"
-                onclick="amenDoShare('d8','I kept Vigil today. The word was KNOW.\\n\\nSaturday · Easter IV · 2 May 2026\\n\\ndailyvigil.app')">Share now</button>
-        <button class="amen-not-now-btn"
-                onclick="amenNotNow('d8')">Not now</button>
-      </div>
-
-      <div class="amen-share-confirmed" id="amen-share-confirmed-d8"></div>
-
-    </div>
-
-    <!-- Standing invitation — always visible -->
-    <div class="amen-invitation-section">
-
-      <div class="amen-invitation-trigger"
-           onclick="amenToggleInvitation('d8')"
-           role="button" tabindex="0"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenToggleInvitation('d8')}">
-        <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
-        <span class="amen-invitation-arrow" id="amen-inv-arrow-d8">&#8250;</span>
-      </div>
-
-      <div class="amen-invitation-panel" id="amen-inv-panel-d8">
-        <div class="amen-invitation-panel-inner">
-          <div class="amen-invitation-message">
-            I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.<br><br>dailyvigil.app
-          </div>
-          <div id="amen-inv-actions-d8" style="width:100%;text-align:center;">
-            <button class="amen-invitation-send"
-                    onclick="amenSendInvitation('d8')">Send invitation</button>
-          </div>
-          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d8"></div>
-        </div>
-      </div>
-
-    </div>
-    <div class="amen-spacer"></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-  </div>
-  <div class="day-screens" data-day="8" style="display:none">
-    <section class="screen screen-season" data-screen="0" aria-label="Season">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Season</div>
-      <div class="screen-inner">
-    <div class="season-name">5th Sunday of Easter</div>
-    <div class="season-position">Eastertide · 3 May 2026</div>
-    <div class="season-divider"></div>
-    <div class="season-body"><p>We are in Eastertide, on the Fifth Sunday of Easter — the season in which the life of the risen Christ begins to show itself in the life of his people.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-word" data-screen="1" aria-label="Word">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Word</div>
-      <div class="screen-inner">
-    <div class="word-title">FRUIT</div>
-    <div class="word-pronunciation">[froot]</div>
-    <div class="word-divider"></div>
-    <div class="word-definition"><p>The Greek karpos (καρπός) means fruit: what is borne, what comes forth from a living thing in season.</p><p>In scripture, fruit is not simply output or achievement. It is the visible sign of an inward life.</p><p>When <button type="button" class="figure-link" data-figure="st_paul">St Paul</button> speaks of the fruit of the Spirit in his letter to the Galatians, he names not what we can produce by ourselves, but what begins to appear when God&#39;s life is quietly at work in ours.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Scripture</div>
-      <div class="screen-inner">
-    <div class="scripture-passage">
-      <div class="scripture-block">
-        <div class="scripture-text"><p>But the fruit of the Spirit is love, joy, peace, patience, kindness, generosity, faithfulness, gentleness and self-control.</p></div>
-      </div>
-      <div class="scripture-translation">Galatians 5:22 (NRSV)</div>
-    </div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-contemplation" data-screen="3" aria-label="Contemplation">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Contemplation</div>
-      <div class="screen-inner">
-    <div class="contemplation-body"><p>Most fruit does not announce itself while it is growing. It becomes visible later: in the patience that was not there before, the gentleness that now comes where sharpness once rose first, the peace that held when everything around you felt strained.</p><p>The work of the Spirit is often like that — quiet enough to miss if you are only looking for something dramatic. Which may be why the truest signs of grace are not always the ones we notice first in ourselves.</p></div>
-    <div class="contemplation-question">What fruit may already be growing in you, unnoticed because it does not look impressive?</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-prayer" data-screen="4" aria-label="Prayer">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Prayer</div>
-      <div class="screen-inner">
-    <div class="prayer-block">
-      <div class="prayer-body"><p>Lord,</p><p>Where your Spirit is at work in us quietly, teach us not to despise what is small or hidden.</p><p>Where love, faithfulness or generosity are beginning to grow, help us to recognise them with gratitude rather than pride.</p><p>Free us from the need to appear fruitful, and make us willing instead to be changed.</p><p>Let your life in us become visible in the ways that matter most.</p></div>
-      <div class="prayer-amen">In Christ’s name, Amen.</div>
-    </div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-practice" data-screen="5" aria-label="Practice">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Practice</div>
-      <div class="screen-inner">
-    <div class="practice-body"><p>At some point today, notice one quiet sign of the Spirit’s fruit in someone near you: a kindness, a moment of self-control or an expression of joy that might easily go unremarked. Give thanks for it before God, whether or not you mention it aloud to them.</p></div>
-    <div class="practice-anchor">The ripest fruit is often that which draws the least attention.</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-amen" data-screen="6" aria-label="Amen">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Amen</div>
-      <div class="screen-inner">
-    
-    <!-- Completion hero -->
-    <div class="amen-hero" id="amen-hero-d9">
-
-      <div class="amen-checkbox-row"
-           role="checkbox" aria-checked="false" tabindex="0"
-           data-uid="d9"
-           onclick="amenCheck(this)"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenCheck(this)}">
-        <div class="amen-checkbox-outer" id="amen-box-d9">
-          <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <polyline points="3,9 7,13 15,4.5"
-              stroke="currentColor" stroke-width="1.5"
-              stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="amen-checkbox-label">I kept Vigil today.</div>
-      </div>
-
-      <div class="amen-word-block" id="amen-word-d9">
-        <div class="amen-word-rule"></div>
-        <div class="amen-word-preposition">The word was</div>
-        <div class="amen-word-name">Fruit</div>
-        <div class="amen-word-date">3 May 2026</div>
-        <div class="amen-word-season">5th Sunday of Easter</div>
-      </div>
-
-    </div>
-
-    <!-- Commission phrase -->
-    <div class="amen-commission" id="amen-commission-d9">
-      <div class="amen-commission-line1">Go in peace.</div>
-      <div class="amen-commission-line2">Carry the Word in your heart.</div>
-    </div>
-
-    <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
-    <div class="amen-count-block" id="amen-count-d9">
-      <div class="amen-count-number" id="amen-count-num-d9">—</div>
-      <div class="amen-count-label">people have kept vigil since Vigil began.<br>Invite someone to keep Vigil with you.</div>
-    </div>
-
-    <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-d9">
-
-      <div id="amen-share-initial-d9">
-        <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
-        <button class="amen-share-btn-primary"
-                onclick="amenDoShare('d9','I kept Vigil today. The word was FRUIT.\\n\\nEastertide · 3 May 2026\\n\\ndailyvigil.app')">Share now</button>
-        <button class="amen-not-now-btn"
-                onclick="amenNotNow('d9')">Not now</button>
-      </div>
-
-      <div class="amen-share-confirmed" id="amen-share-confirmed-d9"></div>
-
-    </div>
-
-    <!-- Standing invitation — always visible -->
-    <div class="amen-invitation-section">
-
-      <div class="amen-invitation-trigger"
-           onclick="amenToggleInvitation('d9')"
-           role="button" tabindex="0"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenToggleInvitation('d9')}">
-        <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
-        <span class="amen-invitation-arrow" id="amen-inv-arrow-d9">&#8250;</span>
-      </div>
-
-      <div class="amen-invitation-panel" id="amen-inv-panel-d9">
-        <div class="amen-invitation-panel-inner">
-          <div class="amen-invitation-message">
-            I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.<br><br>dailyvigil.app
-          </div>
-          <div id="amen-inv-actions-d9" style="width:100%;text-align:center;">
-            <button class="amen-invitation-send"
-                    onclick="amenSendInvitation('d9')">Send invitation</button>
-          </div>
-          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d9"></div>
-        </div>
-      </div>
-
-    </div>
-    <div class="amen-spacer"></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-  </div>
-  <div class="day-screens" data-day="9" style="display:none">
-    <section class="screen screen-season" data-screen="0" aria-label="Season">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Season</div>
-      <div class="screen-inner">
-    <div class="season-name">Eastertide</div>
-    <div class="season-position">Monday · Week Five · 4 May 2026</div>
-    <div class="season-divider"></div>
-    <div class="season-body"><p>We are in the fifth week of Eastertide, the Monday after the Fifth Sunday of Easter.</p><p>This week the readings linger in the language of love, not as sentiment, but as the shape of life made possible by the risen Christ.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-word" data-screen="1" aria-label="Word">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Word</div>
-      <div class="screen-inner">
-    <div class="word-title">LOVE</div>
-    <div class="word-pronunciation">[luv]</div>
-    <div class="word-divider"></div>
-    <div class="word-definition"><p>Here is something that gets lost in translation.</p><p>In the New Testament, one of the words most often used for love is agapē (ἀγάπη).</p><p>It does not mean romance, affection or the ease we sometimes feel with those closest to us. It means a love that chooses the good of the other person, whether or not they are attractive, agreeable or easy to love.</p><p>When scripture says that God is love, it means that this kind of self-giving love is not only something God does. It is what God is.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Scripture</div>
-      <div class="screen-inner">
-    <div class="scripture-passage">
-      <div class="scripture-block">
-        <div class="scripture-text"><p>Beloved, let us love one another, because love is from God; everyone who loves is born of God and knows God. Whoever does not love does not know God, for God is love.</p></div>
-      </div>
-      
-    </div>
-    <div class="scripture-passage">
-      <div class="scripture-block">
-        <div class="scripture-text"></div>
-      </div>
-      <div class="scripture-translation">1 John 4:7–8 (NRSV)</div>
-    </div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-contemplation" data-screen="3" aria-label="Contemplation">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Contemplation</div>
-      <div class="screen-inner">
-    <div class="contemplation-body"><p>Most of us find it easier to love when love comes naturally: when the person is kind, familiar or easy to be around.</p><p>But agapē begins where that ease begins to fail.</p><p>It is the love that does not depend on warmth, agreement or reward. To hold another person in agapē is not to pretend affection, but to seek their good before God when affection is no longer carrying you.</p></div>
-    <div class="contemplation-question">Who becomes harder for you to love when warmth, agreement or reward disappears — and what might it mean to seek their good before God?</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-prayer" data-screen="4" aria-label="Prayer">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Prayer</div>
-      <div class="screen-inner">
-    <div class="prayer-block">
-      <div class="prayer-body"><p>Lord,</p><p>Where our love depends on mood, warmth or convenience, deepen it.</p><p>Where we have drawn back from the person who costs us something, steady us.</p><p>Your love does not wait for us to become easy to love.</p><p>Teach us to love with something of your patience, your freedom and your constancy.</p><p>Let what we receive from you become what we offer to one another.</p></div>
-      <div class="prayer-amen">In Christ’s name, Amen.</div>
-    </div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-practice" data-screen="5" aria-label="Practice">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Practice</div>
-      <div class="screen-inner">
-    <div class="practice-body"><p>Think today of one person you have recently found difficult to love.</p><p>Do one small, unadvertised good for them: answer more gently than you feel like answering, pray for them by name, or refuse one inward rehearsal of grievance.</p><p>Let it be something chosen, not something felt.</p></div>
-    <div class="practice-anchor">Love becomes more truthful when it is no longer waiting for ease.</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-amen" data-screen="6" aria-label="Amen">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Amen</div>
-      <div class="screen-inner">
-    
-    <!-- Completion hero -->
-    <div class="amen-hero" id="amen-hero-d10">
-
-      <div class="amen-checkbox-row"
-           role="checkbox" aria-checked="false" tabindex="0"
-           data-uid="d10"
-           onclick="amenCheck(this)"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenCheck(this)}">
-        <div class="amen-checkbox-outer" id="amen-box-d10">
-          <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <polyline points="3,9 7,13 15,4.5"
-              stroke="currentColor" stroke-width="1.5"
-              stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="amen-checkbox-label">I kept Vigil today.</div>
-      </div>
-
-      <div class="amen-word-block" id="amen-word-d10">
-        <div class="amen-word-rule"></div>
-        <div class="amen-word-preposition">The word was</div>
-        <div class="amen-word-name">Love</div>
-        <div class="amen-word-date">4 May 2026</div>
-        <div class="amen-word-season">Eastertide</div>
-      </div>
-
-    </div>
-
-    <!-- Commission phrase -->
-    <div class="amen-commission" id="amen-commission-d10">
-      <div class="amen-commission-line1">Go in peace.</div>
-      <div class="amen-commission-line2">Carry the Word in your heart.</div>
-    </div>
-
-    <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
-    <div class="amen-count-block" id="amen-count-d10">
-      <div class="amen-count-number" id="amen-count-num-d10">—</div>
-      <div class="amen-count-label">people have kept vigil since Vigil began.<br>Invite someone to keep Vigil with you.</div>
-    </div>
-
-    <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-d10">
-
-      <div id="amen-share-initial-d10">
-        <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
-        <button class="amen-share-btn-primary"
-                onclick="amenDoShare('d10','I kept Vigil today. The word was LOVE.\\n\\nMonday · Week Five · 4 May 2026\\n\\ndailyvigil.app')">Share now</button>
-        <button class="amen-not-now-btn"
-                onclick="amenNotNow('d10')">Not now</button>
-      </div>
-
-      <div class="amen-share-confirmed" id="amen-share-confirmed-d10"></div>
-
-    </div>
-
-    <!-- Standing invitation — always visible -->
-    <div class="amen-invitation-section">
-
-      <div class="amen-invitation-trigger"
-           onclick="amenToggleInvitation('d10')"
-           role="button" tabindex="0"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenToggleInvitation('d10')}">
-        <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
-        <span class="amen-invitation-arrow" id="amen-inv-arrow-d10">&#8250;</span>
-      </div>
-
-      <div class="amen-invitation-panel" id="amen-inv-panel-d10">
-        <div class="amen-invitation-panel-inner">
-          <div class="amen-invitation-message">
-            I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.<br><br>dailyvigil.app
-          </div>
-          <div id="amen-inv-actions-d10" style="width:100%;text-align:center;">
-            <button class="amen-invitation-send"
-                    onclick="amenSendInvitation('d10')">Send invitation</button>
-          </div>
-          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d10"></div>
-        </div>
-      </div>
-
-    </div>
-    <div class="amen-spacer"></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-  </div>
-  <div class="day-screens" data-day="10" style="display:none">
-    <section class="screen screen-season" data-screen="0" aria-label="Season">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Season</div>
-      <div class="screen-inner">
-    <div class="season-name">Eastertide</div>
-    <div class="season-position">Tuesday · Week Five · 5 May 2026</div>
-    <div class="season-divider"></div>
-    <div class="season-body"><p>We are still inside the Farewell Discourse — Jesus speaking to the disciples in the upper room, with the cross a matter of hours away. Each day this week the words are given from that conversation, spoken to people who did not yet know they were the last.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-word" data-screen="1" aria-label="Word">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Word</div>
-      <div class="screen-inner">
-    <div class="word-title">FRIEND</div>
-    <div class="word-pronunciation">[frend]</div>
-    <div class="word-divider"></div>
-    <div class="word-definition"><p>In the ancient world, friendship was a moral and political category before it was a sentimental one. The Greek philos (φίλος) described someone bound to you by loyalty and shared life — not merely someone whose company you enjoyed.</p><p>In John 15, Jesus takes this word and overloads it. He calls the disciples no longer servants — who do not know what the master is doing — but friends, because he has told them everything the Father has given him to say. To be a friend of Christ is not a promotion. It is to be let into his confidence, handed his secrets, entrusted with his purposes. It is a weightier word than it sounds.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Scripture</div>
-      <div class="screen-inner">
-    <div class="scripture-passage">
-      <div class="scripture-block">
-        <div class="scripture-text"><p>I do not call you servants any longer, because the servant does not know what the master is doing; but I have called you friends, because I have made known to you everything that I have heard from my Father.</p></div>
-      </div>
-      <div class="scripture-translation">John 15:15 — NRSV</div>
-    </div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-contemplation" data-screen="3" aria-label="Contemplation">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Contemplation</div>
-      <div class="screen-inner">
-    <div class="contemplation-body"><p>The move from servant to friend is not a relaxation of the relationship. A servant has clear boundaries — a defined role, a safe distance. A friend is let further in, and that is more exposed.</p><p>What Jesus is offering here is intimacy, not ease. He has told them everything. Not a selection, not what he judged they could handle, but everything the Father gave him to say. That is the nature of the friendship: it goes all the way down.</p><p>St Aelred of Rievaulx, the twelfth-century Cistercian, built an entire theology of spiritual friendship on this verse. He did not think it was a licence for sentimentality. He thought it was a vision of what human love could become when oriented toward Christ: the place where two people carry something of God toward each other without either of them needing to pretend.</p></div>
-    <div class="contemplation-question">What would it mean to receive the friendship of Christ — not as a comfort, but as a confidence?</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-prayer" data-screen="4" aria-label="Prayer">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Prayer</div>
-      <div class="screen-inner">
-    <div class="prayer-block">
-      <div class="prayer-body"><p>Lord,</p><p>You called us friends, and meant it.</p><p>Where we keep you at servant's distance — useful but not too close — draw us nearer.</p><p>Let your friendship make something of us: not merely consoled, but trusted, and changed.</p><p>We receive, in fear and in gratitude, everything you have made known.</p></div>
-      <div class="prayer-amen">In Christ&#39;s name, Amen.</div>
-    </div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-practice" data-screen="5" aria-label="Practice">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Practice</div>
-      <div class="screen-inner">
-    <div class="practice-body"><p>Think of one person today toward whom your love has become effortful or thin — not a stranger, but someone close. Do not try to manufacture feeling. Instead, do one small, concrete act in their direction: a message, a patience, a kindness you would not naturally offer today.
-Agapē is always more verb than noun — chosen, willed, and returned to again and again, not from our own reserves, but from the source that does not run dry.</p></div>
-    </div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-amen" data-screen="6" aria-label="Amen">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Amen</div>
-      <div class="screen-inner">
-    
-    <!-- Completion hero -->
-    <div class="amen-hero" id="amen-hero-d11">
-
-      <div class="amen-checkbox-row"
-           role="checkbox" aria-checked="false" tabindex="0"
-           data-uid="d11"
-           onclick="amenCheck(this)"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenCheck(this)}">
-        <div class="amen-checkbox-outer" id="amen-box-d11">
-          <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <polyline points="3,9 7,13 15,4.5"
-              stroke="currentColor" stroke-width="1.5"
-              stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="amen-checkbox-label">I kept Vigil today.</div>
-      </div>
-
-      <div class="amen-word-block" id="amen-word-d11">
-        <div class="amen-word-rule"></div>
-        <div class="amen-word-preposition">The word was</div>
-        <div class="amen-word-name">Friend</div>
-        <div class="amen-word-date">5 May 2026</div>
-        <div class="amen-word-season">Eastertide</div>
-      </div>
-
-    </div>
-
-    <!-- Commission phrase -->
-    <div class="amen-commission" id="amen-commission-d11">
-      <div class="amen-commission-line1">Go in peace.</div>
-      <div class="amen-commission-line2">Carry the Word in your heart.</div>
-    </div>
-
-    <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
-    <div class="amen-count-block" id="amen-count-d11">
-      <div class="amen-count-number" id="amen-count-num-d11">—</div>
-      <div class="amen-count-label">people have kept vigil since Vigil began.<br>Invite someone to keep Vigil with you.</div>
-    </div>
-
-    <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-d11">
-
-      <div id="amen-share-initial-d11">
-        <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
-        <button class="amen-share-btn-primary"
-                onclick="amenDoShare('d11','I kept Vigil today. The word was FRIEND.\\n\\nTuesday · Week Five · 5 May 2026\\n\\ndailyvigil.app')">Share now</button>
-        <button class="amen-not-now-btn"
-                onclick="amenNotNow('d11')">Not now</button>
-      </div>
-
-      <div class="amen-share-confirmed" id="amen-share-confirmed-d11"></div>
-
-    </div>
-
-    <!-- Standing invitation — always visible -->
-    <div class="amen-invitation-section">
-
-      <div class="amen-invitation-trigger"
-           onclick="amenToggleInvitation('d11')"
-           role="button" tabindex="0"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenToggleInvitation('d11')}">
-        <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
-        <span class="amen-invitation-arrow" id="amen-inv-arrow-d11">&#8250;</span>
-      </div>
-
-      <div class="amen-invitation-panel" id="amen-inv-panel-d11">
-        <div class="amen-invitation-panel-inner">
-          <div class="amen-invitation-message">
-            I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.<br><br>dailyvigil.app
-          </div>
-          <div id="amen-inv-actions-d11" style="width:100%;text-align:center;">
-            <button class="amen-invitation-send"
-                    onclick="amenSendInvitation('d11')">Send invitation</button>
-          </div>
-          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d11"></div>
-        </div>
-      </div>
-
-    </div>
-    <div class="amen-spacer"></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-  </div>
-  <div class="day-screens" data-day="11" style="display:none">
-    <section class="screen screen-season" data-screen="0" aria-label="Season">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Season</div>
-      <div class="screen-inner">
-    <div class="season-name">Eastertide</div>
-    <div class="season-position">Wednesday · Week Five · 6 May 2026</div>
-    <div class="season-divider"></div>
-    <div class="season-body"><p>Wednesday, still inside the week following the Fifth Sunday of Easter.</p><p>The Gospel of John continues to carry the week: the Farewell Discourse, in which Jesus prepares the disciples for a world in which he will no longer be visibly present. The words were first spoken in an upper room; now they are spoken into every season.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-word" data-screen="1" aria-label="Word">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Word</div>
-      <div class="screen-inner">
-    <div class="word-title">CHOOSE</div>
-    <div class="word-pronunciation">[chooz]</div>
-    <div class="word-divider"></div>
-    <div class="word-definition"><p>The Greek eklegomai (ἐκλέγομαι) means to select, to pick out, to set apart — with a deliberateness that implies both preference and purpose. The prefix ek- (out of) carries the sense of drawing one thing from among many.</p><p>In John 15, it is the word Jesus uses of his own initiative toward the disciples: I chose you. You did not choose me. This is not a statement about predestination in the speculative sense. It is a statement about priority and gift: the relationship did not begin with the disciples&#39; seeking. It began with his.</p><p>The same word underlies the New Testament language of election — the sense, throughout Israel&#39;s history, that God&#39;s choice precedes and enables the human response.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Scripture</div>
-      <div class="screen-inner">
-    <div class="scripture-passage">
-      <div class="scripture-block">
-        <div class="scripture-text"><p>You did not choose me but I chose you. And I appointed you to go and bear fruit, fruit that will last, so that the Father will give you whatever you ask him in my name.</p></div>
-      </div>
-      <div class="scripture-translation">John 15:16 — NRSV</div>
-    </div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-contemplation" data-screen="3" aria-label="Contemplation">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Contemplation</div>
-      <div class="screen-inner">
-    <div class="contemplation-body"><p>There is a kind of spiritual exhaustion that comes from believing the whole thing depends on us — that we are only in relationship with God as long as we keep reaching. The verse today quietly undoes that.</p><p>You did not choose me. It is not that the disciple&#39;s choice does not matter; it is that it was not first. Before any seeking, any turning, any prayer, there was a prior act: Christ&#39;s own movement toward the one he would call. This is not a theological abstraction. It is a pastoral reality — that on the days when we cannot feel that we have chosen God, or chosen well, or chosen at all, the relationship does not therefore end.</p><p>Jean Calvin, commenting on this verse, observed that election is not God&#39;s approval of what we already are. It is God&#39;s determination of what we will become. The fruit is not the condition of being chosen. It is the consequence.</p></div>
-    <div class="contemplation-question">On the days when you have not chosen well, what does it mean that you were chosen before you could?</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-prayer" data-screen="4" aria-label="Prayer">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Prayer</div>
-      <div class="screen-inner">
-    <div class="prayer-block">
-      <div class="prayer-body"><p>Lord,</p><p>You chose us before we had anything to offer.</p><p>On days when our faithfulness is thin and our love is inconsistent, remind us that the relationship does not rest on our choosing alone.</p><p>What you have appointed, sustain.</p><p>Bear fruit in us that we could not produce ourselves.</p></div>
-      <div class="prayer-amen">In Christ&#39;s name, Amen.</div>
-    </div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-practice" data-screen="5" aria-label="Practice">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Practice</div>
-      <div class="screen-inner">
-    <div class="practice-body"><p>At some point today, recall a moment — recent or long past — when you were aware of being chosen: by a person, for a task, into a community. Notice what that felt like; notice how it changed the way you behaved in that context.</p></div>
-    <div class="practice-anchor">The life of faith is the practice of receiving a prior love — not earning it, but learning to live from it.</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-amen" data-screen="6" aria-label="Amen">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Amen</div>
-      <div class="screen-inner">
-    
-    <!-- Completion hero -->
-    <div class="amen-hero" id="amen-hero-d12">
-
-      <div class="amen-checkbox-row"
-           role="checkbox" aria-checked="false" tabindex="0"
-           data-uid="d12"
-           onclick="amenCheck(this)"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenCheck(this)}">
-        <div class="amen-checkbox-outer" id="amen-box-d12">
-          <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <polyline points="3,9 7,13 15,4.5"
-              stroke="currentColor" stroke-width="1.5"
-              stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="amen-checkbox-label">I kept Vigil today.</div>
-      </div>
-
-      <div class="amen-word-block" id="amen-word-d12">
-        <div class="amen-word-rule"></div>
-        <div class="amen-word-preposition">The word was</div>
-        <div class="amen-word-name">Choose</div>
-        <div class="amen-word-date">6 May 2026</div>
-        <div class="amen-word-season">Eastertide</div>
-      </div>
-
-    </div>
-
-    <!-- Commission phrase -->
-    <div class="amen-commission" id="amen-commission-d12">
-      <div class="amen-commission-line1">Go in peace.</div>
-      <div class="amen-commission-line2">Carry the Word in your heart.</div>
-    </div>
-
-    <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
-    <div class="amen-count-block" id="amen-count-d12">
-      <div class="amen-count-number" id="amen-count-num-d12">—</div>
-      <div class="amen-count-label">people have kept vigil since Vigil began.<br>Invite someone to keep Vigil with you.</div>
-    </div>
-
-    <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-d12">
-
-      <div id="amen-share-initial-d12">
-        <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
-        <button class="amen-share-btn-primary"
-                onclick="amenDoShare('d12','I kept Vigil today. The word was CHOOSE.\\n\\nWednesday · Week Five · 6 May 2026\\n\\ndailyvigil.app')">Share now</button>
-        <button class="amen-not-now-btn"
-                onclick="amenNotNow('d12')">Not now</button>
-      </div>
-
-      <div class="amen-share-confirmed" id="amen-share-confirmed-d12"></div>
-
-    </div>
-
-    <!-- Standing invitation — always visible -->
-    <div class="amen-invitation-section">
-
-      <div class="amen-invitation-trigger"
-           onclick="amenToggleInvitation('d12')"
-           role="button" tabindex="0"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenToggleInvitation('d12')}">
-        <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
-        <span class="amen-invitation-arrow" id="amen-inv-arrow-d12">&#8250;</span>
-      </div>
-
-      <div class="amen-invitation-panel" id="amen-inv-panel-d12">
-        <div class="amen-invitation-panel-inner">
-          <div class="amen-invitation-message">
-            I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.<br><br>dailyvigil.app
-          </div>
-          <div id="amen-inv-actions-d12" style="width:100%;text-align:center;">
-            <button class="amen-invitation-send"
-                    onclick="amenSendInvitation('d12')">Send invitation</button>
-          </div>
-          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d12"></div>
-        </div>
-      </div>
-
-    </div>
-    <div class="amen-spacer"></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-  </div>
-  <div class="day-screens" data-day="12" style="display:none">
-    <section class="screen screen-season" data-screen="0" aria-label="Season">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Season</div>
-      <div class="screen-inner">
-    <div class="season-name">Eastertide</div>
-    <div class="season-position">Thursday · Week Five · 7 May 2026</div>
-    <div class="season-divider"></div>
-    <div class="season-body"><p>We are at the mid-point of the fifth week of Eastertide, and the Gospel readings continue from the Farewell Discourse and move into the High Priestly Prayer of John 17 — the longest sustained prayer in the Gospels, spoken by Jesus for his disciples on the night he was betrayed.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-word" data-screen="1" aria-label="Word">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Word</div>
-      <div class="screen-inner">
-    <div class="word-title">INTERCEDE</div>
-    <div class="word-pronunciation">[in-ter-seed]</div>
-    <div class="word-divider"></div>
-    <div class="word-definition"><p>To stand between — to speak on behalf of another before someone with the power to help. The Latin intercedere combines inter (between) and cedere (to go): to go into the space between two parties and carry one&#39;s petition there.</p><p>In the New Testament, intercession is what Christ does perpetually. The Letter to the Hebrews says he always lives to make intercession for those who approach God through him. John 17 is the great enacted instance: Jesus, hours before his death, praying not for himself but for those he is about to leave — and for all who will come to faith through their word.</p><p>Prayer for another is participation in what Christ is already doing.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Scripture</div>
-      <div class="screen-inner">
-    <div class="scripture-passage">
-      <div class="scripture-block">
-        <div class="scripture-text"><p>I ask not only on behalf of these, but also on behalf of those who will believe in me through their word, that they may all be one.</p></div>
-      </div>
-      <div class="scripture-translation">John 17:20–21a — NRSV</div>
-    </div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-contemplation" data-screen="3" aria-label="Contemplation">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Contemplation</div>
-      <div class="screen-inner">
-    <div class="contemplation-body"><p>Jesus is praying for people who do not yet exist. &quot;Those who will believe through their word&quot; — that is us, among others, and every believer across the centuries who came to faith through the testimony of those first disciples. We are named, without being named, in this prayer.</p><p>The High Priestly Prayer is not a model for petition in the ordinary sense. It is a window onto what Christ is always doing: standing between us and the Father, speaking our names in a place we cannot reach ourselves. The Letter to the Hebrews says this is his permanent occupation — not just what he did in Gethsemane, but what he does, continuously, at the right hand of the Father.</p><p>To intercede for another, then, is to do something of what Christ is doing: to place yourself between a person and the one who can help them, and to speak. It is not magic and it is not manipulation. It is the act of love made speech.</p></div>
-    <div class="contemplation-question">Whose name are you carrying before God — and what does it cost you to stay in that place?</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-prayer" data-screen="4" aria-label="Prayer">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Prayer</div>
-      <div class="screen-inner">
-    <div class="prayer-block">
-      <div class="prayer-body"><p>Lord,</p><p>You intercede for us even now, even here.</p><p>Teach us to pray for one another with something of your persistence:</p><p>to carry names before God not once, but as a way of life.
-Hold those we bring today — the ones we are worried for, the ones we have almost given up on.</p><p>Let our intercession be a sharing in yours.</p></div>
-      <div class="prayer-amen">In Christ&#39;s name, Amen.</div>
-    </div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-practice" data-screen="5" aria-label="Practice">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Practice</div>
-      <div class="screen-inner">
-    <div class="practice-body"><p>Choose one person to pray for today — specifically, not generally. Speak their name to God. Do not ask for a list of outcomes; simply bring the person: who they are, what they are carrying, what you cannot fix for them.</p></div>
-    <div class="practice-anchor">Intercession is less about changing God's mind than about placing someone in the light. You are not their advocate before an unwilling judge. You are bringing a name to a Father who already loves them.</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-amen" data-screen="6" aria-label="Amen">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Amen</div>
-      <div class="screen-inner">
-    
-    <!-- Completion hero -->
-    <div class="amen-hero" id="amen-hero-d13">
-
-      <div class="amen-checkbox-row"
-           role="checkbox" aria-checked="false" tabindex="0"
-           data-uid="d13"
-           onclick="amenCheck(this)"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenCheck(this)}">
-        <div class="amen-checkbox-outer" id="amen-box-d13">
-          <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <polyline points="3,9 7,13 15,4.5"
-              stroke="currentColor" stroke-width="1.5"
-              stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="amen-checkbox-label">I kept Vigil today.</div>
-      </div>
-
-      <div class="amen-word-block" id="amen-word-d13">
-        <div class="amen-word-rule"></div>
-        <div class="amen-word-preposition">The word was</div>
-        <div class="amen-word-name">Intercede</div>
-        <div class="amen-word-date">7 May 2026</div>
-        <div class="amen-word-season">Eastertide</div>
-      </div>
-
-    </div>
-
-    <!-- Commission phrase -->
-    <div class="amen-commission" id="amen-commission-d13">
-      <div class="amen-commission-line1">Go in peace.</div>
-      <div class="amen-commission-line2">Carry the Word in your heart.</div>
-    </div>
-
-    <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
-    <div class="amen-count-block" id="amen-count-d13">
-      <div class="amen-count-number" id="amen-count-num-d13">—</div>
-      <div class="amen-count-label">people have kept vigil since Vigil began.<br>Invite someone to keep Vigil with you.</div>
-    </div>
-
-    <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-d13">
-
-      <div id="amen-share-initial-d13">
-        <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
-        <button class="amen-share-btn-primary"
-                onclick="amenDoShare('d13','I kept Vigil today. The word was INTERCEDE.\\n\\nThursday · Week Five · 7 May 2026\\n\\ndailyvigil.app')">Share now</button>
-        <button class="amen-not-now-btn"
-                onclick="amenNotNow('d13')">Not now</button>
-      </div>
-
-      <div class="amen-share-confirmed" id="amen-share-confirmed-d13"></div>
-
-    </div>
-
-    <!-- Standing invitation — always visible -->
-    <div class="amen-invitation-section">
-
-      <div class="amen-invitation-trigger"
-           onclick="amenToggleInvitation('d13')"
-           role="button" tabindex="0"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenToggleInvitation('d13')}">
-        <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
-        <span class="amen-invitation-arrow" id="amen-inv-arrow-d13">&#8250;</span>
-      </div>
-
-      <div class="amen-invitation-panel" id="amen-inv-panel-d13">
-        <div class="amen-invitation-panel-inner">
-          <div class="amen-invitation-message">
-            I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.<br><br>dailyvigil.app
-          </div>
-          <div id="amen-inv-actions-d13" style="width:100%;text-align:center;">
-            <button class="amen-invitation-send"
-                    onclick="amenSendInvitation('d13')">Send invitation</button>
-          </div>
-          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d13"></div>
-        </div>
-      </div>
-
-    </div>
-    <div class="amen-spacer"></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-  </div>
   </div>
 
   <!-- Navigation dots (6 per day) -->
@@ -2788,12 +1800,15 @@ Hold those we bring today — the ones we are worried for, the ones we have almo
       <div class="figure-body" id="figureBody"></div>
     </div>
   </div>
+
+  <!-- Desktop screen navigation arrows (hidden on mobile via CSS) -->
+  <button class="desktop-nav-arrow desktop-nav-prev" id="desktopPrev" aria-label="Previous screen">&#8249;</button>
+  <button class="desktop-nav-arrow desktop-nav-next" id="desktopNext" aria-label="Next screen">&#8250;</button>
 </div>
 
 <script>
-const VIGIL_MODE = 'mvp';
-const DAYS    = [{"palette": "palette-eastertide", "label": "Saturday 25 April 2026", "date": "25 April 2026"}, {"palette": "palette-eastertide", "label": "Fourth Sunday of Easter 26 April 2026", "date": "26 April 2026"}, {"palette": "palette-eastertide", "label": "Monday 27 April 2026", "date": "27 April 2026"}, {"palette": "palette-eastertide", "label": "Tuesday 28 April 2026", "date": "28 April 2026"}, {"palette": "palette-eastertide", "label": "Wednesday 29 April 2026", "date": "29 April 2026"}, {"palette": "palette-eastertide", "label": "Thursday 30 April 2026", "date": "30 April 2026"}, {"palette": "palette-eastertide", "label": "Friday 1 May 2026", "date": "1 May 2026"}, {"palette": "palette-eastertide", "label": "Saturday 2 May 2026", "date": "2 May 2026"}, {"palette": "palette-eastertide", "label": "Eastertide 3 May 2026", "date": "3 May 2026"}, {"palette": "palette-eastertide", "label": "Monday 4 May 2026", "date": "4 May 2026"}, {"palette": "palette-eastertide", "label": "Tuesday 5 May 2026", "date": "5 May 2026"}, {"palette": "palette-eastertide", "label": "Wednesday 6 May 2026", "date": "6 May 2026"}, {"palette": "palette-eastertide", "label": "Thursday 7 May 2026", "date": "7 May 2026"}];
-const FIGURES = {"st_mark_evangelist": {"name": "St Mark, Evangelist", "dates": "1st century AD", "role": "", "body": "Traditionally identified as the author of the second Gospel and, in early Christian tradition, as a companion and interpreter of St Peter. He is featured today because his feast turns Easter outward: from the resurrection as news received to the Gospel as news proclaimed."}, "st_peter": {"name": "St Peter", "dates": "1st century AD", "role": "", "body": "Traditionally identified as one of the Twelve Apostles and as a leading witness to the resurrection. He is featured today because the First Letter of Peter gives the day its image of return: those who had gone astray are brought back to the shepherd and guardian of their souls."}, "st_peter_chanel": {"name": "St Peter Chanel", "dates": "1803–1841 AD", "role": "", "body": "Marist priest, missionary and martyr, traditionally honoured as the protomartyr of Oceania. The Church remembers him today; his life gives the day’s word a particular sharpness, as the Gospel took root far from the lands where it first began."}, "st_louis_marie_grignion_de_montfort": {"name": "St Louis Marie Grignion de Montfort", "dates": "1673–1716 AD", "role": "", "body": "French priest, preacher and spiritual writer known especially for Marian devotion and missionary preaching. The Church remembers him today; his preaching life reflects the day’s word by drawing people back to the life in God for which they were made."}, "st_catherine_of_siena": {"name": "St Catherine of Siena", "dates": "1347–1380 AD", "role": "", "body": "Mystic, writer and a Doctor of the Church. The Church remembers her today; her life gives the day’s word a particular force, as someone whose love for Christ became unusually clear speech in a dark and divided time."}, "st_pius_v": {"name": "St Pius V", "dates": "1504–1572 AD", "role": "", "body": "Pope and Dominican friar, remembered for reforming Church life and worship after the Council of Trent. The Church remembers him today; his life reflects the day’s word in its concern for faithfulness, order and perseverance during a divided age."}, "st_joseph_the_worker": {"name": "St Joseph the Worker", "dates": "1st century AD", "role": "", "body": "Husband of Mary and earthly father of Jesus. In the Gospels, Jesus is known as the son of a tekton (τέκτων) — a craftsman or builder — and Joseph’s memorial on 1 May honours the dignity of ordinary work done faithfully before God."}, "st_john": {"name": "St John", "dates": "1st century AD", "role": "", "body": "Traditionally identified as one of the Twelve Apostles and as the author of the fourth Gospel, three letters and the book of Revelation. He is featured today because John 14 does not offer knowledge of God as information, but as encounter: in knowing Christ, the disciples come to know the Father."}, "st_athanasius_of_alexandria": {"name": "St Athanasius of Alexandria", "dates": "c. 296–373 AD", "role": "", "body": "Bishop of Alexandria and Doctor of the Church. He is featured today because he defended the full divinity of Christ, helping the Church speak clearly about the mystery at the heart of today’s Gospel: that to know Jesus is truly to know the Father."}, "st_paul": {"name": "St Paul", "dates": "1st century AD", "role": "", "body": "Traditionally identified as the Apostle to the Gentiles and as the author of letters central to the New Testament. He is featured today because, in Galatians 5, Paul names the fruit of the Spirit not as spiritual achievement, but as the visible character of a life being changed by God."}, "first_letter_of_john": {"name": "First Letter of John", "dates": "1st century AD", "role": "Author", "body": "A New Testament writer traditionally associated with St John the Evangelist. It is featured today because this letter gives one of scripture’s clearest and most searching claims about love: that love comes from God, and that to know God is to be changed by it."}};
+const DAYS    = [{"palette": "palette-eastertide", "label": "Eastertide \u00b7 25 Apr", "date": "25 April 2026"}, {"palette": "palette-eastertide", "label": "Eastertide \u00b7 26 Apr", "date": "26 April 2026"}, {"palette": "palette-eastertide", "label": "Eastertide \u00b7 27 Apr", "date": "27 April 2026"}, {"palette": "palette-eastertide", "label": "Eastertide \u00b7 28 Apr", "date": "28 April 2026"}, {"palette": "palette-eastertide", "label": "Eastertide \u00b7 29 Apr", "date": "29 April 2026"}, {"palette": "palette-eastertide", "label": "Eastertide \u00b7 30 Apr", "date": "30 April 2026"}];
+const FIGURES = {"st_mark_evangelist": {"name": "St Mark, Evangelist", "dates": "1st century AD", "role": "", "body": "Traditionally identified as the author of the second Gospel and, in early Christian tradition, as a companion and interpreter of St Peter. He is featured today because his feast turns Easter outward: from the resurrection as news received to the Gospel as news proclaimed."}, "st_peter": {"name": "St Peter", "dates": "1st century AD", "role": "", "body": "Traditionally identified as one of the Twelve Apostles and as a leading witness to the resurrection. He is featured today because the First Letter of Peter gives the day its image of return: those who had gone astray are brought back to the shepherd and guardian of their souls."}, "st_peter_chanel": {"name": "St Peter Chanel", "dates": "1803–1841 AD", "role": "", "body": "Marist priest, missionary and martyr, traditionally honoured as the protomartyr of Oceania. The Church remembers him today; his life gives the day’s word a particular sharpness, as the Gospel took root far from the lands where it first began."}, "st_louis_marie_grignion_de_montfort": {"name": "St Louis Marie Grignion de Montfort", "dates": "1673–1716 AD", "role": "", "body": "French priest, preacher and spiritual writer known especially for Marian devotion and missionary preaching. The Church remembers him today; his preaching life reflects the day’s word by drawing people back to the life in God for which they were made."}, "st_catherine_of_siena": {"name": "St Catherine of Siena", "dates": "1347–1380 AD", "role": "", "body": "Mystic, writer and a Doctor of the Church. The Church remembers her today; her life gives the day’s word a particular force, as someone whose love for Christ became unusually clear speech in a dark and divided time."}, "st_pius_v": {"name": "St Pius V", "dates": "1504–1572 AD", "role": "", "body": "Pope and Dominican friar, remembered for reforming Church life and worship after the Council of Trent. The Church remembers him today; his life reflects the day’s word in its concern for faithfulness, order and perseverance during a divided age."}};
 const TOTAL_SCREENS = 7;
 const LABELS  = ["Season", "Word", "Scripture", "Contemplation", "Prayer", "Practice", "Amen"];
 
@@ -2822,7 +1837,7 @@ function showDay(dayIndex, screenIndex=0) {
   applyPalette(dayIndex);
   buildDots();
   updateDayLabel();
-  if (VIGIL_MODE === 'prototype') updateDayNavButtons();
+  updateDayNavButtons();
   goTo(screenIndex, false);
 }
 
@@ -2851,7 +1866,6 @@ function formatDateForNav(dateStr) {
 function updateDayNavButtons() {
   const prevBtn = document.querySelector('.day-prev');
   const nextBtn = document.querySelector('.day-next');
-  if (!prevBtn || !nextBtn) return;  // MVP mode: buttons don't exist
   const prevDateEl = document.getElementById('prevDate');
   const nextDateEl = document.getElementById('nextDate');
   
@@ -2878,17 +1892,12 @@ function updateDayNavButtons() {
   }
 }
 
-// Day-nav click listeners (prototype only — buttons absent in MVP)
-if (document.querySelector('.day-prev')) {
-  document.querySelector('.day-prev').addEventListener('click', () => {
-    if (currentDay > 0) showDay(currentDay - 1, 0);
-  });
-}
-if (document.querySelector('.day-next')) {
-  document.querySelector('.day-next').addEventListener('click', () => {
-    if (currentDay < totalDays - 1) showDay(currentDay + 1, 0);
-  });
-}
+document.querySelector('.day-prev').addEventListener('click', () => {
+  if (currentDay > 0) showDay(currentDay - 1, 0);
+});
+document.querySelector('.day-next').addEventListener('click', () => {
+  if (currentDay < totalDays - 1) showDay(currentDay + 1, 0);
+});
 
 // ── Screen navigation ─────────────────────────────────────────────────────
 
@@ -2896,9 +1905,14 @@ function getCurrentScreens() {
   return document.querySelectorAll(`.day-screens[data-day="${currentDay}"] .screen`);
 }
 
+function getScreenWidth() {
+  // On desktop the app is constrained to 480px; on mobile it's full viewport width.
+  const appEl = document.getElementById('app');
+  return appEl ? appEl.offsetWidth : window.innerWidth;
+}
+
 function goTo(i, anim=true) {
   // On Screen 7, a left swipe wraps to Screen 1 of the same day.
-  // Screen 7 exits left; Screen 1 enters from the right.
   if (i >= TOTAL_SCREENS) {
     wrapAmenToScreen1();
     return;
@@ -2908,27 +1922,25 @@ function goTo(i, anim=true) {
 
   const dayEl = document.querySelector(`.day-screens[data-day="${currentDay}"]`);
   if (!dayEl) return;
-  dayEl.style.transform = `translateX(-${i * 100}%)`;
+  const sw = getScreenWidth();
+  dayEl.style.transform = `translateX(-${i * sw}px)`;
 
   document.querySelectorAll('.dot').forEach((d, idx) => d.classList.toggle('active', idx === i));
   document.getElementById('counter').textContent = `${i + 1} / ${TOTAL_SCREENS}`;
 
-  if (i > 0) document.getElementById('swipeHint').style.opacity = '0';
+  const hint = document.getElementById('swipeHint');
+  if (hint && i > 0) hint.style.opacity = '0';
   if (anim) animateScreen(i);
 }
 
 function wrapAmenToScreen1() {
-  // Screen 7 exits left; Screen 1 of the same day enters from the right.
-  // Uses a temporary overlay rather than traversing Screens 2–6.
   const dayEl = document.querySelector(`.day-screens[data-day="${currentDay}"]`);
   if (!dayEl) return;
 
-  // Snapshot the current (Screen 7) position
   const screens = dayEl.querySelectorAll('.screen');
-  const s7 = screens[6];  // zero-indexed
   const s1 = screens[0];
+  const sw = getScreenWidth();
 
-  // Place Screen 1 visually to the right of Screen 7 using a clone overlay
   const overlay = document.createElement('div');
   overlay.style.cssText = `
     position:fixed;inset:0;z-index:50;pointer-events:none;overflow:hidden;
@@ -2942,9 +1954,8 @@ function wrapAmenToScreen1() {
   overlay.appendChild(clone);
   document.body.appendChild(overlay);
 
-  // Slide Screen 7 out left simultaneously
   dayEl.style.transition = 'transform 0.42s cubic-bezier(0.4,0,0.2,1)';
-  dayEl.style.transform  = `translateX(-${(TOTAL_SCREENS) * 100}%)`;
+  dayEl.style.transform  = `translateX(-${TOTAL_SCREENS * sw}px)`;
 
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
@@ -2954,14 +1965,12 @@ function wrapAmenToScreen1() {
 
   setTimeout(() => {
     overlay.remove();
-    // Reset day to Screen 1 without animation
     dayEl.style.transition = 'none';
     dayEl.style.transform  = 'translateX(0)';
     currentScreen = 0;
     document.querySelectorAll('.dot').forEach((d, idx) => d.classList.toggle('active', idx === 0));
     document.getElementById('counter').textContent = `1 / ${TOTAL_SCREENS}`;
     animateScreen(0);
-    // Restore transition for subsequent swipes
     setTimeout(() => { dayEl.style.transition = ''; }, 50);
   }, 440);
 }
@@ -3046,41 +2055,182 @@ document.addEventListener('keydown', ev => {
   if (ev.key === 'ArrowLeft'  || ev.key === 'ArrowUp')   goTo(currentScreen - 1);
 });
 
-// ── Initialise ────────────────────────────────────────────────────────────
-
-// MVP mode: find today's date and show only that day.
-// Prototype mode: show the first day (existing behaviour).
-(function initVigil() {
-  if (VIGIL_MODE === 'mvp') {
-    // Build today's date string to match the format in DAYS[].date e.g. "1 May 2026"
-    const now    = new Date();
-    const day    = now.getDate();
-    const months = ['January','February','March','April','May','June',
-                    'July','August','September','October','November','December'];
-    const todayStr = day + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
-
-    const matchIndex = DAYS.findIndex(d => d.date === todayStr);
-    if (matchIndex >= 0) {
-      showDay(matchIndex, 0);
-    } else {
-      // No content for today — show a holding screen
-      document.querySelectorAll('.day-screens').forEach(el => el.style.display = 'none');
-      document.getElementById('dots').style.display      = 'none';
-      document.getElementById('swipeHint').style.display  = 'none';
-      document.getElementById('counter').style.display    = 'none';
-      document.getElementById('dayLabel').textContent     = '';
-
-      const holding = document.createElement('div');
-      holding.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;height:80vh;text-align:center;padding:2rem;';
-      holding.innerHTML = '<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;font-style:italic;color:var(--dim);line-height:1.6;max-width:300px;">'
-        + 'Vigil will return<br>with a new word<br>tomorrow.'
-        + '</div>';
-      document.getElementById('screens').appendChild(holding);
+// ── Word title auto-fit ───────────────────────────────────────────────────
+// Ensures the word always fits on one line regardless of length.
+function fitWordTitle(dayIndex) {
+  const dayEl = document.querySelector(`.day-screens[data-day="${dayIndex}"]`);
+  if (!dayEl) return;
+  const titles = dayEl.querySelectorAll('.word-title');
+  titles.forEach(el => {
+    el.style.fontSize = '';
+    const container = el.closest('.screen-inner') || el.parentElement;
+    if (!container) return;
+    // Measure the actual usable width from the container's computed padding
+    const style = getComputedStyle(container);
+    const usable = container.clientWidth
+      - parseFloat(style.paddingLeft)
+      - parseFloat(style.paddingRight);
+    // Binary-search the largest font-size that keeps el.scrollWidth ≤ usable
+    let lo = 14, hi = 128;
+    for (let iter = 0; iter < 14; iter++) {
+      const mid = (lo + hi) / 2;
+      el.style.fontSize = mid + 'px';
+      if (el.scrollWidth <= usable) lo = mid;
+      else hi = mid;
     }
+    el.style.fontSize = Math.floor(lo) + 'px';
+  });
+}
+
+// ── Initialise ────────────────────────────────────────────────────────────
+showDay(0, 0);
+// Fit all word titles after initial render
+setTimeout(() => {
+  for (let d = 0; d < totalDays; d++) fitWordTitle(d);
+}, 100);
+
+// Recalculate slide position on resize (e.g. browser window resized on desktop)
+window.addEventListener('resize', () => {
+  const dayEl = document.querySelector(`.day-screens[data-day="${currentDay}"]`);
+  if (!dayEl) return;
+  const sw = getScreenWidth();
+  dayEl.style.transition = 'none';
+  dayEl.style.transform = `translateX(-${currentScreen * sw}px)`;
+  setTimeout(() => { dayEl.style.transition = ''; }, 50);
+  // Re-fit word titles on resize
+  for (let d = 0; d < totalDays; d++) fitWordTitle(d);
+});
+
+// ── Desktop navigation arrows ─────────────────────────────────────────────
+const desktopPrev = document.getElementById('desktopPrev');
+const desktopNext = document.getElementById('desktopNext');
+
+function updateDesktopArrows() {
+  if (!desktopPrev || !desktopNext) return;
+  if (currentScreen <= 0) {
+    desktopPrev.classList.add('disabled');
   } else {
-    showDay(0, 0);
+    desktopPrev.classList.remove('disabled');
   }
-})();
+  if (currentScreen >= TOTAL_SCREENS - 1) {
+    desktopNext.classList.add('disabled');
+  } else {
+    desktopNext.classList.remove('disabled');
+  }
+}
+
+if (desktopPrev) desktopPrev.addEventListener('click', () => {
+  if (currentScreen > 0) goTo(currentScreen - 1);
+});
+if (desktopNext) desktopNext.addEventListener('click', () => {
+  if (currentScreen < TOTAL_SCREENS - 1) goTo(currentScreen + 1);
+  else wrapAmenToScreen1();
+});
+
+// Patch goTo to also update desktop arrows
+const _origGoTo = goTo;
+// Already patched inline — call updateDesktopArrows after each navigation
+document.addEventListener('vigil:screenchange', updateDesktopArrows);
+updateDesktopArrows();
+
+// ── Scroll overflow indicator ─────────────────────────────────────────────
+// Shows a subtle animated chevron when screen content extends below the fold.
+// Works on both mobile and desktop; on mobile the fade already hints at more.
+// ── Scroll overflow indicator ─────────────────────────────────────────────
+
+// Returns the pixel height of the bottom fade overlay on a given screen element.
+function getFadeHeight(sc) {
+  const fade = sc.querySelector('.screen-fade-bottom');
+  return fade ? fade.offsetHeight : 0;
+}
+
+// Returns the bottom position of the last meaningful content element in screen-inner,
+// relative to the top of screen-inner's scroll container.
+function getContentBottom(inner) {
+  const children = Array.from(inner.children);
+  if (!children.length) return 0;
+  const last = children[children.length - 1];
+  return last.offsetTop + last.offsetHeight;
+}
+
+// True if, at the current scroll position, the last content element is obscured by the fade.
+function isLastLineInFade(inner, sc) {
+  const fadeH     = getFadeHeight(sc);
+  const viewBottom = inner.scrollTop + inner.clientHeight; // bottom of visible area
+  const contentBottom = getContentBottom(inner);
+  // The last line is in the fade zone if its bottom sits within fadeH of viewBottom
+  return contentBottom > viewBottom - fadeH;
+}
+
+// True if there is any content hidden below the current scroll position (ignoring fade).
+function hasHiddenContent(inner, sc) {
+  const fadeH = getFadeHeight(sc);
+  const contentBottom = getContentBottom(inner);
+  const viewBottom = inner.scrollTop + inner.clientHeight;
+  // Content is hidden if its bottom would be below the clear zone (above the fade)
+  return contentBottom > viewBottom - fadeH + 4;
+}
+
+// Scroll screen-inner so the last content element clears the bottom fade.
+function scrollToClearFade(inner, sc, behavior) {
+  behavior = behavior || 'smooth';
+  const fadeH = getFadeHeight(sc);
+  const contentBottom = getContentBottom(inner);
+  // Target: last element bottom is 16px above the fade zone
+  const targetScrollTop = contentBottom - inner.clientHeight + fadeH + 16;
+  if (targetScrollTop > inner.scrollTop) {
+    inner.scrollTo({ top: targetScrollTop, behavior: behavior });
+  }
+}
+
+// Scroll so a specific element clears the bottom fade.
+function scrollElementClearFade(inner, sc, el, behavior) {
+  behavior = behavior || 'smooth';
+  const fadeH = getFadeHeight(sc);
+  const elBottom = el.offsetTop + el.offsetHeight;
+  const targetScrollTop = elBottom - inner.clientHeight + fadeH + 16;
+  if (targetScrollTop > inner.scrollTop) {
+    inner.scrollTo({ top: targetScrollTop, behavior: behavior });
+  }
+}
+
+function updateScrollIndicator(screenIndex) {
+  const screens = getCurrentScreens();
+  const sc = screens[screenIndex];
+  if (!sc) return;
+  const inner = sc.querySelector('.screen-inner');
+  if (!inner) return;
+
+  let ind = sc.querySelector('.scroll-indicator');
+  if (!ind) {
+    ind = document.createElement('div');
+    ind.className = 'scroll-indicator';
+    ind.innerHTML = '<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><polyline points="5,8 11,14 17,8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    sc.appendChild(ind);
+  }
+
+  function check() {
+    // Show arrow only if actual content is hidden below the fade zone
+    const show = hasHiddenContent(inner, sc);
+    ind.classList.toggle('visible', show);
+  }
+
+  check();
+  inner.removeEventListener('scroll', inner._scrollCheck);
+  inner._scrollCheck = check;
+  inner.addEventListener('scroll', check, { passive: true });
+}
+
+// Hook scroll indicator into goTo
+const _goToOrig = goTo;
+goTo = function(i, anim=true) {
+  _goToOrig(i, anim);
+  updateDesktopArrows();
+  const idx = i < 0 ? 0 : i >= TOTAL_SCREENS ? 0 : i;
+  setTimeout(() => updateScrollIndicator(idx), 350);
+};
+// Initialise on load
+setTimeout(() => updateScrollIndicator(0), 500);
 
 // ── Screen 7: Amen — interaction functions ────────────────────────────────
 
@@ -3136,10 +2286,7 @@ function amenCheck(row) {
     // Commission phrase after word echo settles
     setTimeout(() => comm.classList.add('amen-visible'), 700);
     // Share block after commission phrase
-    setTimeout(() => {
-      share.classList.add('amen-visible');
-      share.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }, 1200);
+    setTimeout(() => share.classList.add('amen-visible'), 1200);
   } else {
     comm.classList.remove('amen-visible');
     share.classList.remove('amen-visible');
@@ -3191,14 +2338,14 @@ function amenToggleInvitation(uid) {
   if (panel) panel.classList.toggle('amen-inv-open', amenInvOpen[uid]);
   if (arrow) arrow.classList.toggle('amen-inv-arrow-open', amenInvOpen[uid]);
   if (amenInvOpen[uid] && panel) {
+    // Wait for the panel's max-height transition (450ms) then scroll its bottom clear of the fade
     setTimeout(() => {
-      const inner = panel.querySelector('.amen-invitation-panel-inner');
-      if (inner) {
-        const bottom = inner.getBoundingClientRect().bottom;
-        const vBottom = window.innerHeight;
-        if (bottom > vBottom - 60) {
-          inner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
+      const inner = panel.closest('.screen-inner');
+      const sc    = panel.closest('.screen');
+      if (inner && sc) {
+        const panelInner = panel.querySelector('.amen-invitation-panel-inner');
+        const target = panelInner || panel;
+        scrollElementClearFade(inner, sc, target, 'smooth');
       }
     }, 480);
   }
