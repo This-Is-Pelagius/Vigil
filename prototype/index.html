@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Prototype / test site · Generated 2026-04-26 22:33 · 6 day(s) -->
+<!-- Vigil · Prototype / test site · Generated 2026-04-27 06:46 · 6 day(s) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil — Prototype</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -640,11 +640,19 @@ body { overflow: hidden; }
 
 /* Override screen-inner padding for Amen — needs more bottom room */
 .screen-amen .screen-inner {
-  padding: 1.4rem 1.4rem 8rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  padding: 1.4rem 1.4rem 0;
+  display: block;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
+/* Centre amen children individually; bottom padding on last child pushes scrollHeight */
+.screen-amen .screen-inner > * {
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  max-width: 100%;
+}
+.amen-spacer { height: 12rem; flex-shrink: 0; }
 
 /* ── Hero: checkbox + word echo ── */
 .amen-hero {
@@ -769,7 +777,7 @@ body { overflow: hidden; }
   pointer-events: none; margin-bottom: 0;
 }
 .amen-share-block.amen-visible {
-  opacity: 1; max-height: 400px; pointer-events: all; margin-bottom: 1.6rem;
+  opacity: 1; max-height: 700px; pointer-events: all; margin-bottom: 1.6rem;
 }
 .amen-share-prompt {
   font-family: 'Libre Baskerville', serif; font-size: 1rem; font-style: italic;
@@ -785,6 +793,16 @@ body { overflow: hidden; }
   transition: opacity 0.2s; -webkit-tap-highlight-color: transparent;
 }
 .amen-share-btn-primary:hover { opacity: 0.85; }
+.amen-share-btn-secondary {
+  display: block; width: 100%;
+  font-family: 'Raleway', sans-serif; font-size: 0.6rem; font-weight: 600;
+  letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--gold); background: none;
+  border: 1px solid rgba(184,134,11,0.4); padding: 0.95rem 1.5rem;
+  cursor: pointer; margin-bottom: 0.8rem;
+  transition: opacity 0.2s, border-color 0.2s; -webkit-tap-highlight-color: transparent;
+}
+.amen-share-btn-secondary:hover { opacity: 0.75; border-color: var(--gold); }
 .amen-not-now-btn {
   display: block; width: 100%;
   font-family: 'Libre Baskerville', serif; font-size: 0.95rem; font-style: italic;
@@ -799,15 +817,6 @@ body { overflow: hidden; }
   line-height: 1.75; text-align: center;
 }
 .amen-share-confirmed.amen-share-confirmed-visible { display: block; }
-.amen-share-again-btn {
-  display: inline-block; margin-top: 0.9rem;
-  font-family: 'Libre Baskerville', serif; font-size: 0.9rem; font-style: italic;
-  color: var(--gold); background: none; border: none;
-  cursor: pointer; padding: 0; text-decoration: underline;
-  text-decoration-color: rgba(184,134,11,0.45); text-underline-offset: 3px;
-  transition: color 0.2s; -webkit-tap-highlight-color: transparent;
-}
-.amen-share-again-btn:hover { color: var(--accent); }
 
 /* ── Standing invitation ── */
 .amen-invitation-section {
@@ -816,12 +825,20 @@ body { overflow: hidden; }
   border-top: 1px solid var(--accent-soft);
 }
 .amen-invitation-trigger {
-  display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
+  display: block; width: 100%;
   cursor: pointer; -webkit-tap-highlight-color: transparent;
-  border-bottom: 1px solid rgba(184,134,11,0.35); padding-bottom: 0.15rem;
+  background: none; border: none; padding: 0;
+  font: inherit; text-decoration: none;
+  -webkit-user-select: none; user-select: none;
+  touch-action: manipulation;
+}
+.amen-invitation-trigger-inner {
+  display: flex; align-items: center; justify-content: center; gap: 0.45rem;
+  padding: 1.1rem 1rem;
+  border-bottom: 1px solid rgba(184,134,11,0.35);
   transition: border-color 0.2s;
 }
-.amen-invitation-trigger:hover { border-color: var(--gold); }
+.amen-invitation-trigger:hover .amen-invitation-trigger-inner { border-color: var(--gold); }
 .amen-invitation-trigger:hover .amen-invitation-text { color: var(--accent); }
 .amen-invitation-text {
   font-family: 'Cormorant Garamond', serif; font-size: 1.2rem;
@@ -841,7 +858,7 @@ body { overflow: hidden; }
   transition: max-height 0.45s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease 0.08s;
   width: 100%;
 }
-.amen-invitation-panel.amen-inv-open { max-height: 800px; opacity: 1; overflow: visible; }
+.amen-invitation-panel.amen-inv-open { max-height: 600px; opacity: 1; }
 .amen-invitation-panel-inner {
   padding: 1.3rem 0 0.5rem;
   display: flex; flex-direction: column; align-items: center; gap: 1rem;
@@ -868,7 +885,6 @@ body { overflow: hidden; }
 }
 .amen-inv-confirmed.amen-inv-confirmed-visible { display: block; }
 
-.amen-spacer { height: 4rem; flex-shrink: 0; }
 
 /* Amen screen fade overlays — uses --bg (primary) colours */
 .palette-eastertide .screen-amen .screen-fade-top
@@ -999,10 +1015,7 @@ Or where might your life already be telling the truth about Christ before you fi
       </div>
 
       <div class="amen-word-block" id="amen-word-d1">
-        <div class="amen-word-rule"></div>
-        <div class="amen-word-preposition">The word was</div>
         <div class="amen-word-name">Proclaim</div>
-        <div class="amen-word-date">Eastertide · 25 Apr</div>
       </div>
 
     </div>
@@ -1025,7 +1038,9 @@ Or where might your life already be telling the truth about Christ before you fi
       <div id="amen-share-initial-d1">
         <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
         <button class="amen-share-btn-primary"
-                onclick="amenDoShare('d1','I kept Vigil today. The word was PROCLAIM.\\n\\nSaturday · Week Three · 25 April 2026\\n\\ndailyvigil.app')">Share now</button>
+                onclick="amenShareImage('d1')">Share today’s Vigil</button>
+        <button class="amen-share-btn-secondary"
+                onclick="amenShareApp('d1')">Share the app</button>
         <button class="amen-not-now-btn"
                 onclick="amenNotNow('d1')">Not now</button>
       </div>
@@ -1037,13 +1052,14 @@ Or where might your life already be telling the truth about Christ before you fi
     <!-- Standing invitation — always visible -->
     <div class="amen-invitation-section">
 
-      <div class="amen-invitation-trigger"
-           onclick="amenToggleInvitation('d1')"
-           role="button" tabindex="0"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenToggleInvitation('d1')}">
-        <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
-        <span class="amen-invitation-arrow" id="amen-inv-arrow-d1">&#8250;</span>
-      </div>
+      <button class="amen-invitation-trigger"
+              onclick="amenToggleInvitation('d1')"
+              type="button">
+        <span class="amen-invitation-trigger-inner">
+          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
+          <span class="amen-invitation-arrow" id="amen-inv-arrow-d1">&#8250;</span>
+        </span>
+      </button>
 
       <div class="amen-invitation-panel" id="amen-inv-panel-d1">
         <div class="amen-invitation-panel-inner">
@@ -1145,10 +1161,7 @@ Or where might your life already be telling the truth about Christ before you fi
       </div>
 
       <div class="amen-word-block" id="amen-word-d2">
-        <div class="amen-word-rule"></div>
-        <div class="amen-word-preposition">The word was</div>
         <div class="amen-word-name">Return</div>
-        <div class="amen-word-date">Eastertide · 26 Apr</div>
       </div>
 
     </div>
@@ -1171,7 +1184,9 @@ Or where might your life already be telling the truth about Christ before you fi
       <div id="amen-share-initial-d2">
         <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
         <button class="amen-share-btn-primary"
-                onclick="amenDoShare('d2','I kept Vigil today. The word was RETURN.\\n\\nFourth Sunday of Easter · 26 April 2026\\n\\ndailyvigil.app')">Share now</button>
+                onclick="amenShareImage('d2')">Share today’s Vigil</button>
+        <button class="amen-share-btn-secondary"
+                onclick="amenShareApp('d2')">Share the app</button>
         <button class="amen-not-now-btn"
                 onclick="amenNotNow('d2')">Not now</button>
       </div>
@@ -1183,13 +1198,14 @@ Or where might your life already be telling the truth about Christ before you fi
     <!-- Standing invitation — always visible -->
     <div class="amen-invitation-section">
 
-      <div class="amen-invitation-trigger"
-           onclick="amenToggleInvitation('d2')"
-           role="button" tabindex="0"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenToggleInvitation('d2')}">
-        <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
-        <span class="amen-invitation-arrow" id="amen-inv-arrow-d2">&#8250;</span>
-      </div>
+      <button class="amen-invitation-trigger"
+              onclick="amenToggleInvitation('d2')"
+              type="button">
+        <span class="amen-invitation-trigger-inner">
+          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
+          <span class="amen-invitation-arrow" id="amen-inv-arrow-d2">&#8250;</span>
+        </span>
+      </button>
 
       <div class="amen-invitation-panel" id="amen-inv-panel-d2">
         <div class="amen-invitation-panel-inner">
@@ -1291,10 +1307,7 @@ Or where might your life already be telling the truth about Christ before you fi
       </div>
 
       <div class="amen-word-block" id="amen-word-d3">
-        <div class="amen-word-rule"></div>
-        <div class="amen-word-preposition">The word was</div>
         <div class="amen-word-name">Receive</div>
-        <div class="amen-word-date">Eastertide · 27 Apr</div>
       </div>
 
     </div>
@@ -1317,7 +1330,9 @@ Or where might your life already be telling the truth about Christ before you fi
       <div id="amen-share-initial-d3">
         <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
         <button class="amen-share-btn-primary"
-                onclick="amenDoShare('d3','I kept Vigil today. The word was RECEIVE.\\n\\nMonday · Week Four · 27 April 2026\\n\\ndailyvigil.app')">Share now</button>
+                onclick="amenShareImage('d3')">Share today’s Vigil</button>
+        <button class="amen-share-btn-secondary"
+                onclick="amenShareApp('d3')">Share the app</button>
         <button class="amen-not-now-btn"
                 onclick="amenNotNow('d3')">Not now</button>
       </div>
@@ -1329,13 +1344,14 @@ Or where might your life already be telling the truth about Christ before you fi
     <!-- Standing invitation — always visible -->
     <div class="amen-invitation-section">
 
-      <div class="amen-invitation-trigger"
-           onclick="amenToggleInvitation('d3')"
-           role="button" tabindex="0"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenToggleInvitation('d3')}">
-        <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
-        <span class="amen-invitation-arrow" id="amen-inv-arrow-d3">&#8250;</span>
-      </div>
+      <button class="amen-invitation-trigger"
+              onclick="amenToggleInvitation('d3')"
+              type="button">
+        <span class="amen-invitation-trigger-inner">
+          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
+          <span class="amen-invitation-arrow" id="amen-inv-arrow-d3">&#8250;</span>
+        </span>
+      </button>
 
       <div class="amen-invitation-panel" id="amen-inv-panel-d3">
         <div class="amen-invitation-panel-inner">
@@ -1437,10 +1453,7 @@ Or where might your life already be telling the truth about Christ before you fi
       </div>
 
       <div class="amen-word-block" id="amen-word-d4">
-        <div class="amen-word-rule"></div>
-        <div class="amen-word-preposition">The word was</div>
         <div class="amen-word-name">Born</div>
-        <div class="amen-word-date">Eastertide · 28 Apr</div>
       </div>
 
     </div>
@@ -1463,7 +1476,9 @@ Or where might your life already be telling the truth about Christ before you fi
       <div id="amen-share-initial-d4">
         <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
         <button class="amen-share-btn-primary"
-                onclick="amenDoShare('d4','I kept Vigil today. The word was BORN.\\n\\nTuesday · Week Four · 28 April 2026\\n\\ndailyvigil.app')">Share now</button>
+                onclick="amenShareImage('d4')">Share today’s Vigil</button>
+        <button class="amen-share-btn-secondary"
+                onclick="amenShareApp('d4')">Share the app</button>
         <button class="amen-not-now-btn"
                 onclick="amenNotNow('d4')">Not now</button>
       </div>
@@ -1475,13 +1490,14 @@ Or where might your life already be telling the truth about Christ before you fi
     <!-- Standing invitation — always visible -->
     <div class="amen-invitation-section">
 
-      <div class="amen-invitation-trigger"
-           onclick="amenToggleInvitation('d4')"
-           role="button" tabindex="0"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenToggleInvitation('d4')}">
-        <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
-        <span class="amen-invitation-arrow" id="amen-inv-arrow-d4">&#8250;</span>
-      </div>
+      <button class="amen-invitation-trigger"
+              onclick="amenToggleInvitation('d4')"
+              type="button">
+        <span class="amen-invitation-trigger-inner">
+          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
+          <span class="amen-invitation-arrow" id="amen-inv-arrow-d4">&#8250;</span>
+        </span>
+      </button>
 
       <div class="amen-invitation-panel" id="amen-inv-panel-d4">
         <div class="amen-invitation-panel-inner">
@@ -1583,10 +1599,7 @@ Or where might your life already be telling the truth about Christ before you fi
       </div>
 
       <div class="amen-word-block" id="amen-word-d5">
-        <div class="amen-word-rule"></div>
-        <div class="amen-word-preposition">The word was</div>
         <div class="amen-word-name">Light</div>
-        <div class="amen-word-date">Eastertide · 29 Apr</div>
       </div>
 
     </div>
@@ -1609,7 +1622,9 @@ Or where might your life already be telling the truth about Christ before you fi
       <div id="amen-share-initial-d5">
         <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
         <button class="amen-share-btn-primary"
-                onclick="amenDoShare('d5','I kept Vigil today. The word was LIGHT.\\n\\nWednesday · Week Four · 29 April 2026\\n\\ndailyvigil.app')">Share now</button>
+                onclick="amenShareImage('d5')">Share today’s Vigil</button>
+        <button class="amen-share-btn-secondary"
+                onclick="amenShareApp('d5')">Share the app</button>
         <button class="amen-not-now-btn"
                 onclick="amenNotNow('d5')">Not now</button>
       </div>
@@ -1621,13 +1636,14 @@ Or where might your life already be telling the truth about Christ before you fi
     <!-- Standing invitation — always visible -->
     <div class="amen-invitation-section">
 
-      <div class="amen-invitation-trigger"
-           onclick="amenToggleInvitation('d5')"
-           role="button" tabindex="0"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenToggleInvitation('d5')}">
-        <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
-        <span class="amen-invitation-arrow" id="amen-inv-arrow-d5">&#8250;</span>
-      </div>
+      <button class="amen-invitation-trigger"
+              onclick="amenToggleInvitation('d5')"
+              type="button">
+        <span class="amen-invitation-trigger-inner">
+          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
+          <span class="amen-invitation-arrow" id="amen-inv-arrow-d5">&#8250;</span>
+        </span>
+      </button>
 
       <div class="amen-invitation-panel" id="amen-inv-panel-d5">
         <div class="amen-invitation-panel-inner">
@@ -1729,10 +1745,7 @@ Or where might your life already be telling the truth about Christ before you fi
       </div>
 
       <div class="amen-word-block" id="amen-word-d6">
-        <div class="amen-word-rule"></div>
-        <div class="amen-word-preposition">The word was</div>
         <div class="amen-word-name">Steadfast</div>
-        <div class="amen-word-date">Eastertide · 30 Apr</div>
       </div>
 
     </div>
@@ -1755,7 +1768,9 @@ Or where might your life already be telling the truth about Christ before you fi
       <div id="amen-share-initial-d6">
         <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
         <button class="amen-share-btn-primary"
-                onclick="amenDoShare('d6','I kept Vigil today. The word was STEADFAST.\\n\\nThursday · Week Four · 30 April 2026\\n\\ndailyvigil.app')">Share now</button>
+                onclick="amenShareImage('d6')">Share today’s Vigil</button>
+        <button class="amen-share-btn-secondary"
+                onclick="amenShareApp('d6')">Share the app</button>
         <button class="amen-not-now-btn"
                 onclick="amenNotNow('d6')">Not now</button>
       </div>
@@ -1767,13 +1782,14 @@ Or where might your life already be telling the truth about Christ before you fi
     <!-- Standing invitation — always visible -->
     <div class="amen-invitation-section">
 
-      <div class="amen-invitation-trigger"
-           onclick="amenToggleInvitation('d6')"
-           role="button" tabindex="0"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenToggleInvitation('d6')}">
-        <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
-        <span class="amen-invitation-arrow" id="amen-inv-arrow-d6">&#8250;</span>
-      </div>
+      <button class="amen-invitation-trigger"
+              onclick="amenToggleInvitation('d6')"
+              type="button">
+        <span class="amen-invitation-trigger-inner">
+          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
+          <span class="amen-invitation-arrow" id="amen-inv-arrow-d6">&#8250;</span>
+        </span>
+      </button>
 
       <div class="amen-invitation-panel" id="amen-inv-panel-d6">
         <div class="amen-invitation-panel-inner">
@@ -2206,14 +2222,10 @@ function amenCheck(row) {
     setTimeout(() => comm.classList.add('amen-visible'), 700);
     setTimeout(() => {
       share.classList.add('amen-visible');
-      // After the share block has expanded, scroll it into view and refresh the indicator
       setTimeout(() => {
-        const sc    = share.closest('.screen');
         const inner = share.closest('.screen-inner');
-        if (inner && sc) scrollElementClearFade(inner, sc, share, 'smooth');
-        const screenIdx = Array.from(getCurrentScreens()).indexOf(sc);
-        if (screenIdx !== -1) updateScrollIndicator(screenIdx);
-      }, 420);
+        if (inner) inner.scrollTo({ top: inner.scrollHeight, behavior: 'smooth' });
+      }, 450);
     }, 1200);
   } else {
     comm.classList.remove('amen-visible');
@@ -2225,11 +2237,116 @@ function amenCheck(row) {
   }
 }
 
-function amenDoShare(uid, rawText) {
-  const text = rawText.replace(/\\n/g, '\n');
+async function amenShareImage(uid) {
+  const wordEl   = document.getElementById('amen-word-' + uid);
+  const wordName = wordEl ? (wordEl.querySelector('.amen-word-name')?.textContent?.trim() || '') : '';
+  const cs   = getComputedStyle(document.documentElement);
+  const BG   = cs.getPropertyValue('--bg').trim()   || '#FAF7F2';
+  const GOLD = cs.getPropertyValue('--gold').trim() || '#B8860B';
+  const TEXT = cs.getPropertyValue('--text').trim() || '#1C1714';
+  const DIM  = cs.getPropertyValue('--dim').trim()  || '#8A7D6E';
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
+  const PX = 375;
+  const goldRgb = GOLD.startsWith('#')
+    ? GOLD.slice(1).match(/../g).map(h => parseInt(h,16)).join(',')
+    : '184,134,11';
+  const wordUpper = wordName.toUpperCase();
+  let wSize = 88;
+  const tempC = document.createElement('canvas');
+  const tempCtx = tempC.getContext('2d');
+  tempCtx.font = `600 ${wSize}px "Cormorant Garamond", Georgia, serif`;
+  while (tempCtx.measureText(wordUpper).width > PX - 48 && wSize > 32) {
+    wSize -= 2;
+    tempCtx.font = `600 ${wSize}px "Cormorant Garamond", Georgia, serif`;
+  }
+  const cardHTML = `
+<div xmlns="http://www.w3.org/1999/xhtml" style="
+  width:${PX}px; box-sizing:border-box;
+  background:${BG}; padding:40px 28px 36px;
+  font-family:'Cormorant Garamond',Georgia,serif;
+  display:flex; flex-direction:column; align-items:center; gap:0;
+">
+  <div style="font-family:Raleway,'Helvetica Neue',Arial,sans-serif; font-weight:300;
+    font-size:22px; letter-spacing:0.32em; color:${GOLD}; text-align:center;
+    margin-bottom:6px;">V I G I L</div>
+  <div style="font-family:Raleway,'Helvetica Neue',Arial,sans-serif; font-weight:400;
+    font-size:9px; letter-spacing:0.22em; text-transform:uppercase; color:${DIM};
+    text-align:center; margin-bottom:32px;">Eastertide</div>
+  <div style="display:flex; align-items:center; justify-content:center;
+    gap:12px; margin-bottom:24px; width:100%;">
+    <div style="width:22px; height:22px; flex-shrink:0;
+      border:1.5px solid ${GOLD}; background:rgba(${goldRgb},0.06);
+      display:flex; align-items:center; justify-content:center;">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polyline points="2,6.5 5,10 11,3" stroke="${GOLD}" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div style="font-size:20px; font-weight:300; font-style:italic;
+      color:${TEXT}; letter-spacing:0.02em; line-height:1.15;">I kept Vigil today.</div>
+  </div>
+  <div style="width:48px; height:1px; background:${GOLD}; opacity:0.5; margin-bottom:20px;"></div>
+  <div style="font-size:${wSize}px; font-weight:600; letter-spacing:0.06em;
+    color:${TEXT}; text-align:center; line-height:1; margin-bottom:26px;
+    text-transform:uppercase;">${wordUpper}</div>
+  <div style="font-size:18px; font-weight:400; font-style:italic;
+    color:${TEXT}; text-align:center; line-height:1.7; letter-spacing:0.01em;
+    margin-bottom:28px;">Go in peace.<br/>And carry the Word with you.</div>
+  <div style="width:100%; height:1px; background:rgba(${goldRgb},0.25); margin-bottom:18px;"></div>
+  <div style="font-family:Raleway,'Helvetica Neue',Arial,sans-serif; font-weight:400;
+    font-size:10px; letter-spacing:0.2em; color:${GOLD};
+    text-align:center;">dailyvigil.app</div>
+</div>`;
+  const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" width="${PX}" height="600">
+    <foreignObject width="100%" height="100%">${cardHTML}</foreignObject>
+  </svg>`;
+  const probe = document.createElement('div');
+  probe.style.cssText = `position:fixed;left:-9999px;top:0;width:${PX}px;visibility:hidden;`;
+  probe.innerHTML = cardHTML.replace(/xmlns="[^"]*"/g,'');
+  document.body.appendChild(probe);
+  const H = Math.ceil(probe.offsetHeight) + 2;
+  document.body.removeChild(probe);
+  const svgFinal = `<svg xmlns="http://www.w3.org/2000/svg" width="${PX}" height="${H}">
+    <foreignObject width="${PX}" height="${H}">${cardHTML}</foreignObject>
+  </svg>`;
+  const SCALE = 2;
+  const blob = await new Promise((resolve, reject) => {
+    const img = new Image();
+    const svgBlob = new Blob([svgFinal], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = PX * SCALE; c.height = H * SCALE;
+      const ctx2 = c.getContext('2d');
+      ctx2.scale(SCALE, SCALE);
+      ctx2.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      c.toBlob(resolve, 'image/png');
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+  const file = new File([blob], 'vigil-today.png', { type: 'image/png' });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'Vigil' });
+      amenShowShareConfirmed(uid, 'Thank you for sharing.');
+    } else {
+      const dlUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = dlUrl; a.download = 'vigil-today.png'; a.click();
+      setTimeout(() => URL.revokeObjectURL(dlUrl), 2000);
+      amenShowShareConfirmed(uid, 'Image saved to your device.');
+    }
+  } catch(e) {
+    if (e.name !== 'AbortError') amenShowShareConfirmed(uid, 'Image saved to your device.');
+  }
+}
+function amenShareApp(uid) {
+  const text = 'I’ve been keeping Vigil — a daily devotional app rooted in the Christian year. You might love it.';
   amenTriggerShare(text, 'https://dailyvigil.app',
-    () => amenShowShareConfirmed(uid, 'Thank you for sharing.'),
-    () => amenShowShareConfirmed(uid, 'Copied to clipboard — ready to share.')
+    () => amenShowShareConfirmed(uid, 'Thank you for sharing Vigil.'),
+    () => amenShowShareConfirmed(uid, 'The message has been copied. Paste it into a text, email or WhatsApp to share.')
   );
 }
 
@@ -2237,17 +2354,7 @@ function amenShowShareConfirmed(uid, msg) {
   const initial   = document.getElementById('amen-share-initial-' + uid);
   const confirmed = document.getElementById('amen-share-confirmed-' + uid);
   if (initial)   initial.style.display = 'none';
-  if (confirmed) {
-    confirmed.innerHTML = msg + '<br><button class="amen-share-again-btn" onclick="amenResetShare(\'' + uid + '\')">Share again</button>';
-    confirmed.classList.add('amen-share-confirmed-visible');
-  }
-}
-
-function amenResetShare(uid) {
-  const initial   = document.getElementById('amen-share-initial-' + uid);
-  const confirmed = document.getElementById('amen-share-confirmed-' + uid);
-  if (initial)   initial.style.display = '';
-  if (confirmed) { confirmed.innerHTML = ''; confirmed.classList.remove('amen-share-confirmed-visible'); }
+  if (confirmed) { confirmed.innerHTML = msg; confirmed.classList.add('amen-share-confirmed-visible'); }
 }
 
 function amenNotNow(uid) {
@@ -2269,17 +2376,14 @@ function amenToggleInvitation(uid) {
   const arrow = document.getElementById('amen-inv-arrow-' + uid);
   if (panel) panel.classList.toggle('amen-inv-open', amenInvOpen[uid]);
   if (arrow) arrow.classList.toggle('amen-inv-arrow-open', amenInvOpen[uid]);
-  if (amenInvOpen[uid] && panel) {
+  if (amenInvOpen[uid]) {
     setTimeout(() => {
-      const inner = panel.closest('.screen-inner');
-      const sc    = panel.closest('.screen');
-      if (inner && sc) {
-        const target = panel.querySelector('.amen-invitation-panel-inner') || panel;
-        scrollElementClearFade(inner, sc, target, 'smooth');
-      }
+      const inner = panel ? panel.closest('.screen-inner') : null;
+      if (inner) inner.scrollTo({ top: inner.scrollHeight, behavior: 'smooth' });
     }, 480);
   }
 }
+
 
 function amenSendInvitation(uid) {
   const text = "I’ve been using Vigil for my daily devotion — a beautiful app rooted in the Christian year. I thought you might like it.";
@@ -2293,15 +2397,7 @@ function amenShowInvConfirmed(uid, msg) {
   const actions   = document.getElementById('amen-inv-actions-' + uid);
   const confirmed = document.getElementById('amen-inv-confirmed-' + uid);
   if (actions)   actions.style.display = 'none';
-  if (confirmed) {
-    confirmed.textContent = msg;
-    confirmed.classList.add('amen-inv-confirmed-visible');
-    setTimeout(() => {
-      if (actions) actions.style.display = '';
-      confirmed.textContent = '';
-      confirmed.classList.remove('amen-inv-confirmed-visible');
-    }, 3000);
-  }
+  if (confirmed) { confirmed.textContent = msg; confirmed.classList.add('amen-inv-confirmed-visible'); }
 }
 
 function amenTriggerShare(text, url, onSuccess, onCopy) {
