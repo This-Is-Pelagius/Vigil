@@ -2,9 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-04-28 12:40 · 6 day(s) -->
+<!-- Vigil · Production MVP · Generated 2026-04-28 17:18 · 6 day(s) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
+<!-- PWA / icon declarations -->
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png">
+<meta name="theme-color" content="#FAF7F2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Vigil">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 
@@ -1036,9 +1045,7 @@ Or where might your life already be telling the truth about Christ before you fi
         <div class="amen-checkbox-label">I kept Vigil today.</div>
       </div>
 
-      <div class="amen-word-block" id="amen-word-d1"
-           data-date="Eastertide · 25 Apr"
-           data-season="Eastertide">
+      <div class="amen-word-block" id="amen-word-d1">
         <div class="amen-word-name">Proclaim</div>
       </div>
 
@@ -1167,9 +1174,7 @@ Or where might your life already be telling the truth about Christ before you fi
         <div class="amen-checkbox-label">I kept Vigil today.</div>
       </div>
 
-      <div class="amen-word-block" id="amen-word-d2"
-           data-date="Eastertide · 26 Apr"
-           data-season="Eastertide">
+      <div class="amen-word-block" id="amen-word-d2">
         <div class="amen-word-name">Return</div>
       </div>
 
@@ -1298,9 +1303,7 @@ Or where might your life already be telling the truth about Christ before you fi
         <div class="amen-checkbox-label">I kept Vigil today.</div>
       </div>
 
-      <div class="amen-word-block" id="amen-word-d3"
-           data-date="Eastertide · 27 Apr"
-           data-season="Eastertide">
+      <div class="amen-word-block" id="amen-word-d3">
         <div class="amen-word-name">Receive</div>
       </div>
 
@@ -1429,9 +1432,7 @@ Or where might your life already be telling the truth about Christ before you fi
         <div class="amen-checkbox-label">I kept Vigil today.</div>
       </div>
 
-      <div class="amen-word-block" id="amen-word-d4"
-           data-date="Eastertide · 28 Apr"
-           data-season="Eastertide">
+      <div class="amen-word-block" id="amen-word-d4">
         <div class="amen-word-name">Born</div>
       </div>
 
@@ -1560,9 +1561,7 @@ Or where might your life already be telling the truth about Christ before you fi
         <div class="amen-checkbox-label">I kept Vigil today.</div>
       </div>
 
-      <div class="amen-word-block" id="amen-word-d5"
-           data-date="Eastertide · 29 Apr"
-           data-season="Eastertide">
+      <div class="amen-word-block" id="amen-word-d5">
         <div class="amen-word-name">Light</div>
       </div>
 
@@ -1691,9 +1690,7 @@ Or where might your life already be telling the truth about Christ before you fi
         <div class="amen-checkbox-label">I kept Vigil today.</div>
       </div>
 
-      <div class="amen-word-block" id="amen-word-d6"
-           data-date="Eastertide · 30 Apr"
-           data-season="Eastertide">
+      <div class="amen-word-block" id="amen-word-d6">
         <div class="amen-word-name">Steadfast</div>
       </div>
 
@@ -2131,271 +2128,117 @@ function amenCheck(row) {
 }
 
 async function amenShareImage(uid) {
-  // Draws the share card directly on Canvas 2D.
-  // SVG foreignObject is avoided: Safari on iOS blocks web fonts inside it,
-  // causing canvas tainting. All fonts are already loaded in the page.
-  //
-  // Card layout (top → bottom):
-  //   A. VIGIL wordmark          Raleway 300, gold, letter-spaced, centred
-  //   B. Season · date           Raleway 400, dim, centred  (from data-date attribute)
-  //   C. "AMEN" screen label     Raleway 600, dim, left-aligned to PAD
-  //   D. Checkbox row            ticked box + "I kept Vigil today."
-  //   E. Accent-soft rule
-  //   F. Word echo               large word, constrained to PAD margins
-  //   G. Accent-soft rule        above commission, same spacing as rule I below
-  //   H. "Go in peace."
-  //   I. "And carry the Word with you."
-  //   J. Accent-soft rule        below commission, symmetric with rule G
-  //   K. Gold bar                single full-width bar
-  //   L. dailyvigil.app          Raleway, gold, centred
-
-  // ── Live content ──────────────────────────────────────────────────────────
-  const wordEl    = document.getElementById('amen-word-' + uid);
-  const wordName  = wordEl ? (wordEl.querySelector('.amen-word-name')?.textContent?.trim() || '') : '';
-  // date_display embedded at build time as data-date, e.g. "Eastertide · 27 Apr"
-  const dateLabel = wordEl ? (wordEl.dataset.date || '') : '';
-
-  // ── Live palette colours ──────────────────────────────────────────────────
-  const cs        = getComputedStyle(document.documentElement);
-  const BG        = cs.getPropertyValue('--bg').trim()   || '#FAF7F2';
-  const GOLD      = cs.getPropertyValue('--gold').trim() || '#B8860B';
-  const TEXT      = cs.getPropertyValue('--text').trim() || '#1C1714';
-  const DIM       = cs.getPropertyValue('--dim').trim()  || '#8A7D6E';
-  const SOFT_LINE = hexToRgba(GOLD, 0.2);
-  const GOLD_LINE = hexToRgba(GOLD, 0.45);
-
+  const wordEl   = document.getElementById('amen-word-' + uid);
+  const wordName = wordEl ? (wordEl.querySelector('.amen-word-name')?.textContent?.trim() || '') : '';
+  const cs   = getComputedStyle(document.documentElement);
+  const BG   = cs.getPropertyValue('--bg').trim()   || '#FAF7F2';
+  const GOLD = cs.getPropertyValue('--gold').trim() || '#B8860B';
+  const TEXT = cs.getPropertyValue('--text').trim() || '#1C1714';
+  const DIM  = cs.getPropertyValue('--dim').trim()  || '#8A7D6E';
   if (document.fonts && document.fonts.ready) await document.fonts.ready;
-
-  // ── Geometry ──────────────────────────────────────────────────────────────
-  const W     = 375;   // logical px — standard iPhone viewport width
-  const SCALE = 3;     // physical pixels per logical pixel (Retina)
-  const PAD   = 28;    // horizontal margin; word left-edge aligns with "AMEN"
-  const CX    = W / 2;
-
-  const CG  = '"Cormorant Garamond", Georgia, serif';
-  const RAL = 'Raleway, "Helvetica Neue", Arial, sans-serif';
-
-  // ── Fit word to available width (PAD on each side) ────────────────────────
+  const PX = 375;
+  const goldRgb = GOLD.startsWith('#')
+    ? GOLD.slice(1).match(/../g).map(h => parseInt(h,16)).join(',')
+    : '184,134,11';
   const wordUpper = wordName.toUpperCase();
-  const mCtx = document.createElement('canvas').getContext('2d');
-  function trackedWidth(text, size, tracking) {
-    mCtx.font = `600 ${size}px ${CG}`;
-    const chars = [...text];
-    return chars.reduce((s, ch) => s + mCtx.measureText(ch).width, 0)
-           + tracking * (chars.length - 1);
-  }
   let wSize = 88;
-  while (trackedWidth(wordUpper, wSize, 0.14 * wSize) > W - PAD * 2 && wSize > 24) {
+  const tempC = document.createElement('canvas');
+  const tempCtx = tempC.getContext('2d');
+  tempCtx.font = `600 ${wSize}px "Cormorant Garamond", Georgia, serif`;
+  while (tempCtx.measureText(wordUpper).width > PX - 48 && wSize > 32) {
     wSize -= 2;
+    tempCtx.font = `600 ${wSize}px "Cormorant Garamond", Georgia, serif`;
   }
-
-  // ── Section heights (logical px) ─────────────────────────────────────────
-  const topPad     = 44;
-  const vigilH     = 18;   // VIGIL wordmark
-  const vigilGap   = 8;
-  const subH       = 11;   // season · date
-  const subGap     = 32;
-  const labelH     = 13;   // "AMEN"
-  const labelGap   = 22;
-  const cbSize     = 32;   // checkbox square
-  const cbGap      = 24;
-  const ruleH      = 1;    // all accent-soft rules
-  const ruleEGap   = 30;   // below rule E to word
-  const wordH      = wSize;
-  const wordGap    = 30;   // below word to rule G
-  const commPad    = 22;   // symmetric: rule G→line1 and line2→rule J
-  const commLine   = 22;   // each commission line
-  const commGap    = 6;    // gap between the two commission lines
-  const goldGap    = commPad; // below rule J to gold bar (matches commPad)
-  const goldBarGap = 18;
-  const urlH       = 12;
-  const botPad     = 36;
-
-  const H = topPad + vigilH + vigilGap + subH + subGap
-          + labelH + labelGap
-          + cbSize + cbGap
-          + ruleH + ruleEGap          // rule E
-          + wordH + wordGap
-          + ruleH + commPad           // rule G
-          + commLine + commGap + commLine + commPad
-          + ruleH + goldGap           // rule J
-          + ruleH + goldBarGap        // gold bar
-          + urlH + botPad;
-
-  // ── Canvas ────────────────────────────────────────────────────────────────
-  const c   = document.createElement('canvas');
-  c.width   = W * SCALE;
-  c.height  = H * SCALE;
-  const ctx = c.getContext('2d');
-  ctx.scale(SCALE, SCALE);
-
-  function hRule(y, colour) {
-    ctx.save();
-    ctx.strokeStyle = colour;
-    ctx.lineWidth   = 1 / SCALE;
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-    ctx.restore();
-  }
-
-  // ── A. Background ─────────────────────────────────────────────────────────
-  ctx.fillStyle = BG;
-  ctx.fillRect(0, 0, W, H);
-
-  let y = topPad;
-
-  // ── B. VIGIL wordmark ─────────────────────────────────────────────────────
-  ctx.font = `300 ${vigilH}px ${RAL}`; ctx.fillStyle = GOLD; ctx.textBaseline = 'top';
-  drawTracked(ctx, 'VIGIL', CX, y, 0.32 * vigilH, true);
-  y += vigilH + vigilGap;
-
-  // ── C. Season · date ──────────────────────────────────────────────────────
-  const subText = dateLabel.toUpperCase();
-  ctx.font = `400 ${subH}px ${RAL}`; ctx.fillStyle = DIM; ctx.textBaseline = 'top';
-  drawTracked(ctx, subText, CX, y, 0.18 * subH, true);
-  y += subH + subGap;
-
-  // ── D. Screen label: "AMEN" ───────────────────────────────────────────────
-  ctx.font = `600 ${labelH}px ${RAL}`; ctx.fillStyle = DIM;
-  ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-  drawTracked(ctx, 'AMEN', PAD, y, 0.38 * labelH);
-  y += labelH + labelGap;
-
-  // ── E. Checkbox row ───────────────────────────────────────────────────────
-  const cbY    = y;
-  const rowMid = cbY + cbSize / 2;
-
-  ctx.font = `300 italic 22px ${CG}`;
-  const labW  = ctx.measureText('I kept Vigil today.').width;
-  const pair  = cbSize + 14 + labW;
-  const pairX = (W - pair) / 2;
-
-  ctx.strokeStyle = GOLD; ctx.lineWidth = 1.5;
-  ctx.strokeRect(pairX, cbY, cbSize, cbSize);
-  ctx.fillStyle = hexToRgba(GOLD, 0.06);
-  ctx.fillRect(pairX + 0.75, cbY + 0.75, cbSize - 1.5, cbSize - 1.5);
-
-  // Tick — scaled to fill box with 4px margin on each side
-  const tkScale = (cbSize - 8) / 18;
-  const tkOX = pairX + 4, tkOY = cbY + 4;
-  ctx.strokeStyle = GOLD; ctx.lineWidth = 2;
-  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  ctx.beginPath();
-  ctx.moveTo(tkOX +  3 * tkScale, tkOY +  9   * tkScale);
-  ctx.lineTo(tkOX +  7 * tkScale, tkOY + 13   * tkScale);
-  ctx.lineTo(tkOX + 15 * tkScale, tkOY +  4.5 * tkScale);
-  ctx.stroke();
-
-  ctx.font = `300 italic 22px ${CG}`; ctx.fillStyle = TEXT;
-  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-  ctx.fillText('I kept Vigil today.', pairX + cbSize + 14, rowMid);
-
-  y += cbSize + cbGap;
-
-  // ── F. Rule E ─────────────────────────────────────────────────────────────
-  hRule(y, SOFT_LINE);
-  y += ruleH + ruleEGap;
-
-  // ── G. Word echo ──────────────────────────────────────────────────────────
-  ctx.font = `600 ${wSize}px ${CG}`; ctx.fillStyle = TEXT; ctx.textBaseline = 'top';
-  drawTracked(ctx, wordUpper, CX, y, 0.14 * wSize, true);
-  y += wordH + wordGap;
-
-  // ── H. Rule G (above commission) ─────────────────────────────────────────
-  hRule(y, SOFT_LINE);
-  y += ruleH + commPad;
-
-  // ── I. Commission phrase ──────────────────────────────────────────────────
-  ctx.font = `400 italic ${commLine}px ${CG}`; ctx.fillStyle = TEXT;
-  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-  ctx.fillText('Go in peace.', CX, y);
-  y += commLine + commGap;
-  ctx.fillText('And carry the Word with you.', CX, y);
-  y += commLine + commPad;
-
-  // ── J. Rule J (below commission, symmetric with rule G) ──────────────────
-  hRule(y, SOFT_LINE);
-  y += ruleH + goldGap;
-
-  // ── K. Gold bar ───────────────────────────────────────────────────────────
-  hRule(y, GOLD_LINE);
-  y += ruleH + goldBarGap;
-
-  // ── L. URL ────────────────────────────────────────────────────────────────
-  ctx.font = `400 ${urlH}px ${RAL}`; ctx.fillStyle = GOLD;
-  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-  drawTracked(ctx, 'dailyvigil.app', CX, y, 0.2 * urlH, true);
-
-  // ── Export ────────────────────────────────────────────────────────────────
-  const SHARE_URL = 'https://dailyvigil.app';
+  const cardHTML = `
+<div xmlns="http://www.w3.org/1999/xhtml" style="
+  width:${PX}px; box-sizing:border-box;
+  background:${BG}; padding:40px 28px 36px;
+  font-family:'Cormorant Garamond',Georgia,serif;
+  display:flex; flex-direction:column; align-items:center; gap:0;
+">
+  <div style="font-family:Raleway,'Helvetica Neue',Arial,sans-serif; font-weight:300;
+    font-size:22px; letter-spacing:0.32em; color:${GOLD}; text-align:center;
+    margin-bottom:6px;">V I G I L</div>
+  <div style="font-family:Raleway,'Helvetica Neue',Arial,sans-serif; font-weight:400;
+    font-size:9px; letter-spacing:0.22em; text-transform:uppercase; color:${DIM};
+    text-align:center; margin-bottom:32px;">Eastertide</div>
+  <div style="display:flex; align-items:center; justify-content:center;
+    gap:12px; margin-bottom:24px; width:100%;">
+    <div style="width:22px; height:22px; flex-shrink:0;
+      border:1.5px solid ${GOLD}; background:rgba(${goldRgb},0.06);
+      display:flex; align-items:center; justify-content:center;">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polyline points="2,6.5 5,10 11,3" stroke="${GOLD}" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div style="font-size:20px; font-weight:300; font-style:italic;
+      color:${TEXT}; letter-spacing:0.02em; line-height:1.15;">I kept Vigil today.</div>
+  </div>
+  <div style="width:48px; height:1px; background:${GOLD}; opacity:0.5; margin-bottom:20px;"></div>
+  <div style="font-size:${wSize}px; font-weight:600; letter-spacing:0.06em;
+    color:${TEXT}; text-align:center; line-height:1; margin-bottom:26px;
+    text-transform:uppercase;">${wordUpper}</div>
+  <div style="font-size:18px; font-weight:400; font-style:italic;
+    color:${TEXT}; text-align:center; line-height:1.7; letter-spacing:0.01em;
+    margin-bottom:28px;">Go in peace.<br/>And carry the Word with you.</div>
+  <div style="width:100%; height:1px; background:rgba(${goldRgb},0.25); margin-bottom:18px;"></div>
+  <div style="font-family:Raleway,'Helvetica Neue',Arial,sans-serif; font-weight:400;
+    font-size:10px; letter-spacing:0.2em; color:${GOLD};
+    text-align:center;">dailyvigil.app</div>
+</div>`;
+  const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" width="${PX}" height="600">
+    <foreignObject width="100%" height="100%">${cardHTML}</foreignObject>
+  </svg>`;
+  const probe = document.createElement('div');
+  probe.style.cssText = `position:fixed;left:-9999px;top:0;width:${PX}px;visibility:hidden;`;
+  probe.innerHTML = cardHTML.replace(/xmlns="[^"]*"/g,'');
+  document.body.appendChild(probe);
+  const H = Math.ceil(probe.offsetHeight) + 2;
+  document.body.removeChild(probe);
+  const svgFinal = `<svg xmlns="http://www.w3.org/2000/svg" width="${PX}" height="${H}">
+    <foreignObject width="${PX}" height="${H}">${cardHTML}</foreignObject>
+  </svg>`;
+  const SCALE = 2;
   let blob;
   try {
-    blob = await new Promise((res, rej) =>
-      c.toBlob(b => b ? res(b) : rej(new Error('toBlob null')), 'image/png'));
+    blob = await new Promise((resolve, reject) => {
+      const img = new Image();
+      const svgBlob = new Blob([svgFinal], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+      img.onload = () => {
+        const c = document.createElement('canvas');
+        c.width = PX * SCALE; c.height = H * SCALE;
+        const ctx2 = c.getContext('2d');
+        ctx2.scale(SCALE, SCALE);
+        ctx2.drawImage(img, 0, 0);
+        URL.revokeObjectURL(url);
+        c.toBlob(b => b ? resolve(b) : reject(new Error('toBlob returned null')), 'image/png');
+      };
+      img.onerror = (e) => { URL.revokeObjectURL(url); reject(e); };
+      img.src = url;
+    });
   } catch(e) {
     amenShowShareConfirmed(uid, 'Unable to generate image. Try again.');
     return;
   }
-
+  if (!blob) { amenShowShareConfirmed(uid, 'Unable to generate image. Try again.'); return; }
   const file = new File([blob], 'vigil-today.png', { type: 'image/png' });
   try {
-    // Tier 1: image + URL via native share sheet (iOS/Android over HTTPS)
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], url: SHARE_URL, title: 'Vigil' });
+      await navigator.share({ files: [file], title: 'Vigil' });
       amenShowShareConfirmed(uid, 'Thank you for sharing.');
-      return;
+    } else {
+      const dlUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = dlUrl; a.download = 'vigil-today.png'; a.click();
+      setTimeout(() => URL.revokeObjectURL(dlUrl), 2000);
+      amenShowShareConfirmed(uid, 'Image saved to your device.');
     }
-    // Tier 2: URL-only share sheet if file sharing unavailable
-    if (typeof navigator.share === 'function') {
-      await navigator.share({ title: 'Vigil', url: SHARE_URL });
-      amenShowShareConfirmed(uid, 'Thank you for sharing.');
-      return;
-    }
-    // Tier 3: desktop fallback — download the image
-    const dlUrl = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = dlUrl; a.download = 'vigil-today.png'; a.click();
-    setTimeout(() => URL.revokeObjectURL(dlUrl), 2000);
-    amenShowShareConfirmed(uid, 'Image downloaded.');
   } catch(e) {
-    if (e.name !== 'AbortError') {
-      try {
-        const dlUrl2 = URL.createObjectURL(blob);
-        const a2 = document.createElement('a');
-        a2.href = dlUrl2; a2.download = 'vigil-today.png'; a2.click();
-        setTimeout(() => URL.revokeObjectURL(dlUrl2), 2000);
-        amenShowShareConfirmed(uid, 'Image downloaded.');
-      } catch(_) {}
-    }
+    if (e.name !== 'AbortError') amenShowShareConfirmed(uid, 'Image saved to your device.');
   }
 }
-
-// ── Utility: letter-spaced text on Canvas 2D ─────────────────────────────────
-// Native CSS letter-spacing is unsupported on canvas in older Safari.
-// centred=true → x is the horizontal centre; false → x is the left edge.
-function drawTracked(ctx, text, x, y, tracking, centred) {
-  if (!text) return;
-  const chars  = [...text];
-  const widths = chars.map(ch => ctx.measureText(ch).width);
-  const totalW = widths.reduce((a, b) => a + b, 0) + tracking * (chars.length - 1);
-  let cx = centred ? x - totalW / 2 : x;
-  const savedAlign    = ctx.textAlign;
-  const savedBaseline = ctx.textBaseline;
-  ctx.textAlign    = 'left';
-  ctx.textBaseline = savedBaseline;
-  chars.forEach((ch, i) => { ctx.fillText(ch, cx, y); cx += widths[i] + tracking; });
-  ctx.textAlign    = savedAlign;
-}
-
-// ── Utility: hex colour → rgba() string ──────────────────────────────────────
-function hexToRgba(hex, alpha) {
-  const h = hex.replace('#', '');
-  if (h.length !== 6) return hex;
-  const r = parseInt(h.slice(0,2), 16);
-  const g = parseInt(h.slice(2,4), 16);
-  const b = parseInt(h.slice(4,6), 16);
-  return `rgba(${r},${g},${b},${alpha})`;
-}
-
 function amenShareApp(uid) {
   const text = 'I’ve been keeping Vigil — a daily devotional app rooted in the Christian year. You might love it.';
   amenTriggerShare(text, 'https://dailyvigil.app',
