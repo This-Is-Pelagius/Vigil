@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Prototype / test site · Generated 2026-04-27 14:09 · 6 day(s) -->
+<!-- Vigil · Prototype / test site · Generated 2026-04-28 10:12 · 6 day(s) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil — Prototype</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -2381,6 +2381,7 @@ function vigilRequestNotification(uid) {
   if (window.OneSignalDeferred) {
     OneSignalDeferred.push(async function(OneSignal) {
       await OneSignal.Notifications.requestPermission();
+      localStorage.setItem('vigil-notif-dismissed', '1');
       const el = document.getElementById('amen-notif-' + uid);
       if (el) el.style.display = 'none';
     });
