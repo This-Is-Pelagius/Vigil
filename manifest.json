@@ -1,60 +1,36 @@
 {
-  "name": "Vigil — A Daily Devotional",
+  "name": "Vigil",
   "short_name": "Vigil",
-  "description": "A daily devotional for the Christian year. One word, one scripture, one prayer — every day.",
+  "description": "A daily devotional app rooted in the rhythm of the Christian year.",
   "start_url": "/",
-  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#F5F0E8",
-  "theme_color": "#F5F0E8",
-  "lang": "en-GB",
-  "categories": ["lifestyle", "religion"],
+  "background_color": "#FAF7F2",
+  "theme_color": "#FAF7F2",
   "icons": [
     {
-      "src": "icons/icon-16.png",
-      "sizes": "16x16",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icons/icon-32.png",
-      "sizes": "32x32",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icons/icon-180.png",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icons/icon-192.png",
+      "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-maskable-192.png",
+      "src": "/icons/icon-maskable-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "icons/icon-maskable-512.png",
+      "src": "/icons/icon-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     }
-  ],
-  "screenshots": [],
-  "related_applications": [],
-  "prefer_related_applications": false
+  ]
 }
