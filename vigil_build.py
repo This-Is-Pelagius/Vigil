@@ -1,22 +1,866 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-04-29 19:31 -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vigil</title>
-<!-- PWA / icon declarations -->
-<link rel="manifest" href="/manifest.json">
-<link rel="apple-touch-icon" href="/icons/icon-180.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png">
-<meta name="theme-color" content="#FAF7F2">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Vigil">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
+#!/usr/bin/env python3
+"""
+vigil_build.py
+Vigil PWA build script — Version 2.0
+Reads Vigil_Content_v2.0.xlsx, identifies today's day, and writes a single
+index.html for deployment to the v2-build branch of github.com/This-Is-Pelagius/Vigil.
 
+Usage:
+    python3 vigil_build.py
+
+Output:
+    index.html  (in the same directory as this script)
+"""
+
+import re
+import sys
+import html
+import datetime
+import os
+
+try:
+    import openpyxl
+except ImportError:
+    print("Error: openpyxl is required. Install it with: pip3 install openpyxl")
+    sys.exit(1)
+
+# ── Configuration ─────────────────────────────────────────────────────────────
+
+SPREADSHEET = "Vigil_Content_v2.0.xlsx"
+OUTPUT_FILE = "index.html"
+
+# Liturgical season → CSS palette class mapping
+PALETTE_MAP = {
+    "eastertide":    "palette-eastertide",
+    "lent":          "palette-lent",
+    "good friday":   "palette-goodfriday",
+    "holy saturday": "palette-goodfriday",
+    "pentecost":     "palette-pentecost",
+    # Fallback
+    "ordinary time": "palette-eastertide",
+    "advent":        "palette-eastertide",
+}
+
+# Abbreviated month names for the day label and word echo date
+MONTH_ABBR = {
+    1: "Jan", 2: "Feb", 3: "Mar", 4: "Apr", 5: "May", 6: "Jun",
+    7: "Jul", 8: "Aug", 9: "Sep", 10: "Oct", 11: "Nov", 12: "Dec",
+}
+
+# Screen labels (indices 0–6)
+SCREEN_LABELS = ["Season", "Word", "Scripture", "Contemplation", "Prayer", "Practice", "Amen"]
+
+# Jesus is never hover-linked — any variant must be excluded
+JESUS_NAMES = {
+    "jesus", "jesus christ", "christ jesus", "lord jesus", "lord jesus christ",
+}
+
+# ── Spreadsheet parsing ───────────────────────────────────────────────────────
+
+def load_spreadsheet(path):
+    """Load all data rows from all tabs of the spreadsheet.
+    Returns a list of dicts, one per content day, in sheet order."""
+    if not os.path.exists(path):
+        print(f"Error: Cannot find spreadsheet '{path}'.")
+        print("Make sure Vigil_Content_v2.0.xlsx is in the same folder as this script.")
+        sys.exit(1)
+
+    wb = openpyxl.load_workbook(path, data_only=True)
+    days = []
+
+    for sheet_name in wb.sheetnames:
+        ws = wb[sheet_name]
+        rows = list(ws.iter_rows(min_row=1, values_only=True))
+        if not rows:
+            continue
+
+        # Row 1 is the header
+        header = [str(c).strip() if c else "" for c in rows[0]]
+
+        # Build a column index map
+        col = {}
+        for i, h in enumerate(header):
+            hl = h.lower()
+            if "version" in hl:
+                col["version"] = i
+            elif "liturgical day" in hl:
+                col["liturgical_day"] = i
+            elif "screen 1" in hl or "season" in hl:
+                col["season"] = i
+            elif "screen 2" in hl or "word" in hl:
+                col["word"] = i
+            elif "screen 3" in hl or "scripture" in hl:
+                col["scripture"] = i
+            elif "screen 4" in hl or "contemplation" in hl:
+                col["contemplation"] = i
+            elif "screen 5" in hl or "prayer" in hl:
+                col["prayer"] = i
+            elif "screen 6" in hl or "practice" in hl:
+                col["practice"] = i
+            elif "hover" in hl:
+                col["hover_links"] = i
+
+        # Required columns
+        required = ["liturgical_day", "season", "word", "scripture",
+                    "contemplation", "prayer", "practice"]
+        for r in required:
+            if r not in col:
+                print(f"Warning: Sheet '{sheet_name}' — could not find column for '{r}'. Skipping sheet.")
+                col = {}
+                break
+        if not col:
+            continue
+
+        for row in rows[1:]:
+            # Skip empty rows
+            if all(v is None or str(v).strip() == "" for v in row):
+                continue
+
+            def get(key, default=""):
+                if key not in col:
+                    return default
+                v = row[col[key]]
+                if v is None:
+                    return default
+                s = str(v).strip()
+                # Strip leading single quote (Excel text-prefix marker)
+                if s.startswith("'"):
+                    s = s[1:]
+                return s
+
+            day = {
+                "version":      get("version"),
+                "liturgical_day": get("liturgical_day"),
+                "season":       get("season"),
+                "word":         get("word"),
+                "scripture":    get("scripture"),
+                "contemplation": get("contemplation"),
+                "prayer":       get("prayer"),
+                "practice":     get("practice"),
+                "hover_links":  get("hover_links"),
+                "sheet":        sheet_name,
+            }
+
+            # Must have at minimum a liturgical day and a word
+            if not day["liturgical_day"] or not day["word"]:
+                continue
+
+            days.append(day)
+
+    return days
+
+
+# ── Date parsing ──────────────────────────────────────────────────────────────
+
+MONTH_NAMES = {
+    "january": 1, "february": 2, "march": 3, "april": 4,
+    "may": 5, "june": 6, "july": 7, "august": 8,
+    "september": 9, "october": 10, "november": 11, "december": 12,
+}
+
+def parse_date_from_liturgical_day(liturgical_day_text):
+    """Extract a date from the position line in the Liturgical Day cell.
+    The position line contains a date like '25 April 2026'.
+    Returns a datetime.date or None."""
+    # Try to find a pattern like "25 April 2026" or "1 May 2026"
+    m = re.search(r'\b(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})\b', liturgical_day_text)
+    if not m:
+        return None
+    day_n = int(m.group(1))
+    month_n = MONTH_NAMES.get(m.group(2).lower())
+    year_n = int(m.group(3))
+    if not month_n:
+        return None
+    try:
+        return datetime.date(year_n, month_n, day_n)
+    except ValueError:
+        return None
+
+
+def today_date():
+    return datetime.date.today()
+
+
+def find_today(days):
+    """Return the index of today's day in the days list, or -1."""
+    today = today_date()
+    for i, day in enumerate(days):
+        d = parse_date_from_liturgical_day(day["liturgical_day"])
+        if d and d == today:
+            return i
+    return -1
+
+
+# ── Liturgical Day parsing ────────────────────────────────────────────────────
+
+# Ordinal word map for normalising numeric ordinals in day names
+# e.g. "5th Sunday of Easter" → "Fifth Sunday of Easter"
+ORDINAL_WORDS = {
+    "1st": "First",  "2nd": "Second", "3rd": "Third",  "4th": "Fourth",
+    "5th": "Fifth",  "6th": "Sixth",  "7th": "Seventh","8th": "Eighth",
+    "9th": "Ninth",  "10th": "Tenth",
+}
+
+def normalise_ordinal(text):
+    """Replace numeric ordinals with words: '5th Sunday' → 'Fifth Sunday'."""
+    return re.sub(
+        r'\b(\d{1,2}(?:st|nd|rd|th))\b',
+        lambda m: ORDINAL_WORDS.get(m.group(1).lower(), m.group(1)),
+        text,
+    )
+
+
+def parse_liturgical_day(text):
+    """Parse the Liturgical Day cell.
+
+    Actual cell structure (confirmed against spreadsheet):
+      Line 0: date          e.g. "29 April 2026"
+      Line 1: day name      e.g. "Wednesday" / "Fourth Sunday of Easter"
+      Line 2: season·week   e.g. "Eastertide · Week Four"
+      Line 3: feast line    e.g. "Memorial · St Catherine of Siena…" (optional)
+
+    Returns (season_name, position_line, feast_line, season_key) where:
+      season_name   = the season·week string (line 2), used for palette lookup
+      position_line = the full original text (legacy — used by format_day_label
+                      and parse_date_from_liturgical_day via regex)
+      feast_line    = line 3 if present, else ""
+      season_key    = first token of season_name, lowercased, e.g. "eastertide"
+    """
+    lines = [l.strip() for l in text.split("\n") if l.strip()]
+    # season_name: take the season·week line (index 2) for palette detection
+    season_name   = lines[2] if len(lines) > 2 else (lines[0] if lines else "")
+    position_line = text  # keep full text so date regex still works
+    feast_line    = lines[3] if len(lines) > 3 else ""
+    # season_key: first word of the season·week line, e.g. "eastertide"
+    season_key    = season_name.split()[0].lower() if season_name else ""
+    return season_name, position_line, feast_line, season_key
+
+
+def format_day_label(season_name, position_line):
+    """Build the top-bar day label: '29 April 2026' (full date, no season name)."""
+    m = re.search(r'\b(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})\b', position_line)
+    if m:
+        return f"{int(m.group(1))} {m.group(2).capitalize()} {m.group(3)}"
+    return ""
+
+
+def format_word_echo_date(season_name, position_line):
+    """Build the word echo date line: '29 April 2026' (matches top bar label)."""
+    return format_day_label(season_name, position_line)
+
+
+# ── Hover link parsing ────────────────────────────────────────────────────────
+
+def parse_hover_links(hover_links_text):
+    """Parse the Hover Links cell into a dict keyed by figure slug.
+    Each block is separated by a blank line.
+    Format: Name (dates).\nBody text.
+    Pipe format: Role | Name (dates).\nBody text.
+    Returns {slug: {name, dates, role, body}}"""
+    if not hover_links_text.strip():
+        return {}
+
+    figures = {}
+    # Split on blank lines
+    blocks = re.split(r'\n\s*\n', hover_links_text.strip())
+
+    for block in blocks:
+        block = block.strip()
+        if not block:
+            continue
+
+        lines = [l.strip() for l in block.split("\n") if l.strip()]
+        if not lines:
+            continue
+
+        header = lines[0]
+        body_lines = lines[1:]
+        body = " ".join(body_lines).strip()
+
+        role = ""
+
+        # Pipe format: Role | Name (dates).
+        if "|" in header:
+            parts = header.split("|", 1)
+            role = parts[0].strip()
+            header = parts[1].strip()
+
+        # Extract name and dates: Name (dates). or Name (dates)
+        m = re.match(r'^(.+?)\s*\(([^)]+)\)\.?\s*$', header)
+        if m:
+            name = m.group(1).strip()
+            dates = m.group(2).strip()
+        else:
+            # No dates found — use the whole header as name
+            name = header.rstrip(".")
+            dates = ""
+
+        slug = make_figure_slug(name)
+        figures[slug] = {
+            "name":  name,
+            "dates": dates,
+            "role":  role,
+            "body":  body,
+        }
+
+    return figures
+
+
+def make_figure_slug(name):
+    """Convert a figure name to a slug key, e.g. 'St Mark, Evangelist' → 'st_mark_evangelist'"""
+    s = name.lower()
+    s = re.sub(r'[^a-z0-9\s]', '', s)
+    s = re.sub(r'\s+', '_', s.strip())
+    return s
+
+
+# ── Figure link injection ─────────────────────────────────────────────────────
+
+def build_figure_link_pattern(figures):
+    """Build a regex that matches any figure name in the figures dict.
+    Returns (pattern, slug_map) or (None, {}) if no figures."""
+    if not figures:
+        return None, {}
+
+    # Build a map from (lower-case name) → slug
+    name_to_slug = {}
+    for slug, fig in figures.items():
+        name_lower = fig["name"].lower()
+        if name_lower not in JESUS_NAMES:
+            name_to_slug[name_lower] = slug
+
+    if not name_to_slug:
+        return None, {}
+
+    # Also add short-name variants: "St Mark, Evangelist" → also match "Mark"
+    # Extract the last proper name token(s) from each figure name
+    extra = {}
+    for name_lower, slug in list(name_to_slug.items()):
+        # e.g. "st mark, evangelist" → "mark"
+        # Strip honorifics and role suffixes
+        clean = re.sub(r'\b(st|saint|blessed|fr|dr|pope|bishop)\b', '', name_lower)
+        clean = re.sub(r',.*$', '', clean)  # remove role suffix after comma
+        clean = clean.strip()
+        tokens = clean.split()
+        if tokens:
+            short = tokens[-1]  # last name token
+            if len(short) >= 3 and short not in JESUS_NAMES and short not in name_to_slug:
+                extra[short] = slug
+
+    name_to_slug.update(extra)
+
+    # Sort by length descending so longer names match before shorter substrings
+    sorted_names = sorted(name_to_slug.keys(), key=len, reverse=True)
+
+    # Build pattern — use word boundaries
+    escaped = [re.escape(n) for n in sorted_names]
+    pattern = re.compile(r'\b(' + '|'.join(escaped) + r')\b', re.IGNORECASE)
+
+    return pattern, name_to_slug
+
+
+def inject_figure_links(text, pattern, name_to_slug, no_links=False):
+    """Replace named figures in text with hover-link button elements.
+    If no_links is True (e.g. Screen 5 Prayer), returns plain text."""
+    if no_links or pattern is None or not text:
+        return html.escape(text)
+
+    result = []
+    last = 0
+    for m in pattern.finditer(text):
+        start, end = m.start(), m.end()
+        matched = m.group(1)
+        slug = name_to_slug.get(matched.lower())
+        if not slug:
+            result.append(html.escape(text[last:end]))
+            last = end
+            continue
+        result.append(html.escape(text[last:start]))
+        result.append(
+            f'<button type="button" class="figure-link" '
+            f'data-figure="{slug}">{html.escape(matched)}</button>'
+        )
+        last = end
+    result.append(html.escape(text[last:]))
+    return "".join(result)
+
+
+# ── Screen content builders ───────────────────────────────────────────────────
+
+def paragraphs_to_html(text, pattern=None, name_to_slug=None, no_links=False):
+    """Split text on blank lines and return <p> elements.
+    Named figures are linked unless no_links is True."""
+    paras = [p.strip() for p in re.split(r'\n\s*\n', text.strip()) if p.strip()]
+    out = []
+    for p in paras:
+        inner = inject_figure_links(p, pattern, name_to_slug or {}, no_links=no_links)
+        out.append(f"<p>{inner}</p>")
+    return "\n".join(out)
+
+
+def parse_screen1_lines(text):
+    """Extract (day_name, season_week) from the Liturgical Day cell.
+
+    Cell structure:
+      Line 0: date          "29 April 2026"
+      Line 1: day name      "Wednesday" / "Fourth Sunday of Easter"
+      Line 2: season·week   "Eastertide · Week Four"
+      Line 3: feast line    optional
+
+    Returns (day_name, season_week).
+    day_name has numeric ordinals normalised: "5th" → "Fifth".
+    season_week is absent ("") for superseding Solemnities that have no
+    week descriptor — not currently in the dataset but handled defensively.
+    """
+    lines = [l.strip() for l in text.split("\n") if l.strip()]
+    day_name    = normalise_ordinal(lines[1]) if len(lines) > 1 else ""
+    season_week = lines[2]                    if len(lines) > 2 else ""
+    # A superseding Solemnity would have no season_week line — leave as "".
+    return day_name, season_week
+
+
+def build_screen1_season(day, pattern, name_to_slug):
+    """Build the inner HTML for Screen 1 — Season.
+
+    Header (new design, reading order):
+      .season-day    — always   e.g. "Wednesday" / "Fourth Sunday of Easter"
+      .season-week   — cond.    e.g. "Eastertide · Week Four" (absent for superseding Solemnities)
+      .season-feast  — cond.    e.g. "Memorial · St Catherine of Siena…"
+    """
+    _, position_line, feast_line, _ = parse_liturgical_day(day["liturgical_day"])
+    body_text = day["season"]
+
+    day_name, season_week = parse_screen1_lines(day["liturgical_day"])
+
+    day_name_html    = html.escape(day_name)
+    season_week_html = html.escape(season_week) if season_week else ""
+
+    feast_html = ""
+    if feast_line:
+        feast_inner = inject_figure_links(feast_line, pattern, name_to_slug)
+        feast_html = f'<div class="season-feast">{feast_inner}</div>'
+
+    divider_html = '<div class="season-divider"></div>'
+    body_paras   = paragraphs_to_html(body_text, pattern, name_to_slug)
+    body_html    = f'<div class="season-body">{body_paras}</div>'
+
+    header = f'<div class="season-day">{day_name_html}</div>\n'
+    if season_week_html:
+        header += f'<div class="season-week">{season_week_html}</div>\n'
+    if feast_html:
+        header += feast_html + "\n"
+
+    return header + divider_html + "\n" + body_html
+
+
+def build_screen2_word(day, pattern, name_to_slug):
+    """Build the inner HTML for Screen 2 — Word and Definition."""
+    raw = day["word"].strip()
+    lines = [l.strip() for l in raw.split("\n") if l.strip()]
+
+    # Line 1: WORD or WORD [pronunciation] on same line
+    # Line 2 (if starts with [): pronunciation
+    # Remaining: definition paragraphs
+    word_name = ""
+    pronunciation = ""
+    definition_lines = []
+
+    if not lines:
+        return ""
+
+    first_line = lines[0]
+
+    # Check if pronunciation is embedded on first line: "ABIDE [uh-byd]"
+    m = re.match(r'^([A-Z\s\-\']+?)\s*(\[.+?\])\s*$', first_line)
+    if m:
+        word_name     = m.group(1).strip()
+        pronunciation = m.group(2).strip()
+        def_start     = 1
+    else:
+        word_name = first_line
+        def_start = 1
+        # Check if next non-blank line is a pronunciation
+        if len(lines) > 1 and lines[1].startswith("["):
+            pronunciation = lines[1].strip()
+            def_start = 2
+
+    # Everything after word + pronunciation is definition
+    def_text = "\n\n".join(lines[def_start:])
+    # Re-join into proper paragraphs (blank-line-separated)
+    raw_after = "\n".join(lines[def_start:])
+    # Use the original raw to preserve blank lines
+    # Find where definition starts in the raw text
+    if pronunciation:
+        pron_pos = raw.find(pronunciation)
+        if pron_pos != -1:
+            def_text = raw[pron_pos + len(pronunciation):].strip()
+        else:
+            def_text = "\n\n".join(lines[def_start:])
+    else:
+        word_name_pos = raw.find(first_line)
+        def_text = raw[word_name_pos + len(first_line):].strip()
+
+    word_name_html    = html.escape(word_name)
+    pronunciation_html = html.escape(pronunciation) if pronunciation else ""
+    def_paras = paragraphs_to_html(def_text, pattern, name_to_slug)
+
+    pron_block = ""
+    if pronunciation_html:
+        pron_block = f'<div class="word-pronunciation">{pronunciation_html}</div>'
+
+    return (
+        f'<div class="word-title">{word_name_html}</div>\n'
+        + (pron_block + "\n" if pron_block else "")
+        + '<div class="word-divider"></div>\n'
+        + f'<div class="word-definition">{def_paras}</div>'
+    )
+
+
+def build_screen3_scripture(day, pattern, name_to_slug):
+    """Build the inner HTML for Screen 3 — Scripture."""
+    raw = day["scripture"].strip()
+    lines_raw = raw.split("\n")
+
+    # Split into blank-line-separated blocks
+    blocks = []
+    current = []
+    for line in lines_raw:
+        if line.strip() == "":
+            if current:
+                blocks.append("\n".join(current).strip())
+                current = []
+        else:
+            current.append(line)
+    if current:
+        blocks.append("\n".join(current).strip())
+
+    if not blocks:
+        return ""
+
+    # Identify the reference line: the last block matching a citation pattern
+    # Pattern: starts with a book name or number+book, contains chapter:verse
+    citation_pattern = re.compile(
+        r'^(\d\s+)?[A-Z][a-z].*\d+:\d+|^Psalm\s+\d+',
+        re.IGNORECASE
+    )
+
+    reference = ""
+    verse_blocks = []
+
+    # Check last block first
+    if citation_pattern.match(blocks[-1]):
+        reference = blocks[-1]
+        verse_blocks = blocks[:-1]
+    else:
+        verse_blocks = blocks
+
+    # Build verse HTML — all verses share one .scripture-block
+    verse_parts = []
+    for i, vb in enumerate(verse_blocks):
+        if i > 0:
+            verse_parts.append('<div class="scripture-inter-verse"></div>')
+        inner = inject_figure_links(vb, pattern, name_to_slug)
+        verse_parts.append(f"<p>{inner}</p>")
+
+    verse_html = "\n".join(verse_parts)
+    ref_html   = html.escape(reference) if reference else ""
+
+    scripture_block = (
+        f'<div class="scripture-block">\n'
+        f'  <div class="scripture-text">{verse_html}</div>\n'
+        + (f'</div>\n<div class="scripture-translation">{ref_html}</div>' if ref_html
+           else '</div>')
+    )
+
+    return f'<div class="scripture-passage">\n{scripture_block}\n</div>'
+
+
+def build_screen4_contemplation(day, pattern, name_to_slug):
+    """Build the inner HTML for Screen 4 — Contemplation."""
+    raw = day["contemplation"].strip()
+    # Split into blank-line-separated blocks
+    blocks = [b.strip() for b in re.split(r'\n\s*\n', raw) if b.strip()]
+
+    if not blocks:
+        return ""
+
+    # The closing question is the last block.
+    # Detect it: it ends with a "?" or is a short single sentence ending with "?"
+    # Also acceptable: two closely joined questions.
+    question_block = blocks[-1]
+    body_blocks    = blocks[:-1]
+
+    body_html = ""
+    if body_blocks:
+        paras = []
+        for b in body_blocks:
+            inner = inject_figure_links(b, pattern, name_to_slug)
+            paras.append(f"<p>{inner}</p>")
+        body_html = (
+            f'<div class="contemplation-body">'
+            + "\n".join(paras)
+            + '</div>'
+        )
+
+    q_inner = inject_figure_links(question_block, pattern, name_to_slug)
+    question_html = f'<div class="contemplation-question">{q_inner}</div>'
+
+    return (body_html + "\n" if body_html else "") + question_html
+
+
+def build_screen5_prayer(day):
+    """Build the inner HTML for Screen 5 — Prayer.
+    No figure links in the prayer."""
+    raw = day["prayer"].strip()
+    # Split into blank-line-separated blocks = prayer lines
+    lines = [b.strip() for b in re.split(r'\n\s*\n', raw) if b.strip()]
+
+    if not lines:
+        return ""
+
+    # The closing line begins "In Christ's name" or "Amen"
+    amen_patterns = re.compile(r'^(In Christ|Amen)', re.IGNORECASE)
+    prayer_lines  = []
+    amen_line     = ""
+
+    for line in lines:
+        if amen_patterns.match(line) and not amen_line:
+            amen_line = line
+        else:
+            prayer_lines.append(line)
+
+    # If no explicit amen detected, treat the last line as amen
+    if not amen_line and prayer_lines:
+        amen_line    = prayer_lines[-1]
+        prayer_lines = prayer_lines[:-1]
+
+    prayer_paras = "".join(f"<p>{html.escape(l)}</p>\n" for l in prayer_lines)
+    amen_html    = f'<div class="prayer-amen">{html.escape(amen_line)}</div>' if amen_line else ""
+
+    return (
+        f'<div class="prayer-block">\n'
+        f'  <div class="prayer-body">\n{prayer_paras}  </div>\n'
+        + (f"  {amen_html}\n" if amen_html else "")
+        + '</div>'
+    )
+
+
+def build_screen6_practice(day, pattern, name_to_slug):
+    """Build the inner HTML for Screen 6 — Practice."""
+    raw = day["practice"].strip()
+    blocks = [b.strip() for b in re.split(r'\n\s*\n', raw) if b.strip()]
+
+    if not blocks:
+        return ""
+
+    # The anchor sentence is the last block
+    anchor_block = blocks[-1]
+    body_blocks  = blocks[:-1]
+
+    body_html = ""
+    if body_blocks:
+        paras = []
+        for b in body_blocks:
+            inner = inject_figure_links(b, pattern, name_to_slug)
+            paras.append(f"<p>{inner}</p>")
+        body_html = (
+            '<div class="practice-body">'
+            + "\n".join(paras)
+            + '</div>'
+        )
+
+    anchor_inner = inject_figure_links(anchor_block, pattern, name_to_slug)
+    anchor_html  = f'<div class="practice-anchor">{anchor_inner}</div>'
+
+    return (body_html + "\n" if body_html else "") + anchor_html
+
+
+def build_screen7_amen(day, uid):
+    """Build the inner HTML for Screen 7 — Amen (fully auto-generated)."""
+    raw_word = day["word"].strip()
+    first_line = raw_word.split("\n")[0].strip()
+
+    # Extract just the word name (strip any embedded pronunciation)
+    m = re.match(r'^([A-Z\s\-\']+?)\s*\[', first_line)
+    if m:
+        word_name = m.group(1).strip()
+    else:
+        # Word name is the first line, capitalise title-case for display
+        word_name = first_line.title()
+
+    # Parse date for word echo
+    season_name, position_line, _, _ = parse_liturgical_day(day["liturgical_day"])
+    echo_date = format_word_echo_date(season_name, position_line)
+
+    w = html.escape(word_name)
+    d = html.escape(echo_date)
+    u = uid
+
+    return f"""
+    <!-- Completion hero -->
+    <div class="amen-hero" id="amen-hero-{u}">
+
+      <div class="amen-checkbox-row"
+           role="checkbox" aria-checked="false" tabindex="0"
+           data-uid="{u}"
+           onclick="amenCheck(this)"
+           onkeydown="if(event.key===' '||event.key==='Enter'){{event.preventDefault();amenCheck(this)}}">
+        <div class="amen-checkbox-outer" id="amen-box-{u}">
+          <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <polyline points="3,9 7,13 15,4.5"
+              stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="amen-checkbox-label">I kept Vigil today.</div>
+      </div>
+
+      <div class="amen-word-block" id="amen-word-{u}">
+        <div class="amen-word-name">{w}</div>
+      </div>
+
+    </div>
+
+    <!-- Commission phrase -->
+    <div class="amen-commission" id="amen-commission-{u}">
+      <div class="amen-commission-line1">Go in peace.</div>
+      <div class="amen-commission-line1">And carry the Word with you.</div>
+    </div>
+
+    <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
+    <div class="amen-count-block" id="amen-count-{u}">
+      <div class="amen-count-number" id="amen-count-num-{u}">—</div>
+      <div class="amen-count-label">people have kept vigil since Vigil began.<br>Invite someone to keep Vigil with you.</div>
+    </div>
+
+    <!-- Share block — appears after checkbox is ticked -->
+    <div class="amen-share-block" id="amen-share-{u}">
+
+      <div id="amen-share-initial-{u}">
+        <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
+        <button class="amen-share-btn-primary"
+                onclick="amenShareImage('{u}')">Share today's Vigil</button>
+        <button class="amen-share-btn-secondary"
+                onclick="amenShareApp('{u}')">Share the app</button>
+        <button class="amen-not-now-btn"
+                onclick="amenNotNow('{u}')">Not now</button>
+      </div>
+
+      <div class="amen-share-confirmed" id="amen-share-confirmed-{u}"></div>
+
+    </div>
+
+    <!-- Standing invitation -->
+    <div class="amen-invitation-section">
+      <button class="amen-invitation-trigger" onclick="amenToggleInvitation('{u}')" tabindex="0">
+        <div class="amen-invitation-trigger-inner">
+          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
+          <span class="amen-invitation-arrow" id="amen-inv-arrow-{u}">›</span>
+        </div>
+      </button>
+      <div class="amen-invitation-panel" id="amen-inv-panel-{u}">
+        <div class="amen-invitation-panel-inner">
+          <div class="amen-invitation-message">I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.</div>
+          <div id="amen-inv-actions-{u}">
+            <button class="amen-invitation-send" onclick="amenSendInvitation('{u}')">Send invitation</button>
+          </div>
+          <div class="amen-inv-confirmed" id="amen-inv-confirmed-{u}"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification prompt — shown once, only if not already subscribed -->
+    <div class="amen-notif-section" id="amen-notif-{u}">
+      <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
+      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('{u}')">
+        Turn on notifications
+      </button>
+      <button class="amen-not-now-btn" onclick="vigilDismissNotification('{u}')">Not now</button>
+    </div>
+
+    <div class="amen-spacer"></div>"""
+
+
+# ── HTML assembly ─────────────────────────────────────────────────────────────
+
+def build_screen_html(screen_index, inner_html, screen_class):
+    """Wrap screen content in the standard screen shell."""
+    label = SCREEN_LABELS[screen_index]
+    aria  = label
+    return f"""    <section class="screen {screen_class}" data-screen="{screen_index}" aria-label="{aria}">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">{label}</div>
+      <div class="screen-inner">
+{inner_html}</div>
+      <div class="screen-fade-bottom"></div>
+    </section>"""
+
+
+SCREEN_CLASSES = [
+    "screen-season",
+    "screen-word",
+    "screen-scripture",
+    "screen-contemplation",
+    "screen-prayer",
+    "screen-practice",
+    "screen-amen",
+]
+
+
+def build_day_html(day, day_index, figures):
+    """Build the HTML for all 7 screens of a single day."""
+    pattern, name_to_slug = build_figure_link_pattern(figures)
+    uid = f"d{day_index + 1}"
+
+    screen_inners = [
+        build_screen1_season(day, pattern, name_to_slug),
+        build_screen2_word(day, pattern, name_to_slug),
+        build_screen3_scripture(day, pattern, name_to_slug),
+        build_screen4_contemplation(day, pattern, name_to_slug),
+        build_screen5_prayer(day),
+        build_screen6_practice(day, pattern, name_to_slug),
+        build_screen7_amen(day, uid),
+    ]
+
+    screens_html = []
+    for i, inner in enumerate(screen_inners):
+        screens_html.append(build_screen_html(i, inner, SCREEN_CLASSES[i]))
+
+    all_screens = "\n".join(screens_html)
+    return f'  <div class="day-screens" data-day="0">\n{all_screens}\n  </div>'
+
+
+def build_days_js(day, figures):
+    """Build the DAYS and FIGURES JavaScript data objects for a single day."""
+    import json
+
+    season_name, position_line, _, season_key = parse_liturgical_day(day["liturgical_day"])
+    palette = PALETTE_MAP.get(season_key, "palette-eastertide")
+    label   = format_day_label(season_name, position_line)
+    d       = parse_date_from_liturgical_day(day["liturgical_day"])
+    date_str = d.strftime("%-d %B %Y") if d else ""
+
+    days_obj = [{"palette": palette, "label": label, "date": date_str}]
+
+    # Build FIGURES from parsed hover links
+    figs_obj = {}
+    for slug, fig in figures.items():
+        figs_obj[slug] = {
+            "name":  fig["name"],
+            "dates": fig["dates"],
+            "role":  fig["role"],
+            "body":  fig["body"],
+        }
+
+    days_js    = f"const DAYS    = {json.dumps(days_obj, ensure_ascii=False)};"
+    figures_js = f"const FIGURES = {json.dumps(figs_obj, ensure_ascii=False, indent=2)};"
+
+    return days_js, figures_js
+
+
+# ── Full page assembly ────────────────────────────────────────────────────────
+
+CSS = r"""
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -850,232 +1694,10 @@ body { overflow: hidden; }
 
 /* Production top bar — centred */
 .top-bar-inner--prod { justify-content: center; }
+"""
 
-</style>
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "ee15b094-145a-4b1e-9b6c-6a29fa0a469e",
-      safari_web_id: "web.onesignal.auto.0868f031-816f-4b4e-9724-08fcd0b320db",
-      notifyButton: { enable: false },
-    });
-  });
-</script>
-</head>
-<body>
-<div class="app" id="app">
 
-  <div class="top-bar">
-    <div class="top-bar-inner top-bar-inner--prod">
-      <div class="brand-wrap">
-        <div class="brand">Vigil</div>
-        <div class="day-label" id="dayLabel"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="screens-container" id="screens">
-  <div class="day-screens" data-day="0">
-    <section class="screen screen-season" data-screen="0" aria-label="Season">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Season</div>
-      <div class="screen-inner">
-<div class="season-day">Wednesday</div>
-<div class="season-week">Eastertide · Week Four</div>
-<div class="season-feast">Memorial · <button type="button" class="figure-link" data-figure="st_catherine_of_siena">St Catherine of Siena</button>, Virgin and Doctor of the Church</div>
-<div class="season-divider"></div>
-<div class="season-body"><p>We are in the fourth week of Eastertide, and today the Church remembers <button type="button" class="figure-link" data-figure="st_catherine_of_siena">St Catherine of Siena</button>, whose fierce love for Christ became counsel, courage and truth-telling.</p>
-<p>Easter light is not soft decoration. It shows what is real, and asks us to live there.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-word" data-screen="1" aria-label="Word">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Word</div>
-      <div class="screen-inner">
-<div class="word-title">LIGHT</div>
-<div class="word-pronunciation">[lyt]</div>
-<div class="word-divider"></div>
-<div class="word-definition"><p>Light is what makes sight possible. It does not invent what is there; it reveals it.</p>
-<p>The word comes from a Gospel passage the Church hears in Eastertide, where Jesus speaks of himself as light coming into the world. This is not light as mood or atmosphere, but light as mercy: the presence that keeps us from having to remain hidden in the dark.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Scripture</div>
-      <div class="screen-inner">
-<div class="scripture-passage">
-<div class="scripture-block">
-  <div class="scripture-text"><p>“I have come as light into the world, so that everyone who believes in me should not remain in the darkness.”</p></div>
-</div>
-<div class="scripture-translation">John 12:46 — NRSV</div>
-</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-contemplation" data-screen="3" aria-label="Contemplation">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Contemplation</div>
-      <div class="screen-inner">
-<div class="contemplation-body"><p>Darkness is not always wickedness. Sometimes it is fear, confusion, secrecy or the old habit of keeping parts of ourselves unlooked at.</p>
-<p>Christ comes as light, not to expose us for humiliation, but to make remaining in darkness unnecessary. <button type="button" class="figure-link" data-figure="st_catherine_of_siena">St Catherine of Siena</button> understood that light can be severe, but never cruel: truth spoken plainly in the service of love. The light of Christ is like that — clear enough to show what is real, and merciful enough not to leave us alone with what it shows.</p></div>
-<div class="contemplation-question">What part of your life are you still keeping dim because you are not sure mercy will meet you there? Where is Christ’s light already quietly at work in you, asking not to be hidden but trusted?</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-prayer" data-screen="4" aria-label="Prayer">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Prayer</div>
-      <div class="screen-inner">
-<div class="prayer-block">
-  <div class="prayer-body">
-<p>Lord,</p>
-<p>You come as light into the world.</p>
-<p>Shine where we have grown used to the dark.</p>
-<p>Where truth frightens us, let mercy arrive with it.</p>
-<p>Where we have hidden from you, teach us that your light does not come to shame us, but to save.</p>
-<p>Make us honest enough to be healed.</p>
-  </div>
-  <div class="prayer-amen">In Christ’s name, Amen.</div>
-</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-practice" data-screen="5" aria-label="Practice">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Practice</div>
-      <div class="screen-inner">
-<div class="practice-body"><p>Today, bring one hidden or half-hidden thing into prayer: not to analyse it, excuse it or solve it, but to let Christ look at it with you. Name it plainly before God.</p></div>
-<div class="practice-anchor">Nothing is healed by staying in the dark.</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-amen" data-screen="6" aria-label="Amen">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Amen</div>
-      <div class="screen-inner">
-
-    <!-- Completion hero -->
-    <div class="amen-hero" id="amen-hero-d5">
-
-      <div class="amen-checkbox-row"
-           role="checkbox" aria-checked="false" tabindex="0"
-           data-uid="d5"
-           onclick="amenCheck(this)"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenCheck(this)}">
-        <div class="amen-checkbox-outer" id="amen-box-d5">
-          <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <polyline points="3,9 7,13 15,4.5"
-              stroke="currentColor" stroke-width="1.5"
-              stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="amen-checkbox-label">I kept Vigil today.</div>
-      </div>
-
-      <div class="amen-word-block" id="amen-word-d5">
-        <div class="amen-word-name">Light</div>
-      </div>
-
-    </div>
-
-    <!-- Commission phrase -->
-    <div class="amen-commission" id="amen-commission-d5">
-      <div class="amen-commission-line1">Go in peace.</div>
-      <div class="amen-commission-line1">And carry the Word with you.</div>
-    </div>
-
-    <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
-    <div class="amen-count-block" id="amen-count-d5">
-      <div class="amen-count-number" id="amen-count-num-d5">—</div>
-      <div class="amen-count-label">people have kept vigil since Vigil began.<br>Invite someone to keep Vigil with you.</div>
-    </div>
-
-    <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-d5">
-
-      <div id="amen-share-initial-d5">
-        <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
-        <button class="amen-share-btn-primary"
-                onclick="amenShareImage('d5')">Share today's Vigil</button>
-        <button class="amen-share-btn-secondary"
-                onclick="amenShareApp('d5')">Share the app</button>
-        <button class="amen-not-now-btn"
-                onclick="amenNotNow('d5')">Not now</button>
-      </div>
-
-      <div class="amen-share-confirmed" id="amen-share-confirmed-d5"></div>
-
-    </div>
-
-    <!-- Standing invitation -->
-    <div class="amen-invitation-section">
-      <button class="amen-invitation-trigger" onclick="amenToggleInvitation('d5')" tabindex="0">
-        <div class="amen-invitation-trigger-inner">
-          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
-          <span class="amen-invitation-arrow" id="amen-inv-arrow-d5">›</span>
-        </div>
-      </button>
-      <div class="amen-invitation-panel" id="amen-inv-panel-d5">
-        <div class="amen-invitation-panel-inner">
-          <div class="amen-invitation-message">I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.</div>
-          <div id="amen-inv-actions-d5">
-            <button class="amen-invitation-send" onclick="amenSendInvitation('d5')">Send invitation</button>
-          </div>
-          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d5"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Notification prompt — shown once, only if not already subscribed -->
-    <div class="amen-notif-section" id="amen-notif-d5">
-      <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d5')">
-        Turn on notifications
-      </button>
-      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d5')">Not now</button>
-    </div>
-
-    <div class="amen-spacer"></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-  </div>
-  </div>
-
-  <!-- Navigation dots -->
-  <nav class="nav-dots" id="dots" aria-label="Screen navigation"></nav>
-  <div class="swipe-hint" id="swipeHint">&#8592; swipe &#8594;</div>
-  <div class="screen-counter" id="counter">1 / 7</div>
-
-  <!-- Figure modal -->
-  <div class="figure-overlay" id="figureOverlay" role="dialog" aria-modal="true" aria-labelledby="figureName">
-    <div class="figure-card">
-      <button class="close" id="figureClose" aria-label="Close">&times;</button>
-      <div class="figure-eyebrow">People of the Faith</div>
-      <div class="figure-name" id="figureName"></div>
-      <div class="figure-dates" id="figureDates"></div>
-      <div class="figure-role" id="figureRole"></div>
-      <div class="figure-divider"></div>
-      <div class="figure-body" id="figureBody"></div>
-    </div>
-  </div>
-
-  <!-- Desktop screen navigation arrows (hidden on mobile via CSS) -->
-  <button class="desktop-nav-arrow desktop-nav-prev" id="desktopPrev" aria-label="Previous screen">&#8249;</button>
-  <button class="desktop-nav-arrow desktop-nav-next" id="desktopNext" aria-label="Next screen">&#8250;</button>
-
-</div>
-
-<script>
-const DAYS    = [{"palette": "palette-eastertide", "label": "29 April 2026", "date": "29 April 2026"}];
-const FIGURES = {
-  "st_catherine_of_siena": {
-    "name": "St Catherine of Siena",
-    "dates": "1347–1380 AD",
-    "role": "",
-    "body": "Mystic, writer and a Doctor of the Church. The Church remembers her today; her life gives the day’s word a particular force, as someone whose love for Christ became unusually clear speech in a dark and divided time."
-  }
-};
-</script>
-<script>
-
+JS = r"""
 const TOTAL_SCREENS = 7;
 const LABELS = ["Season", "Word", "Scripture", "Contemplation", "Prayer", "Practice", "Amen"];
 
@@ -1743,7 +2365,199 @@ if (todayIdx === -1) {
   }
   scheduleMidnightAdvance();
 }
+"""
 
+
+def build_html(day, day_index, figures, build_time):
+    """Assemble the complete index.html string."""
+    days_js, figures_js = build_days_js(day, figures)
+    day_html = build_day_html(day, day_index, figures)
+
+    # Extract word for build comment
+    raw_word = day["word"].strip().split("\n")[0].strip()
+    m = re.match(r'^([A-Z\s\-\']+?)\s*(\[|$)', raw_word)
+    word_display = m.group(1).strip() if m else raw_word
+
+    # Parse date for display
+    d = parse_date_from_liturgical_day(day["liturgical_day"])
+    date_display = d.strftime("%-d %B %Y") if d else "unknown date"
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- Vigil · Production MVP · Generated {build_time} -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vigil</title>
+<!-- PWA / icon declarations -->
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png">
+<meta name="theme-color" content="#FAF7F2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Vigil">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+{CSS}
+</style>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {{
+    await OneSignal.init({{
+      appId: "ee15b094-145a-4b1e-9b6c-6a29fa0a469e",
+      safari_web_id: "web.onesignal.auto.0868f031-816f-4b4e-9724-08fcd0b320db",
+      notifyButton: {{ enable: false }},
+    }});
+  }});
+</script>
+</head>
+<body>
+<div class="app" id="app">
+
+  <div class="top-bar">
+    <div class="top-bar-inner top-bar-inner--prod">
+      <div class="brand-wrap">
+        <div class="brand">Vigil</div>
+        <div class="day-label" id="dayLabel"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screens-container" id="screens">
+{day_html}
+  </div>
+
+  <!-- Navigation dots -->
+  <nav class="nav-dots" id="dots" aria-label="Screen navigation"></nav>
+  <div class="swipe-hint" id="swipeHint">&#8592; swipe &#8594;</div>
+  <div class="screen-counter" id="counter">1 / 7</div>
+
+  <!-- Figure modal -->
+  <div class="figure-overlay" id="figureOverlay" role="dialog" aria-modal="true" aria-labelledby="figureName">
+    <div class="figure-card">
+      <button class="close" id="figureClose" aria-label="Close">&times;</button>
+      <div class="figure-eyebrow">People of the Faith</div>
+      <div class="figure-name" id="figureName"></div>
+      <div class="figure-dates" id="figureDates"></div>
+      <div class="figure-role" id="figureRole"></div>
+      <div class="figure-divider"></div>
+      <div class="figure-body" id="figureBody"></div>
+    </div>
+  </div>
+
+  <!-- Desktop screen navigation arrows (hidden on mobile via CSS) -->
+  <button class="desktop-nav-arrow desktop-nav-prev" id="desktopPrev" aria-label="Previous screen">&#8249;</button>
+  <button class="desktop-nav-arrow desktop-nav-next" id="desktopNext" aria-label="Next screen">&#8250;</button>
+
+</div>
+
+<script>
+{days_js}
+{figures_js}
+</script>
+<script>
+{JS}
 </script>
 </body>
-</html>
+</html>"""
+
+
+# ── Holding page ──────────────────────────────────────────────────────────────
+
+def build_holding_page(days, build_time):
+    """Build a holding page when no content exists for today."""
+    today = today_date()
+    first_date = None
+    if days:
+        first_date = parse_date_from_liturgical_day(days[0]["liturgical_day"])
+
+    if first_date and today < first_date:
+        msg = f"Vigil begins on {days[0]['liturgical_day'].split(chr(10))[1].strip() if chr(10) in days[0]['liturgical_day'] else 'soon'}.<br>Come back then."
+    else:
+        msg = "Vigil will return with a new word tomorrow."
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- Vigil · Holding page · Generated {build_time} -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vigil</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png">
+<meta name="theme-color" content="#FAF7F2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Vigil">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {{ --bg: #FAF7F2; --gold: #B8860B; --dim: #8A7D6E; }}
+html, body {{ margin:0; height:100%; background:var(--bg); font-family:'Raleway',sans-serif; color:var(--dim); }}
+.centre {{ display:flex; flex-direction:column; align-items:center; justify-content:center; height:100svh; padding:2rem; text-align:center; }}
+.wordmark {{ font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:300; letter-spacing:0.4em; text-transform:uppercase; color:var(--gold); margin-bottom:2rem; }}
+.message {{ font-size:1rem; line-height:1.8; max-width:280px; }}
+</style>
+</head>
+<body>
+<div class="centre">
+  <div class="wordmark">Vigil</div>
+  <div class="message">{msg}</div>
+</div>
+</body>
+</html>"""
+
+
+# ── Main ──────────────────────────────────────────────────────────────────────
+
+def main():
+    build_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    print(f"Reading {SPREADSHEET}...")
+    days = load_spreadsheet(SPREADSHEET)
+
+    if not days:
+        print("Error: No content rows found in the spreadsheet.")
+        sys.exit(1)
+
+    print(f"Building {len(days)} day(s):")
+
+    today_idx = find_today(days)
+
+    for i, day in enumerate(days):
+        d = parse_date_from_liturgical_day(day["liturgical_day"])
+        date_str = d.strftime("%-d %B %Y") if d else "?"
+        raw_word = day["word"].strip().split("\n")[0].strip()
+        m = re.match(r'^([A-Z\s\-\']+?)\s*(\[|$)', raw_word)
+        word_display = m.group(1).strip() if m else raw_word
+        mark = "✓" if i == today_idx else "◦"
+        print(f"  {mark} Day {i+1:2d} · {date_str} · {word_display}")
+
+    if today_idx == -1:
+        print("\n  ◦ No content for today — generating holding page.")
+        html_out = build_holding_page(days, build_time)
+    else:
+        day = days[today_idx]
+        figures = parse_hover_links(day["hover_links"])
+        html_out = build_html(day, today_idx, figures, build_time)
+
+    # Write output
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        f.write(html_out)
+
+    size_kb = os.path.getsize(OUTPUT_FILE) / 1024
+
+    # Flag the column discrepancy for the user
+    print(f"\n  ✓ Wrote {OUTPUT_FILE} ({size_kb:.1f} KB) — today's date only")
+    print()
+    print(f"Deploy to github.com/This-Is-Pelagius/Vigil (v2-build branch):")
+    print(f"  dailyvigil.app  ← {OUTPUT_FILE}")
+    print()
+
+
+if __name__ == "__main__":
+    main()
