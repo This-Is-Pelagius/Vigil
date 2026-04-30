@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-04-30 18:28 · 30 April 2026 – 7 May 2026 (8 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-04-30 18:46 · 30 April 2026 – 7 May 2026 (8 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -599,11 +599,7 @@ body { overflow: hidden; }
   text-align: center; width: 100%;
   padding: 0.5rem 0 1.8rem;
   margin-bottom: 0;
-  border-bottom: 1px solid transparent;
-  transition: border-color 0.9s ease;
-}
-.amen-hero.amen-hero-checked {
-  border-bottom-color: var(--accent-soft);
+  border-bottom: 1px solid var(--accent-soft);
 }
 
 .amen-checkbox-row {
@@ -641,15 +637,10 @@ body { overflow: hidden; }
 .amen-word-block {
   display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
   width: 100%;
-  opacity: 0; transform: translateY(-4px);
-  max-height: 0; overflow: hidden; margin-bottom: 0;
-  transition: opacity 0.9s ease, transform 0.9s ease,
-              max-height 0.9s ease, margin-bottom 0.9s ease;
+  opacity: 0; transform: translateY(6px);
+  transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
 }
-.amen-word-block.amen-visible {
-  opacity: 1; transform: translateY(0);
-  max-height: 300px; margin-bottom: 0;
-}
+.amen-word-block.amen-visible { opacity: 1; transform: translateY(0); }
 .amen-word-rule {
   width: 2rem; height: 1px;
   background: linear-gradient(to right, transparent, var(--gold), transparent);
@@ -672,19 +663,19 @@ body { overflow: hidden; }
 
 .amen-commission {
   width: 100%; text-align: center;
-  padding: 0; max-height: 0; overflow: hidden;
-  border-top: 1px solid var(--accent-soft);
-  border-bottom: 1px solid var(--accent-soft);
+  padding: 0; max-height: 0; overflow: visible;
+  border-top: 0px solid var(--accent-soft);
+  border-bottom: 0px solid var(--accent-soft);
   margin-bottom: 0;
-  opacity: 0; transform: translateY(-4px);
-  transition: opacity 0.9s ease, transform 0.9s ease,
-              max-height 0.9s ease, padding 0.9s ease, margin-bottom 0.9s ease;
-  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.55s ease, max-height 0.55s ease, padding 0.55s ease,
+              margin-bottom 0.55s ease, border-top-width 0.3s ease, border-bottom-width 0.3s ease;
 }
 .amen-commission.amen-visible {
-  opacity: 1; transform: translateY(0);
-  max-height: 300px; padding: 1.6rem 0 1.4rem; margin-bottom: 1.6rem;
-  pointer-events: auto;
+  opacity: 1; max-height: 300px;
+  padding: 1.6rem 0 1.4rem;
+  border-top-width: 1px; border-bottom-width: 1px;
+  margin-bottom: 1.6rem;
 }
 .amen-commission-line1 {
   font-family: 'Cormorant Garamond', serif;
@@ -710,16 +701,12 @@ body { overflow: hidden; }
 
 .amen-share-block {
   width: 100%; text-align: center;
-  opacity: 0; transform: translateY(-4px);
-  max-height: 0; overflow: hidden; margin-bottom: 0;
-  transition: opacity 0.9s ease, transform 0.9s ease,
-              max-height 0.9s ease, margin-bottom 0.9s ease;
-  pointer-events: none;
+  opacity: 0; max-height: 0; overflow: hidden;
+  transition: opacity 0.4s ease, max-height 0.4s ease, margin-bottom 0.4s ease;
+  pointer-events: none; margin-bottom: 0;
 }
 .amen-share-block.amen-visible {
-  opacity: 1; transform: translateY(0);
-  max-height: 700px; margin-bottom: 1.6rem;
-  pointer-events: all;
+  opacity: 1; max-height: 700px; pointer-events: all; margin-bottom: 1.6rem;
 }
 .amen-share-prompt {
   font-family: 'Libre Baskerville', serif; font-size: 1rem; font-style: italic;
@@ -828,17 +815,11 @@ body { overflow: hidden; }
 
 .amen-notif-section {
   display: none;
-  position: fixed;
-  bottom: 4.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - 2.8rem);
-  max-width: 380px;
+  width: 100%;
   text-align: center;
-  padding: 1.2rem 0 0;
+  padding: 1.4rem 0 0;
   border-top: 1px solid var(--accent-soft);
-  background: var(--bg);
-  z-index: 20;
+  margin-bottom: 1rem;
 }
 .amen-notif-prompt {
   font-family: 'Libre Baskerville', serif;
@@ -1004,7 +985,7 @@ body { overflow: hidden; }
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
     <div class="amen-count-block" id="amen-count-d1">
       <div class="amen-count-number" id="amen-count-num-d1">—</div>
-      <div class="amen-count-label">people have kept vigil since Vigil began.</div>
+      <div class="amen-count-label">people have kept vigil since Vigil began.<br>Invite someone to keep Vigil with you.</div>
     </div>
 
     <!-- Share block — appears after checkbox is ticked -->
@@ -1022,6 +1003,25 @@ body { overflow: hidden; }
 
       <div class="amen-share-confirmed" id="amen-share-confirmed-d1"></div>
 
+    </div>
+
+    <!-- Standing invitation -->
+    <div class="amen-invitation-section">
+      <button class="amen-invitation-trigger" onclick="amenToggleInvitation('d1')" tabindex="0">
+        <div class="amen-invitation-trigger-inner">
+          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
+          <span class="amen-invitation-arrow" id="amen-inv-arrow-d1">›</span>
+        </div>
+      </button>
+      <div class="amen-invitation-panel" id="amen-inv-panel-d1">
+        <div class="amen-invitation-panel-inner">
+          <div class="amen-invitation-message">I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.</div>
+          <div id="amen-inv-actions-d1">
+            <button class="amen-invitation-send" onclick="amenSendInvitation('d1')">Send invitation</button>
+          </div>
+          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d1"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
@@ -1143,7 +1143,7 @@ body { overflow: hidden; }
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
     <div class="amen-count-block" id="amen-count-d2">
       <div class="amen-count-number" id="amen-count-num-d2">—</div>
-      <div class="amen-count-label">people have kept vigil since Vigil began.</div>
+      <div class="amen-count-label">people have kept vigil since Vigil began.<br>Invite someone to keep Vigil with you.</div>
     </div>
 
     <!-- Share block — appears after checkbox is ticked -->
@@ -1161,6 +1161,25 @@ body { overflow: hidden; }
 
       <div class="amen-share-confirmed" id="amen-share-confirmed-d2"></div>
 
+    </div>
+
+    <!-- Standing invitation -->
+    <div class="amen-invitation-section">
+      <button class="amen-invitation-trigger" onclick="amenToggleInvitation('d2')" tabindex="0">
+        <div class="amen-invitation-trigger-inner">
+          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
+          <span class="amen-invitation-arrow" id="amen-inv-arrow-d2">›</span>
+        </div>
+      </button>
+      <div class="amen-invitation-panel" id="amen-inv-panel-d2">
+        <div class="amen-invitation-panel-inner">
+          <div class="amen-invitation-message">I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.</div>
+          <div id="amen-inv-actions-d2">
+            <button class="amen-invitation-send" onclick="amenSendInvitation('d2')">Send invitation</button>
+          </div>
+          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d2"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
@@ -1284,7 +1303,7 @@ body { overflow: hidden; }
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
     <div class="amen-count-block" id="amen-count-d3">
       <div class="amen-count-number" id="amen-count-num-d3">—</div>
-      <div class="amen-count-label">people have kept vigil since Vigil began.</div>
+      <div class="amen-count-label">people have kept vigil since Vigil began.<br>Invite someone to keep Vigil with you.</div>
     </div>
 
     <!-- Share block — appears after checkbox is ticked -->
@@ -1302,6 +1321,25 @@ body { overflow: hidden; }
 
       <div class="amen-share-confirmed" id="amen-share-confirmed-d3"></div>
 
+    </div>
+
+    <!-- Standing invitation -->
+    <div class="amen-invitation-section">
+      <button class="amen-invitation-trigger" onclick="amenToggleInvitation('d3')" tabindex="0">
+        <div class="amen-invitation-trigger-inner">
+          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
+          <span class="amen-invitation-arrow" id="amen-inv-arrow-d3">›</span>
+        </div>
+      </button>
+      <div class="amen-invitation-panel" id="amen-inv-panel-d3">
+        <div class="amen-invitation-panel-inner">
+          <div class="amen-invitation-message">I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.</div>
+          <div id="amen-inv-actions-d3">
+            <button class="amen-invitation-send" onclick="amenSendInvitation('d3')">Send invitation</button>
+          </div>
+          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d3"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
@@ -1423,7 +1461,7 @@ Galatians 5:22 (NRSV)</p></div>
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
     <div class="amen-count-block" id="amen-count-d4">
       <div class="amen-count-number" id="amen-count-num-d4">—</div>
-      <div class="amen-count-label">people have kept vigil since Vigil began.</div>
+      <div class="amen-count-label">people have kept vigil since Vigil began.<br>Invite someone to keep Vigil with you.</div>
     </div>
 
     <!-- Share block — appears after checkbox is ticked -->
@@ -1441,6 +1479,25 @@ Galatians 5:22 (NRSV)</p></div>
 
       <div class="amen-share-confirmed" id="amen-share-confirmed-d4"></div>
 
+    </div>
+
+    <!-- Standing invitation -->
+    <div class="amen-invitation-section">
+      <button class="amen-invitation-trigger" onclick="amenToggleInvitation('d4')" tabindex="0">
+        <div class="amen-invitation-trigger-inner">
+          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
+          <span class="amen-invitation-arrow" id="amen-inv-arrow-d4">›</span>
+        </div>
+      </button>
+      <div class="amen-invitation-panel" id="amen-inv-panel-d4">
+        <div class="amen-invitation-panel-inner">
+          <div class="amen-invitation-message">I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.</div>
+          <div id="amen-inv-actions-d4">
+            <button class="amen-invitation-send" onclick="amenSendInvitation('d4')">Send invitation</button>
+          </div>
+          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d4"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
@@ -1568,7 +1625,7 @@ Galatians 5:22 (NRSV)</p></div>
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
     <div class="amen-count-block" id="amen-count-d5">
       <div class="amen-count-number" id="amen-count-num-d5">—</div>
-      <div class="amen-count-label">people have kept vigil since Vigil began.</div>
+      <div class="amen-count-label">people have kept vigil since Vigil began.<br>Invite someone to keep Vigil with you.</div>
     </div>
 
     <!-- Share block — appears after checkbox is ticked -->
@@ -1586,6 +1643,25 @@ Galatians 5:22 (NRSV)</p></div>
 
       <div class="amen-share-confirmed" id="amen-share-confirmed-d5"></div>
 
+    </div>
+
+    <!-- Standing invitation -->
+    <div class="amen-invitation-section">
+      <button class="amen-invitation-trigger" onclick="amenToggleInvitation('d5')" tabindex="0">
+        <div class="amen-invitation-trigger-inner">
+          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
+          <span class="amen-invitation-arrow" id="amen-inv-arrow-d5">›</span>
+        </div>
+      </button>
+      <div class="amen-invitation-panel" id="amen-inv-panel-d5">
+        <div class="amen-invitation-panel-inner">
+          <div class="amen-invitation-message">I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.</div>
+          <div id="amen-inv-actions-d5">
+            <button class="amen-invitation-send" onclick="amenSendInvitation('d5')">Send invitation</button>
+          </div>
+          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d5"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
@@ -1707,7 +1783,7 @@ Agapē is always more verb than noun — chosen, willed, and returned to again a
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
     <div class="amen-count-block" id="amen-count-d6">
       <div class="amen-count-number" id="amen-count-num-d6">—</div>
-      <div class="amen-count-label">people have kept vigil since Vigil began.</div>
+      <div class="amen-count-label">people have kept vigil since Vigil began.<br>Invite someone to keep Vigil with you.</div>
     </div>
 
     <!-- Share block — appears after checkbox is ticked -->
@@ -1725,6 +1801,25 @@ Agapē is always more verb than noun — chosen, willed, and returned to again a
 
       <div class="amen-share-confirmed" id="amen-share-confirmed-d6"></div>
 
+    </div>
+
+    <!-- Standing invitation -->
+    <div class="amen-invitation-section">
+      <button class="amen-invitation-trigger" onclick="amenToggleInvitation('d6')" tabindex="0">
+        <div class="amen-invitation-trigger-inner">
+          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
+          <span class="amen-invitation-arrow" id="amen-inv-arrow-d6">›</span>
+        </div>
+      </button>
+      <div class="amen-invitation-panel" id="amen-inv-panel-d6">
+        <div class="amen-invitation-panel-inner">
+          <div class="amen-invitation-message">I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.</div>
+          <div id="amen-inv-actions-d6">
+            <button class="amen-invitation-send" onclick="amenSendInvitation('d6')">Send invitation</button>
+          </div>
+          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d6"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
@@ -1848,7 +1943,7 @@ John 15:16 — NRSV</p></div>
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
     <div class="amen-count-block" id="amen-count-d7">
       <div class="amen-count-number" id="amen-count-num-d7">—</div>
-      <div class="amen-count-label">people have kept vigil since Vigil began.</div>
+      <div class="amen-count-label">people have kept vigil since Vigil began.<br>Invite someone to keep Vigil with you.</div>
     </div>
 
     <!-- Share block — appears after checkbox is ticked -->
@@ -1866,6 +1961,25 @@ John 15:16 — NRSV</p></div>
 
       <div class="amen-share-confirmed" id="amen-share-confirmed-d7"></div>
 
+    </div>
+
+    <!-- Standing invitation -->
+    <div class="amen-invitation-section">
+      <button class="amen-invitation-trigger" onclick="amenToggleInvitation('d7')" tabindex="0">
+        <div class="amen-invitation-trigger-inner">
+          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
+          <span class="amen-invitation-arrow" id="amen-inv-arrow-d7">›</span>
+        </div>
+      </button>
+      <div class="amen-invitation-panel" id="amen-inv-panel-d7">
+        <div class="amen-invitation-panel-inner">
+          <div class="amen-invitation-message">I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.</div>
+          <div id="amen-inv-actions-d7">
+            <button class="amen-invitation-send" onclick="amenSendInvitation('d7')">Send invitation</button>
+          </div>
+          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d7"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
@@ -1989,7 +2103,7 @@ Hold those we bring today — the ones we are worried for, the ones we have almo
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
     <div class="amen-count-block" id="amen-count-d8">
       <div class="amen-count-number" id="amen-count-num-d8">—</div>
-      <div class="amen-count-label">people have kept vigil since Vigil began.</div>
+      <div class="amen-count-label">people have kept vigil since Vigil began.<br>Invite someone to keep Vigil with you.</div>
     </div>
 
     <!-- Share block — appears after checkbox is ticked -->
@@ -2007,6 +2121,25 @@ Hold those we bring today — the ones we are worried for, the ones we have almo
 
       <div class="amen-share-confirmed" id="amen-share-confirmed-d8"></div>
 
+    </div>
+
+    <!-- Standing invitation -->
+    <div class="amen-invitation-section">
+      <button class="amen-invitation-trigger" onclick="amenToggleInvitation('d8')" tabindex="0">
+        <div class="amen-invitation-trigger-inner">
+          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
+          <span class="amen-invitation-arrow" id="amen-inv-arrow-d8">›</span>
+        </div>
+      </button>
+      <div class="amen-invitation-panel" id="amen-inv-panel-d8">
+        <div class="amen-invitation-panel-inner">
+          <div class="amen-invitation-message">I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.</div>
+          <div id="amen-inv-actions-d8">
+            <button class="amen-invitation-send" onclick="amenSendInvitation('d8')">Send invitation</button>
+          </div>
+          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d8"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
@@ -2434,26 +2567,23 @@ const amenCounted = {};
 function amenCheck(row) {
   const uid     = row.dataset.uid;
   const box     = document.getElementById('amen-box-' + uid);
-  const hero    = document.getElementById('amen-hero-' + uid);
   const word    = document.getElementById('amen-word-' + uid);
   const comm    = document.getElementById('amen-commission-' + uid);
   const share   = document.getElementById('amen-share-' + uid);
   const checked = box.classList.toggle('amen-checked');
   row.setAttribute('aria-checked', String(checked));
+  word.classList.toggle('amen-visible', checked);
   if (checked) {
     if (!amenCounted[uid]) { amenCounted[uid] = true; amenIncrementCount(); }
+    vigilRecordKept();
     amenPrebuildShareImage(uid);
-    // Entrance — wipe down, top to bottom, 300ms stagger
-    setTimeout(() => { if (hero) hero.classList.add('amen-hero-checked'); },    0);
-    setTimeout(() => word.classList.add('amen-visible'),                       300);
-    setTimeout(() => comm.classList.add('amen-visible'),                       600);
-    setTimeout(() => share.classList.add('amen-visible'),                      900);
+    setTimeout(() => comm.classList.add('amen-visible'), 700);
+    setTimeout(() => {
+      share.classList.add('amen-visible');
+    }, 1200);
   } else {
-    // Exit — wipe up, bottom to top, 300ms stagger (mirror of entrance)
+    comm.classList.remove('amen-visible');
     share.classList.remove('amen-visible');
-    setTimeout(() => comm.classList.remove('amen-visible'),                    300);
-    setTimeout(() => word.classList.remove('amen-visible'),                    600);
-    setTimeout(() => { if (hero) hero.classList.remove('amen-hero-checked'); }, 900);
     const initial   = document.getElementById('amen-share-initial-' + uid);
     const confirmed = document.getElementById('amen-share-confirmed-' + uid);
     if (initial)   initial.style.display = '';
@@ -2635,15 +2765,6 @@ function amenNotNow(uid) {
     share.classList.remove('amen-visible');
     share.style.opacity = '';
   }, 320);
-  // Return to resting completed state — no further calls to action
-  const inv = share.closest('.screen-inner')
-    ? share.closest('.screen-inner').querySelector('.amen-invitation-section')
-    : null;
-  if (inv) {
-    inv.style.transition = 'opacity 0.3s ease';
-    inv.style.opacity    = '0';
-    setTimeout(() => { inv.style.display = 'none'; }, 320);
-  }
 }
 
 const amenInvOpen = {};
@@ -2705,10 +2826,47 @@ function amenExecCopy(text, cb) {
 
 // ── Notification permission ────────────────────────────────────────────────
 
+// Re-prompt interval: number of days after "not now" before we offer again,
+// provided the user has been keeping vigil consistently.
+const NOTIF_REPROMPT_DAYS = 7;
+
+function vigilTodayISO() {
+  const now = new Date();
+  return now.getFullYear() + '-'
+    + String(now.getMonth() + 1).padStart(2, '0') + '-'
+    + String(now.getDate()).padStart(2, '0');
+}
+
+function vigilRecordKept() {
+  // Called when the user ticks "I kept Vigil today" — records today's date.
+  localStorage.setItem('vigil-last-kept', vigilTodayISO());
+}
+
+function vigilShouldShowNotifPrompt() {
+  // Never show if notifications already granted or explicitly enabled.
+  if (typeof Notification !== 'undefined' && Notification.permission === 'granted') return false;
+
+  const dismissed = localStorage.getItem('vigil-notif-dismissed');
+
+  if (!dismissed) {
+    // Never dismissed — show on first visit to Screen 7.
+    return true;
+  }
+
+  // Dismissed before — only re-prompt if:
+  // (a) enough days have passed since dismissal, AND
+  // (b) the user kept vigil today (i.e. they are an active user returning).
+  const dismissedDate = new Date(dismissed);
+  const today = new Date(vigilTodayISO());
+  const daysSince = Math.floor((today - dismissedDate) / 86400000);
+  const keptToday = localStorage.getItem('vigil-last-kept') === vigilTodayISO();
+
+  return daysSince >= NOTIF_REPROMPT_DAYS && keptToday;
+}
+
 function vigilMaybeShowNotifPrompt(screenIndex) {
   if (screenIndex !== 6) return;
-  if (localStorage.getItem('vigil-notif-dismissed')) return;
-  if (typeof Notification !== 'undefined' && Notification.permission !== 'default') return;
+  if (!vigilShouldShowNotifPrompt()) return;
   const uid = 'd' + (currentDay + 1);
   const el = document.getElementById('amen-notif-' + uid);
   if (el) el.style.display = 'block';
@@ -2718,7 +2876,8 @@ function vigilRequestNotification(uid) {
   if (window.OneSignalDeferred) {
     OneSignalDeferred.push(async function(OneSignal) {
       await OneSignal.Notifications.requestPermission();
-      localStorage.setItem('vigil-notif-dismissed', '1');
+      // Mark as permanently handled — don't prompt again.
+      localStorage.setItem('vigil-notif-dismissed', 'granted');
       const el = document.getElementById('amen-notif-' + uid);
       if (el) el.style.display = 'none';
     });
@@ -2726,7 +2885,9 @@ function vigilRequestNotification(uid) {
 }
 
 function vigilDismissNotification(uid) {
-  localStorage.setItem('vigil-notif-dismissed', '1');
+  // Store today's date so we know when they last dismissed,
+  // allowing a behaviour-triggered re-prompt after NOTIF_REPROMPT_DAYS.
+  localStorage.setItem('vigil-notif-dismissed', vigilTodayISO());
   const el = document.getElementById('amen-notif-' + uid);
   if (el) el.style.display = 'none';
 }
