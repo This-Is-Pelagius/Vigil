@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-01 08:47 · 1 May 2026 – 7 May 2026 (7 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-01 09:06 · 1 May 2026 – 7 May 2026 (7 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -2545,7 +2545,8 @@ function amenExecCopy(text, cb) {
 
 // ── Notification permission ────────────────────────────────────────────────
 
-const NOTIF_REPROMPT_DAYS = 7;
+// Number of consecutive days kept before the prompt re-appears after dismissal.
+const NOTIF_REPROMPT_DAYS = 4;
 
 function vigilTodayISO() {
   const now = new Date();
@@ -2554,17 +2555,46 @@ function vigilTodayISO() {
     + String(now.getDate()).padStart(2, '0');
 }
 
+// Add today's date to the kept-dates log and trim the list to the last
+// NOTIF_REPROMPT_DAYS entries — we never need more than that.
 function vigilRecordKept() {
-  localStorage.setItem('vigil-last-kept', vigilTodayISO());
+  const today = vigilTodayISO();
+  let dates = [];
+  try { dates = JSON.parse(localStorage.getItem('vigil-kept-dates') || '[]'); } catch(e) {}
+  if (!dates.includes(today)) dates.push(today);
+  dates.sort();
+  dates = dates.slice(-NOTIF_REPROMPT_DAYS);
+  localStorage.setItem('vigil-kept-dates', JSON.stringify(dates));
+}
+
+// Returns true if the kept-dates log contains a run of NOTIF_REPROMPT_DAYS
+// consecutive calendar days ending on today.
+function vigilHasStreak() {
+  const today = vigilTodayISO();
+  let dates = [];
+  try { dates = JSON.parse(localStorage.getItem('vigil-kept-dates') || '[]'); } catch(e) {}
+  if (dates.length < NOTIF_REPROMPT_DAYS) return false;
+  const recent = dates.slice(-NOTIF_REPROMPT_DAYS);
+  // The last entry must be today.
+  if (recent[recent.length - 1] !== today) return false;
+  // Each entry must be exactly one calendar day before the next.
+  for (let i = 1; i < recent.length; i++) {
+    const diff = (new Date(recent[i]) - new Date(recent[i - 1])) / 86400000;
+    if (diff !== 1) return false;
+  }
+  return true;
 }
 
 function vigilShouldShowNotifPrompt() {
   if (typeof Notification !== 'undefined' && Notification.permission === 'granted') return false;
+  if (typeof Notification !== 'undefined' && Notification.permission === 'denied') return false;
   const dismissed = localStorage.getItem('vigil-notif-dismissed');
+  // Never shown before — show it.
   if (!dismissed) return true;
-  const daysSince = Math.floor((new Date(vigilTodayISO()) - new Date(dismissed)) / 86400000);
-  const keptToday = localStorage.getItem('vigil-last-kept') === vigilTodayISO();
-  return daysSince >= NOTIF_REPROMPT_DAYS && keptToday;
+  // Permanently dismissed after granting (should be caught above, but guard anyway).
+  if (dismissed === 'granted') return false;
+  // Re-prompt only when the user has kept a streak of NOTIF_REPROMPT_DAYS consecutive days.
+  return vigilHasStreak();
 }
 
 function vigilMaybeShowNotifPrompt(screenIndex) {
@@ -2587,6 +2617,8 @@ function vigilRequestNotification(uid) {
 }
 
 function vigilDismissNotification(uid) {
+  // Record the dismissal date so we can measure streaks from this point,
+  // but do not clear the kept-dates log — the streak continues to accrue.
   localStorage.setItem('vigil-notif-dismissed', vigilTodayISO());
   const el = document.getElementById('amen-notif-' + uid);
   if (el) el.style.display = 'none';
