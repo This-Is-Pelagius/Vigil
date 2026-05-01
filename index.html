@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-01 09:06 · 1 May 2026 – 7 May 2026 (7 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-01 09:15 · 1 May 2026 – 7 May 2026 (7 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -2606,13 +2606,19 @@ function vigilMaybeShowNotifPrompt(screenIndex) {
 }
 
 function vigilRequestNotification(uid) {
-  if (window.OneSignalDeferred) {
-    OneSignalDeferred.push(async function(OneSignal) {
-      await OneSignal.Notifications.requestPermission();
+  function doRequest() {
+    OneSignal.Notifications.requestPermission().then(function() {
       localStorage.setItem('vigil-notif-dismissed', 'granted');
       const el = document.getElementById('amen-notif-' + uid);
       if (el) el.style.display = 'none';
     });
+  }
+  // By the time the user taps the button, the SDK will already be initialised.
+  // Call it directly. Fall back to the deferred queue only if somehow it is not.
+  if (window.OneSignal && window.OneSignal.Notifications) {
+    doRequest();
+  } else if (window.OneSignalDeferred) {
+    OneSignalDeferred.push(async function(OneSignal) { doRequest(); });
   }
 }
 
