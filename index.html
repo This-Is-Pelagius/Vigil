@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-01 09:15 · 1 May 2026 – 7 May 2026 (7 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-01 09:29 · 1 May 2026 – 7 May 2026 (7 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -1020,12 +1020,30 @@ body { overflow: hidden; }
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
+    <!-- State is set by vigilMaybeShowNotifPrompt() based on browser/platform detection -->
     <div class="amen-notif-section" id="amen-notif-d1">
-      <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d1')">
-        Turn on notifications
-      </button>
-      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d1')">Not now</button>
+
+      <!-- State 1: normal — browser supports web push (Android, desktop) -->
+      <div id="amen-notif-normal-d1" style="display:none">
+        <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
+        <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d1')">
+          Turn on notifications
+        </button>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d1')">Not now</button>
+      </div>
+
+      <!-- State 2: iOS Safari in browser tab — can install as PWA -->
+      <div id="amen-notif-ios-safari-d1" style="display:none">
+        <div class="amen-notif-prompt">To receive morning notifications, add Vigil to your home screen. Tap the share icon in Safari, then choose <em>Add to Home Screen</em>.</div>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d1')">Dismiss</button>
+      </div>
+
+      <!-- State 3: iOS other browser — must switch to Safari -->
+      <div id="amen-notif-ios-other-d1" style="display:none">
+        <div class="amen-notif-prompt">Morning notifications are only available when Vigil is opened in Safari on iPhone. Open <em>dailyvigil.app</em> in Safari, then add it to your home screen.</div>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d1')">Dismiss</button>
+      </div>
+
     </div>
 
     <div class="amen-spacer"></div></div>
@@ -1161,12 +1179,30 @@ body { overflow: hidden; }
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
+    <!-- State is set by vigilMaybeShowNotifPrompt() based on browser/platform detection -->
     <div class="amen-notif-section" id="amen-notif-d2">
-      <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d2')">
-        Turn on notifications
-      </button>
-      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d2')">Not now</button>
+
+      <!-- State 1: normal — browser supports web push (Android, desktop) -->
+      <div id="amen-notif-normal-d2" style="display:none">
+        <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
+        <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d2')">
+          Turn on notifications
+        </button>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d2')">Not now</button>
+      </div>
+
+      <!-- State 2: iOS Safari in browser tab — can install as PWA -->
+      <div id="amen-notif-ios-safari-d2" style="display:none">
+        <div class="amen-notif-prompt">To receive morning notifications, add Vigil to your home screen. Tap the share icon in Safari, then choose <em>Add to Home Screen</em>.</div>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d2')">Dismiss</button>
+      </div>
+
+      <!-- State 3: iOS other browser — must switch to Safari -->
+      <div id="amen-notif-ios-other-d2" style="display:none">
+        <div class="amen-notif-prompt">Morning notifications are only available when Vigil is opened in Safari on iPhone. Open <em>dailyvigil.app</em> in Safari, then add it to your home screen.</div>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d2')">Dismiss</button>
+      </div>
+
     </div>
 
     <div class="amen-spacer"></div></div>
@@ -1300,12 +1336,30 @@ Galatians 5:22 (NRSV)</p></div>
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
+    <!-- State is set by vigilMaybeShowNotifPrompt() based on browser/platform detection -->
     <div class="amen-notif-section" id="amen-notif-d3">
-      <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d3')">
-        Turn on notifications
-      </button>
-      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d3')">Not now</button>
+
+      <!-- State 1: normal — browser supports web push (Android, desktop) -->
+      <div id="amen-notif-normal-d3" style="display:none">
+        <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
+        <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d3')">
+          Turn on notifications
+        </button>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d3')">Not now</button>
+      </div>
+
+      <!-- State 2: iOS Safari in browser tab — can install as PWA -->
+      <div id="amen-notif-ios-safari-d3" style="display:none">
+        <div class="amen-notif-prompt">To receive morning notifications, add Vigil to your home screen. Tap the share icon in Safari, then choose <em>Add to Home Screen</em>.</div>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d3')">Dismiss</button>
+      </div>
+
+      <!-- State 3: iOS other browser — must switch to Safari -->
+      <div id="amen-notif-ios-other-d3" style="display:none">
+        <div class="amen-notif-prompt">Morning notifications are only available when Vigil is opened in Safari on iPhone. Open <em>dailyvigil.app</em> in Safari, then add it to your home screen.</div>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d3')">Dismiss</button>
+      </div>
+
     </div>
 
     <div class="amen-spacer"></div></div>
@@ -1445,12 +1499,30 @@ Galatians 5:22 (NRSV)</p></div>
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
+    <!-- State is set by vigilMaybeShowNotifPrompt() based on browser/platform detection -->
     <div class="amen-notif-section" id="amen-notif-d4">
-      <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d4')">
-        Turn on notifications
-      </button>
-      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d4')">Not now</button>
+
+      <!-- State 1: normal — browser supports web push (Android, desktop) -->
+      <div id="amen-notif-normal-d4" style="display:none">
+        <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
+        <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d4')">
+          Turn on notifications
+        </button>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d4')">Not now</button>
+      </div>
+
+      <!-- State 2: iOS Safari in browser tab — can install as PWA -->
+      <div id="amen-notif-ios-safari-d4" style="display:none">
+        <div class="amen-notif-prompt">To receive morning notifications, add Vigil to your home screen. Tap the share icon in Safari, then choose <em>Add to Home Screen</em>.</div>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d4')">Dismiss</button>
+      </div>
+
+      <!-- State 3: iOS other browser — must switch to Safari -->
+      <div id="amen-notif-ios-other-d4" style="display:none">
+        <div class="amen-notif-prompt">Morning notifications are only available when Vigil is opened in Safari on iPhone. Open <em>dailyvigil.app</em> in Safari, then add it to your home screen.</div>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d4')">Dismiss</button>
+      </div>
+
     </div>
 
     <div class="amen-spacer"></div></div>
@@ -1584,12 +1656,30 @@ Agapē is always more verb than noun — chosen, willed, and returned to again a
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
+    <!-- State is set by vigilMaybeShowNotifPrompt() based on browser/platform detection -->
     <div class="amen-notif-section" id="amen-notif-d5">
-      <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d5')">
-        Turn on notifications
-      </button>
-      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d5')">Not now</button>
+
+      <!-- State 1: normal — browser supports web push (Android, desktop) -->
+      <div id="amen-notif-normal-d5" style="display:none">
+        <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
+        <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d5')">
+          Turn on notifications
+        </button>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d5')">Not now</button>
+      </div>
+
+      <!-- State 2: iOS Safari in browser tab — can install as PWA -->
+      <div id="amen-notif-ios-safari-d5" style="display:none">
+        <div class="amen-notif-prompt">To receive morning notifications, add Vigil to your home screen. Tap the share icon in Safari, then choose <em>Add to Home Screen</em>.</div>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d5')">Dismiss</button>
+      </div>
+
+      <!-- State 3: iOS other browser — must switch to Safari -->
+      <div id="amen-notif-ios-other-d5" style="display:none">
+        <div class="amen-notif-prompt">Morning notifications are only available when Vigil is opened in Safari on iPhone. Open <em>dailyvigil.app</em> in Safari, then add it to your home screen.</div>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d5')">Dismiss</button>
+      </div>
+
     </div>
 
     <div class="amen-spacer"></div></div>
@@ -1725,12 +1815,30 @@ John 15:16 — NRSV</p></div>
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
+    <!-- State is set by vigilMaybeShowNotifPrompt() based on browser/platform detection -->
     <div class="amen-notif-section" id="amen-notif-d6">
-      <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d6')">
-        Turn on notifications
-      </button>
-      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d6')">Not now</button>
+
+      <!-- State 1: normal — browser supports web push (Android, desktop) -->
+      <div id="amen-notif-normal-d6" style="display:none">
+        <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
+        <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d6')">
+          Turn on notifications
+        </button>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d6')">Not now</button>
+      </div>
+
+      <!-- State 2: iOS Safari in browser tab — can install as PWA -->
+      <div id="amen-notif-ios-safari-d6" style="display:none">
+        <div class="amen-notif-prompt">To receive morning notifications, add Vigil to your home screen. Tap the share icon in Safari, then choose <em>Add to Home Screen</em>.</div>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d6')">Dismiss</button>
+      </div>
+
+      <!-- State 3: iOS other browser — must switch to Safari -->
+      <div id="amen-notif-ios-other-d6" style="display:none">
+        <div class="amen-notif-prompt">Morning notifications are only available when Vigil is opened in Safari on iPhone. Open <em>dailyvigil.app</em> in Safari, then add it to your home screen.</div>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d6')">Dismiss</button>
+      </div>
+
     </div>
 
     <div class="amen-spacer"></div></div>
@@ -1866,12 +1974,30 @@ Hold those we bring today — the ones we are worried for, the ones we have almo
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
+    <!-- State is set by vigilMaybeShowNotifPrompt() based on browser/platform detection -->
     <div class="amen-notif-section" id="amen-notif-d7">
-      <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d7')">
-        Turn on notifications
-      </button>
-      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d7')">Not now</button>
+
+      <!-- State 1: normal — browser supports web push (Android, desktop) -->
+      <div id="amen-notif-normal-d7" style="display:none">
+        <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
+        <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d7')">
+          Turn on notifications
+        </button>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d7')">Not now</button>
+      </div>
+
+      <!-- State 2: iOS Safari in browser tab — can install as PWA -->
+      <div id="amen-notif-ios-safari-d7" style="display:none">
+        <div class="amen-notif-prompt">To receive morning notifications, add Vigil to your home screen. Tap the share icon in Safari, then choose <em>Add to Home Screen</em>.</div>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d7')">Dismiss</button>
+      </div>
+
+      <!-- State 3: iOS other browser — must switch to Safari -->
+      <div id="amen-notif-ios-other-d7" style="display:none">
+        <div class="amen-notif-prompt">Morning notifications are only available when Vigil is opened in Safari on iPhone. Open <em>dailyvigil.app</em> in Safari, then add it to your home screen.</div>
+        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d7')">Dismiss</button>
+      </div>
+
     </div>
 
     <div class="amen-spacer"></div></div>
@@ -2597,12 +2723,35 @@ function vigilShouldShowNotifPrompt() {
   return vigilHasStreak();
 }
 
+// ── Notification browser detection ───────────────────────────────────────────
+
+function vigilGetNotifState() {
+  // Returns 'normal', 'ios-safari', or 'ios-other'.
+  const ua = navigator.userAgent;
+  const isIOS = /iP(hone|ad|od)/.test(ua) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (!isIOS) return 'normal';
+  // Installed PWA on iOS behaves like normal — notifications are supported.
+  if (window.navigator.standalone === true) return 'normal';
+  // Detect Safari: has WebKit, does not have CriOS/FxiOS/EdgiOS/OPiOS/DuckDuckGo etc.
+  const isSafari = /WebKit/.test(ua) &&
+                   !/CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo|Brave|SamsungBrowser/.test(ua) &&
+                   typeof safari !== 'undefined';
+  return isSafari ? 'ios-safari' : 'ios-other';
+}
+
 function vigilMaybeShowNotifPrompt(screenIndex) {
   if (screenIndex !== 6) return;
   if (!vigilShouldShowNotifPrompt()) return;
-  const uid = 'd' + (currentDay + 1);
-  const el = document.getElementById('amen-notif-' + uid);
-  if (el) el.style.display = 'block';
+  const uid   = 'd' + (currentDay + 1);
+  const outer = document.getElementById('amen-notif-' + uid);
+  if (!outer) return;
+  const state = vigilGetNotifState();
+  const inner = document.getElementById('amen-notif-' + state + '-' + uid);
+  if (inner) {
+    outer.style.display = 'block';
+    inner.style.display = 'block';
+  }
 }
 
 function vigilRequestNotification(uid) {
