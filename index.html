@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-04-30 19:26 · 30 April 2026 – 7 May 2026 (8 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-01 08:34 · 1 May 2026 – 7 May 2026 (7 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -599,7 +599,11 @@ body { overflow: hidden; }
   text-align: center; width: 100%;
   padding: 0.5rem 0 1.8rem;
   margin-bottom: 0;
-  border-bottom: 1px solid var(--accent-soft);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.9s ease;
+}
+.amen-hero.amen-hero-checked {
+  border-bottom-color: var(--accent-soft);
 }
 
 .amen-checkbox-row {
@@ -637,10 +641,15 @@ body { overflow: hidden; }
 .amen-word-block {
   display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
   width: 100%;
-  opacity: 0; transform: translateY(6px);
-  transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
+  opacity: 0; transform: translateY(-4px);
+  max-height: 0; overflow: hidden; margin-bottom: 0;
+  transition: opacity 0.9s ease, transform 0.9s ease,
+              max-height 0.9s ease, margin-bottom 0.9s ease;
 }
-.amen-word-block.amen-visible { opacity: 1; transform: translateY(0); }
+.amen-word-block.amen-visible {
+  opacity: 1; transform: translateY(0);
+  max-height: 300px; margin-bottom: 0;
+}
 .amen-word-rule {
   width: 2rem; height: 1px;
   background: linear-gradient(to right, transparent, var(--gold), transparent);
@@ -663,19 +672,19 @@ body { overflow: hidden; }
 
 .amen-commission {
   width: 100%; text-align: center;
-  padding: 0; max-height: 0; overflow: visible;
-  border-top: 0px solid var(--accent-soft);
-  border-bottom: 0px solid var(--accent-soft);
+  padding: 0; max-height: 0; overflow: hidden;
+  border-top: 1px solid var(--accent-soft);
+  border-bottom: 1px solid var(--accent-soft);
   margin-bottom: 0;
-  opacity: 0;
-  transition: opacity 0.55s ease, max-height 0.55s ease, padding 0.55s ease,
-              margin-bottom 0.55s ease, border-top-width 0.3s ease, border-bottom-width 0.3s ease;
+  opacity: 0; transform: translateY(-4px);
+  transition: opacity 0.9s ease, transform 0.9s ease,
+              max-height 0.9s ease, padding 0.9s ease, margin-bottom 0.9s ease;
+  pointer-events: none;
 }
 .amen-commission.amen-visible {
-  opacity: 1; max-height: 300px;
-  padding: 1.6rem 0 1.4rem;
-  border-top-width: 1px; border-bottom-width: 1px;
-  margin-bottom: 1.6rem;
+  opacity: 1; transform: translateY(0);
+  max-height: 300px; padding: 1.6rem 0 1.4rem; margin-bottom: 1.6rem;
+  pointer-events: auto;
 }
 .amen-commission-line1 {
   font-family: 'Cormorant Garamond', serif;
@@ -701,12 +710,16 @@ body { overflow: hidden; }
 
 .amen-share-block {
   width: 100%; text-align: center;
-  opacity: 0; max-height: 0; overflow: hidden;
-  transition: opacity 0.4s ease, max-height 0.4s ease, margin-bottom 0.4s ease;
-  pointer-events: none; margin-bottom: 0;
+  opacity: 0; transform: translateY(-4px);
+  max-height: 0; overflow: hidden; margin-bottom: 0;
+  transition: opacity 0.9s ease, transform 0.9s ease,
+              max-height 0.9s ease, margin-bottom 0.9s ease;
+  pointer-events: none;
 }
 .amen-share-block.amen-visible {
-  opacity: 1; max-height: 700px; pointer-events: all; margin-bottom: 1.6rem;
+  opacity: 1; transform: translateY(0);
+  max-height: 700px; margin-bottom: 1.6rem;
+  pointer-events: all;
 }
 .amen-share-prompt {
   font-family: 'Libre Baskerville', serif; font-size: 1rem; font-style: italic;
@@ -888,147 +901,6 @@ body { overflow: hidden; }
       <div class="screen-fade-top"></div>
       <div class="screen-label">Season</div>
       <div class="screen-inner">
-<div class="season-day">Thursday</div>
-<div class="season-week">Eastertide · Week Four</div>
-<div class="season-feast">Optional Memorial · <button type="button" class="figure-link" data-figure="st_pius_v">St Pius V</button>, Pope</div>
-<div class="season-divider"></div>
-<div class="season-body"><p>We are in the fourth week of Eastertide, where resurrection begins to look less like astonishment and more like a life held steady by God.</p>
-<p>Today the Church remembers <button type="button" class="figure-link" data-figure="st_pius_v">St Pius V</button>, a pope whose life was shaped by reform, worship and the guarding of faith in a divided age.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-word" data-screen="1" aria-label="Word">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Word</div>
-      <div class="screen-inner">
-<div class="word-title">STEADFAST</div>
-<div class="word-pronunciation">[sted-fast]</div>
-<div class="word-divider"></div>
-<div class="word-definition"><p>To be steadfast is not simply to be stubborn. It is to remain true when pressure, fear or time would make it easier to drift.</p>
-<p>The word comes from a psalm the Church hears in Eastertide, where God’s love is described as established for ever. Steadfastness is love with staying power: not a passing warmth, but a faithfulness firm enough to be lived from.</p></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Scripture</div>
-      <div class="screen-inner">
-<div class="scripture-passage">
-<div class="scripture-block">
-  <div class="scripture-text"><p>“I declare that your steadfast love is established forever; your faithfulness is as firm as the heavens.”</p></div>
-</div>
-<div class="scripture-translation">Psalm 89:2 — NRSV</div>
-</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-contemplation" data-screen="3" aria-label="Contemplation">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Contemplation</div>
-      <div class="screen-inner">
-<div class="contemplation-body"><p>We often think of love as something that rises and falls with feeling. It warms, cools, strengthens, fades.</p>
-<p>But the psalm speaks of love established — not improvised, not reactive, not dependent on the weather inside us. God’s steadfast love is not fragile in the way ours often is. It is firm enough to hold us while we are still learning how to stay.</p></div>
-<div class="contemplation-question">Where has your love become changeable because it is tired, hurt or afraid? Where has God already made you steadier than you used to be?</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-prayer" data-screen="4" aria-label="Prayer">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Prayer</div>
-      <div class="screen-inner">
-<div class="prayer-block">
-  <div class="prayer-body">
-<p>Lord,</p>
-<p>Your steadfast love is established for ever.</p>
-<p>Where our love flickers, hold us in yours.</p>
-<p>Where we have become unreliable through fear, weariness or resentment, make us steady again.</p>
-<p>Teach us a faithfulness that does not depend only on feeling.</p>
-<p>Let your constancy become visible in the way we remain.</p>
-  </div>
-  <div class="prayer-amen">In Christ’s name, Amen.</div>
-</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-practice" data-screen="5" aria-label="Practice">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Practice</div>
-      <div class="screen-inner">
-<div class="practice-body"><p>Today, choose one small act of faithful remaining: answer a message you have avoided, keep a promise quietly or return to a prayer you had let slip. Do it without drama.</p></div>
-<div class="practice-anchor">Steadfast love is often practised before it is felt.</div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-    <section class="screen screen-amen" data-screen="6" aria-label="Amen">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Amen</div>
-      <div class="screen-inner">
-
-    <!-- Completion hero -->
-    <div class="amen-hero" id="amen-hero-d1">
-
-      <div class="amen-checkbox-row"
-           role="checkbox" aria-checked="false" tabindex="0"
-           data-uid="d1"
-           onclick="amenCheck(this)"
-           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenCheck(this)}">
-        <div class="amen-checkbox-outer" id="amen-box-d1">
-          <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <polyline points="3,9 7,13 15,4.5"
-              stroke="currentColor" stroke-width="1.5"
-              stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="amen-checkbox-label">I kept Vigil today.</div>
-      </div>
-
-      <div class="amen-word-block" id="amen-word-d1">
-        <div class="amen-word-name">Steadfast</div>
-      </div>
-
-    </div>
-
-    <!-- Commission phrase -->
-    <div class="amen-commission" id="amen-commission-d1">
-      <div class="amen-commission-line1">Go in peace.</div>
-      <div class="amen-commission-line1">And carry the Word with you.</div>
-    </div>
-
-    <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
-    <div class="amen-count-block" id="amen-count-d1">
-      <div class="amen-count-number" id="amen-count-num-d1">—</div>
-      <div class="amen-count-label">people have kept vigil since Vigil began.</div>
-    </div>
-
-    <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-d1">
-
-      <div id="amen-share-initial-d1">
-        <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
-        <button class="amen-share-btn-primary"
-                onclick="amenShareImage('d1')">Share today's Vigil</button>
-        <button class="amen-share-btn-secondary"
-                onclick="amenShareApp('d1')">Share the app</button>
-        <button class="amen-not-now-btn"
-                onclick="amenNotNow('d1')">Not now</button>
-      </div>
-
-      <div class="amen-share-confirmed" id="amen-share-confirmed-d1"></div>
-
-    </div>
-
-    <!-- Notification prompt — shown once, only if not already subscribed -->
-    <div class="amen-notif-section" id="amen-notif-d1">
-      <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d1')">
-        Turn on notifications
-      </button>
-      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d1')">Not now</button>
-    </div>
-
-    <div class="amen-spacer"></div></div>
-      <div class="screen-fade-bottom"></div>
-    </section>
-  </div>
-  <div class="day-screens" data-day="1" style="display:none">
-    <section class="screen screen-season" data-screen="0" aria-label="Season">
-      <div class="screen-fade-top"></div>
-      <div class="screen-label">Season</div>
-      <div class="screen-inner">
 <div class="season-day">Friday</div>
 <div class="season-week">Eastertide · Week Four</div>
 <div class="season-feast">Optional Memorial · <button type="button" class="figure-link" data-figure="st_joseph_the_worker">St Joseph the Worker</button></div>
@@ -1098,14 +970,14 @@ body { overflow: hidden; }
       <div class="screen-inner">
 
     <!-- Completion hero -->
-    <div class="amen-hero" id="amen-hero-d2">
+    <div class="amen-hero" id="amen-hero-d1">
 
       <div class="amen-checkbox-row"
            role="checkbox" aria-checked="false" tabindex="0"
-           data-uid="d2"
+           data-uid="d1"
            onclick="amenCheck(this)"
            onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenCheck(this)}">
-        <div class="amen-checkbox-outer" id="amen-box-d2">
+        <div class="amen-checkbox-outer" id="amen-box-d1">
           <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
             <polyline points="3,9 7,13 15,4.5"
               stroke="currentColor" stroke-width="1.5"
@@ -1115,55 +987,55 @@ body { overflow: hidden; }
         <div class="amen-checkbox-label">I kept Vigil today.</div>
       </div>
 
-      <div class="amen-word-block" id="amen-word-d2">
+      <div class="amen-word-block" id="amen-word-d1">
         <div class="amen-word-name">ABIDE</div>
       </div>
 
     </div>
 
     <!-- Commission phrase -->
-    <div class="amen-commission" id="amen-commission-d2">
+    <div class="amen-commission" id="amen-commission-d1">
       <div class="amen-commission-line1">Go in peace.</div>
       <div class="amen-commission-line1">And carry the Word with you.</div>
     </div>
 
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
-    <div class="amen-count-block" id="amen-count-d2">
-      <div class="amen-count-number" id="amen-count-num-d2">—</div>
+    <div class="amen-count-block" id="amen-count-d1">
+      <div class="amen-count-number" id="amen-count-num-d1">—</div>
       <div class="amen-count-label">people have kept vigil since Vigil began.</div>
     </div>
 
     <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-d2">
+    <div class="amen-share-block" id="amen-share-d1">
 
-      <div id="amen-share-initial-d2">
+      <div id="amen-share-initial-d1">
         <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
         <button class="amen-share-btn-primary"
-                onclick="amenShareImage('d2')">Share today's Vigil</button>
+                onclick="amenShareImage('d1')">Share today's Vigil</button>
         <button class="amen-share-btn-secondary"
-                onclick="amenShareApp('d2')">Share the app</button>
+                onclick="amenShareApp('d1')">Share the app</button>
         <button class="amen-not-now-btn"
-                onclick="amenNotNow('d2')">Not now</button>
+                onclick="amenNotNow('d1')">Not now</button>
       </div>
 
-      <div class="amen-share-confirmed" id="amen-share-confirmed-d2"></div>
+      <div class="amen-share-confirmed" id="amen-share-confirmed-d1"></div>
 
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
-    <div class="amen-notif-section" id="amen-notif-d2">
+    <div class="amen-notif-section" id="amen-notif-d1">
       <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d2')">
+      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d1')">
         Turn on notifications
       </button>
-      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d2')">Not now</button>
+      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d1')">Not now</button>
     </div>
 
     <div class="amen-spacer"></div></div>
       <div class="screen-fade-bottom"></div>
     </section>
   </div>
-  <div class="day-screens" data-day="2" style="display:none">
+  <div class="day-screens" data-day="1" style="display:none">
     <section class="screen screen-season" data-screen="0" aria-label="Season">
       <div class="screen-fade-top"></div>
       <div class="screen-label">Season</div>
@@ -1239,14 +1111,14 @@ body { overflow: hidden; }
       <div class="screen-inner">
 
     <!-- Completion hero -->
-    <div class="amen-hero" id="amen-hero-d3">
+    <div class="amen-hero" id="amen-hero-d2">
 
       <div class="amen-checkbox-row"
            role="checkbox" aria-checked="false" tabindex="0"
-           data-uid="d3"
+           data-uid="d2"
            onclick="amenCheck(this)"
            onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenCheck(this)}">
-        <div class="amen-checkbox-outer" id="amen-box-d3">
+        <div class="amen-checkbox-outer" id="amen-box-d2">
           <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
             <polyline points="3,9 7,13 15,4.5"
               stroke="currentColor" stroke-width="1.5"
@@ -1256,55 +1128,55 @@ body { overflow: hidden; }
         <div class="amen-checkbox-label">I kept Vigil today.</div>
       </div>
 
-      <div class="amen-word-block" id="amen-word-d3">
+      <div class="amen-word-block" id="amen-word-d2">
         <div class="amen-word-name">KNOW</div>
       </div>
 
     </div>
 
     <!-- Commission phrase -->
-    <div class="amen-commission" id="amen-commission-d3">
+    <div class="amen-commission" id="amen-commission-d2">
       <div class="amen-commission-line1">Go in peace.</div>
       <div class="amen-commission-line1">And carry the Word with you.</div>
     </div>
 
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
-    <div class="amen-count-block" id="amen-count-d3">
-      <div class="amen-count-number" id="amen-count-num-d3">—</div>
+    <div class="amen-count-block" id="amen-count-d2">
+      <div class="amen-count-number" id="amen-count-num-d2">—</div>
       <div class="amen-count-label">people have kept vigil since Vigil began.</div>
     </div>
 
     <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-d3">
+    <div class="amen-share-block" id="amen-share-d2">
 
-      <div id="amen-share-initial-d3">
+      <div id="amen-share-initial-d2">
         <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
         <button class="amen-share-btn-primary"
-                onclick="amenShareImage('d3')">Share today's Vigil</button>
+                onclick="amenShareImage('d2')">Share today's Vigil</button>
         <button class="amen-share-btn-secondary"
-                onclick="amenShareApp('d3')">Share the app</button>
+                onclick="amenShareApp('d2')">Share the app</button>
         <button class="amen-not-now-btn"
-                onclick="amenNotNow('d3')">Not now</button>
+                onclick="amenNotNow('d2')">Not now</button>
       </div>
 
-      <div class="amen-share-confirmed" id="amen-share-confirmed-d3"></div>
+      <div class="amen-share-confirmed" id="amen-share-confirmed-d2"></div>
 
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
-    <div class="amen-notif-section" id="amen-notif-d3">
+    <div class="amen-notif-section" id="amen-notif-d2">
       <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d3')">
+      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d2')">
         Turn on notifications
       </button>
-      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d3')">Not now</button>
+      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d2')">Not now</button>
     </div>
 
     <div class="amen-spacer"></div></div>
       <div class="screen-fade-bottom"></div>
     </section>
   </div>
-  <div class="day-screens" data-day="3" style="display:none">
+  <div class="day-screens" data-day="2" style="display:none">
     <section class="screen screen-season" data-screen="0" aria-label="Season">
       <div class="screen-fade-top"></div>
       <div class="screen-label">Season</div>
@@ -1378,14 +1250,14 @@ Galatians 5:22 (NRSV)</p></div>
       <div class="screen-inner">
 
     <!-- Completion hero -->
-    <div class="amen-hero" id="amen-hero-d4">
+    <div class="amen-hero" id="amen-hero-d3">
 
       <div class="amen-checkbox-row"
            role="checkbox" aria-checked="false" tabindex="0"
-           data-uid="d4"
+           data-uid="d3"
            onclick="amenCheck(this)"
            onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenCheck(this)}">
-        <div class="amen-checkbox-outer" id="amen-box-d4">
+        <div class="amen-checkbox-outer" id="amen-box-d3">
           <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
             <polyline points="3,9 7,13 15,4.5"
               stroke="currentColor" stroke-width="1.5"
@@ -1395,55 +1267,55 @@ Galatians 5:22 (NRSV)</p></div>
         <div class="amen-checkbox-label">I kept Vigil today.</div>
       </div>
 
-      <div class="amen-word-block" id="amen-word-d4">
+      <div class="amen-word-block" id="amen-word-d3">
         <div class="amen-word-name">FRUIT</div>
       </div>
 
     </div>
 
     <!-- Commission phrase -->
-    <div class="amen-commission" id="amen-commission-d4">
+    <div class="amen-commission" id="amen-commission-d3">
       <div class="amen-commission-line1">Go in peace.</div>
       <div class="amen-commission-line1">And carry the Word with you.</div>
     </div>
 
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
-    <div class="amen-count-block" id="amen-count-d4">
-      <div class="amen-count-number" id="amen-count-num-d4">—</div>
+    <div class="amen-count-block" id="amen-count-d3">
+      <div class="amen-count-number" id="amen-count-num-d3">—</div>
       <div class="amen-count-label">people have kept vigil since Vigil began.</div>
     </div>
 
     <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-d4">
+    <div class="amen-share-block" id="amen-share-d3">
 
-      <div id="amen-share-initial-d4">
+      <div id="amen-share-initial-d3">
         <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
         <button class="amen-share-btn-primary"
-                onclick="amenShareImage('d4')">Share today's Vigil</button>
+                onclick="amenShareImage('d3')">Share today's Vigil</button>
         <button class="amen-share-btn-secondary"
-                onclick="amenShareApp('d4')">Share the app</button>
+                onclick="amenShareApp('d3')">Share the app</button>
         <button class="amen-not-now-btn"
-                onclick="amenNotNow('d4')">Not now</button>
+                onclick="amenNotNow('d3')">Not now</button>
       </div>
 
-      <div class="amen-share-confirmed" id="amen-share-confirmed-d4"></div>
+      <div class="amen-share-confirmed" id="amen-share-confirmed-d3"></div>
 
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
-    <div class="amen-notif-section" id="amen-notif-d4">
+    <div class="amen-notif-section" id="amen-notif-d3">
       <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d4')">
+      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d3')">
         Turn on notifications
       </button>
-      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d4')">Not now</button>
+      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d3')">Not now</button>
     </div>
 
     <div class="amen-spacer"></div></div>
       <div class="screen-fade-bottom"></div>
     </section>
   </div>
-  <div class="day-screens" data-day="4" style="display:none">
+  <div class="day-screens" data-day="3" style="display:none">
     <section class="screen screen-season" data-screen="0" aria-label="Season">
       <div class="screen-fade-top"></div>
       <div class="screen-label">Season</div>
@@ -1523,14 +1395,14 @@ Galatians 5:22 (NRSV)</p></div>
       <div class="screen-inner">
 
     <!-- Completion hero -->
-    <div class="amen-hero" id="amen-hero-d5">
+    <div class="amen-hero" id="amen-hero-d4">
 
       <div class="amen-checkbox-row"
            role="checkbox" aria-checked="false" tabindex="0"
-           data-uid="d5"
+           data-uid="d4"
            onclick="amenCheck(this)"
            onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenCheck(this)}">
-        <div class="amen-checkbox-outer" id="amen-box-d5">
+        <div class="amen-checkbox-outer" id="amen-box-d4">
           <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
             <polyline points="3,9 7,13 15,4.5"
               stroke="currentColor" stroke-width="1.5"
@@ -1540,55 +1412,55 @@ Galatians 5:22 (NRSV)</p></div>
         <div class="amen-checkbox-label">I kept Vigil today.</div>
       </div>
 
-      <div class="amen-word-block" id="amen-word-d5">
+      <div class="amen-word-block" id="amen-word-d4">
         <div class="amen-word-name">LOVE</div>
       </div>
 
     </div>
 
     <!-- Commission phrase -->
-    <div class="amen-commission" id="amen-commission-d5">
+    <div class="amen-commission" id="amen-commission-d4">
       <div class="amen-commission-line1">Go in peace.</div>
       <div class="amen-commission-line1">And carry the Word with you.</div>
     </div>
 
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
-    <div class="amen-count-block" id="amen-count-d5">
-      <div class="amen-count-number" id="amen-count-num-d5">—</div>
+    <div class="amen-count-block" id="amen-count-d4">
+      <div class="amen-count-number" id="amen-count-num-d4">—</div>
       <div class="amen-count-label">people have kept vigil since Vigil began.</div>
     </div>
 
     <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-d5">
+    <div class="amen-share-block" id="amen-share-d4">
 
-      <div id="amen-share-initial-d5">
+      <div id="amen-share-initial-d4">
         <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
         <button class="amen-share-btn-primary"
-                onclick="amenShareImage('d5')">Share today's Vigil</button>
+                onclick="amenShareImage('d4')">Share today's Vigil</button>
         <button class="amen-share-btn-secondary"
-                onclick="amenShareApp('d5')">Share the app</button>
+                onclick="amenShareApp('d4')">Share the app</button>
         <button class="amen-not-now-btn"
-                onclick="amenNotNow('d5')">Not now</button>
+                onclick="amenNotNow('d4')">Not now</button>
       </div>
 
-      <div class="amen-share-confirmed" id="amen-share-confirmed-d5"></div>
+      <div class="amen-share-confirmed" id="amen-share-confirmed-d4"></div>
 
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
-    <div class="amen-notif-section" id="amen-notif-d5">
+    <div class="amen-notif-section" id="amen-notif-d4">
       <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d5')">
+      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d4')">
         Turn on notifications
       </button>
-      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d5')">Not now</button>
+      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d4')">Not now</button>
     </div>
 
     <div class="amen-spacer"></div></div>
       <div class="screen-fade-bottom"></div>
     </section>
   </div>
-  <div class="day-screens" data-day="5" style="display:none">
+  <div class="day-screens" data-day="4" style="display:none">
     <section class="screen screen-season" data-screen="0" aria-label="Season">
       <div class="screen-fade-top"></div>
       <div class="screen-label">Season</div>
@@ -1662,14 +1534,14 @@ Agapē is always more verb than noun — chosen, willed, and returned to again a
       <div class="screen-inner">
 
     <!-- Completion hero -->
-    <div class="amen-hero" id="amen-hero-d6">
+    <div class="amen-hero" id="amen-hero-d5">
 
       <div class="amen-checkbox-row"
            role="checkbox" aria-checked="false" tabindex="0"
-           data-uid="d6"
+           data-uid="d5"
            onclick="amenCheck(this)"
            onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenCheck(this)}">
-        <div class="amen-checkbox-outer" id="amen-box-d6">
+        <div class="amen-checkbox-outer" id="amen-box-d5">
           <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
             <polyline points="3,9 7,13 15,4.5"
               stroke="currentColor" stroke-width="1.5"
@@ -1679,55 +1551,55 @@ Agapē is always more verb than noun — chosen, willed, and returned to again a
         <div class="amen-checkbox-label">I kept Vigil today.</div>
       </div>
 
-      <div class="amen-word-block" id="amen-word-d6">
+      <div class="amen-word-block" id="amen-word-d5">
         <div class="amen-word-name">FRIEND</div>
       </div>
 
     </div>
 
     <!-- Commission phrase -->
-    <div class="amen-commission" id="amen-commission-d6">
+    <div class="amen-commission" id="amen-commission-d5">
       <div class="amen-commission-line1">Go in peace.</div>
       <div class="amen-commission-line1">And carry the Word with you.</div>
     </div>
 
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
-    <div class="amen-count-block" id="amen-count-d6">
-      <div class="amen-count-number" id="amen-count-num-d6">—</div>
+    <div class="amen-count-block" id="amen-count-d5">
+      <div class="amen-count-number" id="amen-count-num-d5">—</div>
       <div class="amen-count-label">people have kept vigil since Vigil began.</div>
     </div>
 
     <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-d6">
+    <div class="amen-share-block" id="amen-share-d5">
 
-      <div id="amen-share-initial-d6">
+      <div id="amen-share-initial-d5">
         <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
         <button class="amen-share-btn-primary"
-                onclick="amenShareImage('d6')">Share today's Vigil</button>
+                onclick="amenShareImage('d5')">Share today's Vigil</button>
         <button class="amen-share-btn-secondary"
-                onclick="amenShareApp('d6')">Share the app</button>
+                onclick="amenShareApp('d5')">Share the app</button>
         <button class="amen-not-now-btn"
-                onclick="amenNotNow('d6')">Not now</button>
+                onclick="amenNotNow('d5')">Not now</button>
       </div>
 
-      <div class="amen-share-confirmed" id="amen-share-confirmed-d6"></div>
+      <div class="amen-share-confirmed" id="amen-share-confirmed-d5"></div>
 
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
-    <div class="amen-notif-section" id="amen-notif-d6">
+    <div class="amen-notif-section" id="amen-notif-d5">
       <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d6')">
+      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d5')">
         Turn on notifications
       </button>
-      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d6')">Not now</button>
+      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d5')">Not now</button>
     </div>
 
     <div class="amen-spacer"></div></div>
       <div class="screen-fade-bottom"></div>
     </section>
   </div>
-  <div class="day-screens" data-day="6" style="display:none">
+  <div class="day-screens" data-day="5" style="display:none">
     <section class="screen screen-season" data-screen="0" aria-label="Season">
       <div class="screen-fade-top"></div>
       <div class="screen-label">Season</div>
@@ -1803,14 +1675,14 @@ John 15:16 — NRSV</p></div>
       <div class="screen-inner">
 
     <!-- Completion hero -->
-    <div class="amen-hero" id="amen-hero-d7">
+    <div class="amen-hero" id="amen-hero-d6">
 
       <div class="amen-checkbox-row"
            role="checkbox" aria-checked="false" tabindex="0"
-           data-uid="d7"
+           data-uid="d6"
            onclick="amenCheck(this)"
            onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenCheck(this)}">
-        <div class="amen-checkbox-outer" id="amen-box-d7">
+        <div class="amen-checkbox-outer" id="amen-box-d6">
           <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
             <polyline points="3,9 7,13 15,4.5"
               stroke="currentColor" stroke-width="1.5"
@@ -1820,55 +1692,55 @@ John 15:16 — NRSV</p></div>
         <div class="amen-checkbox-label">I kept Vigil today.</div>
       </div>
 
-      <div class="amen-word-block" id="amen-word-d7">
+      <div class="amen-word-block" id="amen-word-d6">
         <div class="amen-word-name">CHOOSE</div>
       </div>
 
     </div>
 
     <!-- Commission phrase -->
-    <div class="amen-commission" id="amen-commission-d7">
+    <div class="amen-commission" id="amen-commission-d6">
       <div class="amen-commission-line1">Go in peace.</div>
       <div class="amen-commission-line1">And carry the Word with you.</div>
     </div>
 
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
-    <div class="amen-count-block" id="amen-count-d7">
-      <div class="amen-count-number" id="amen-count-num-d7">—</div>
+    <div class="amen-count-block" id="amen-count-d6">
+      <div class="amen-count-number" id="amen-count-num-d6">—</div>
       <div class="amen-count-label">people have kept vigil since Vigil began.</div>
     </div>
 
     <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-d7">
+    <div class="amen-share-block" id="amen-share-d6">
 
-      <div id="amen-share-initial-d7">
+      <div id="amen-share-initial-d6">
         <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
         <button class="amen-share-btn-primary"
-                onclick="amenShareImage('d7')">Share today's Vigil</button>
+                onclick="amenShareImage('d6')">Share today's Vigil</button>
         <button class="amen-share-btn-secondary"
-                onclick="amenShareApp('d7')">Share the app</button>
+                onclick="amenShareApp('d6')">Share the app</button>
         <button class="amen-not-now-btn"
-                onclick="amenNotNow('d7')">Not now</button>
+                onclick="amenNotNow('d6')">Not now</button>
       </div>
 
-      <div class="amen-share-confirmed" id="amen-share-confirmed-d7"></div>
+      <div class="amen-share-confirmed" id="amen-share-confirmed-d6"></div>
 
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
-    <div class="amen-notif-section" id="amen-notif-d7">
+    <div class="amen-notif-section" id="amen-notif-d6">
       <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d7')">
+      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d6')">
         Turn on notifications
       </button>
-      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d7')">Not now</button>
+      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d6')">Not now</button>
     </div>
 
     <div class="amen-spacer"></div></div>
       <div class="screen-fade-bottom"></div>
     </section>
   </div>
-  <div class="day-screens" data-day="7" style="display:none">
+  <div class="day-screens" data-day="6" style="display:none">
     <section class="screen screen-season" data-screen="0" aria-label="Season">
       <div class="screen-fade-top"></div>
       <div class="screen-label">Season</div>
@@ -1944,14 +1816,14 @@ Hold those we bring today — the ones we are worried for, the ones we have almo
       <div class="screen-inner">
 
     <!-- Completion hero -->
-    <div class="amen-hero" id="amen-hero-d8">
+    <div class="amen-hero" id="amen-hero-d7">
 
       <div class="amen-checkbox-row"
            role="checkbox" aria-checked="false" tabindex="0"
-           data-uid="d8"
+           data-uid="d7"
            onclick="amenCheck(this)"
            onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenCheck(this)}">
-        <div class="amen-checkbox-outer" id="amen-box-d8">
+        <div class="amen-checkbox-outer" id="amen-box-d7">
           <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
             <polyline points="3,9 7,13 15,4.5"
               stroke="currentColor" stroke-width="1.5"
@@ -1961,48 +1833,48 @@ Hold those we bring today — the ones we are worried for, the ones we have almo
         <div class="amen-checkbox-label">I kept Vigil today.</div>
       </div>
 
-      <div class="amen-word-block" id="amen-word-d8">
+      <div class="amen-word-block" id="amen-word-d7">
         <div class="amen-word-name">INTERCEDE</div>
       </div>
 
     </div>
 
     <!-- Commission phrase -->
-    <div class="amen-commission" id="amen-commission-d8">
+    <div class="amen-commission" id="amen-commission-d7">
       <div class="amen-commission-line1">Go in peace.</div>
       <div class="amen-commission-line1">And carry the Word with you.</div>
     </div>
 
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
-    <div class="amen-count-block" id="amen-count-d8">
-      <div class="amen-count-number" id="amen-count-num-d8">—</div>
+    <div class="amen-count-block" id="amen-count-d7">
+      <div class="amen-count-number" id="amen-count-num-d7">—</div>
       <div class="amen-count-label">people have kept vigil since Vigil began.</div>
     </div>
 
     <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-d8">
+    <div class="amen-share-block" id="amen-share-d7">
 
-      <div id="amen-share-initial-d8">
+      <div id="amen-share-initial-d7">
         <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
         <button class="amen-share-btn-primary"
-                onclick="amenShareImage('d8')">Share today's Vigil</button>
+                onclick="amenShareImage('d7')">Share today's Vigil</button>
         <button class="amen-share-btn-secondary"
-                onclick="amenShareApp('d8')">Share the app</button>
+                onclick="amenShareApp('d7')">Share the app</button>
         <button class="amen-not-now-btn"
-                onclick="amenNotNow('d8')">Not now</button>
+                onclick="amenNotNow('d7')">Not now</button>
       </div>
 
-      <div class="amen-share-confirmed" id="amen-share-confirmed-d8"></div>
+      <div class="amen-share-confirmed" id="amen-share-confirmed-d7"></div>
 
     </div>
 
     <!-- Notification prompt — shown once, only if not already subscribed -->
-    <div class="amen-notif-section" id="amen-notif-d8">
+    <div class="amen-notif-section" id="amen-notif-d7">
       <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d8')">
+      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d7')">
         Turn on notifications
       </button>
-      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d8')">Not now</button>
+      <button class="amen-not-now-btn" onclick="vigilDismissNotification('d7')">Not now</button>
     </div>
 
     <div class="amen-spacer"></div></div>
@@ -2036,14 +1908,8 @@ Hold those we bring today — the ones we are worried for, the ones we have almo
 </div>
 
 <script>
-const DAYS    = [{"palette": "palette-eastertide", "label": "30 April 2026", "date": "30 April 2026"}, {"palette": "palette-eastertide", "label": "1 May 2026", "date": "1 May 2026"}, {"palette": "palette-eastertide", "label": "2 May 2026", "date": "2 May 2026"}, {"palette": "palette-eastertide", "label": "3 May 2026", "date": "3 May 2026"}, {"palette": "palette-eastertide", "label": "4 May 2026", "date": "4 May 2026"}, {"palette": "palette-eastertide", "label": "5 May 2026", "date": "5 May 2026"}, {"palette": "palette-eastertide", "label": "6 May 2026", "date": "6 May 2026"}, {"palette": "palette-eastertide", "label": "7 May 2026", "date": "7 May 2026"}];
+const DAYS    = [{"palette": "palette-eastertide", "label": "1 May 2026", "date": "1 May 2026"}, {"palette": "palette-eastertide", "label": "2 May 2026", "date": "2 May 2026"}, {"palette": "palette-eastertide", "label": "3 May 2026", "date": "3 May 2026"}, {"palette": "palette-eastertide", "label": "4 May 2026", "date": "4 May 2026"}, {"palette": "palette-eastertide", "label": "5 May 2026", "date": "5 May 2026"}, {"palette": "palette-eastertide", "label": "6 May 2026", "date": "6 May 2026"}, {"palette": "palette-eastertide", "label": "7 May 2026", "date": "7 May 2026"}];
 const FIGURES = {
-  "st_pius_v": {
-    "name": "St Pius V",
-    "dates": "1504–1572 AD",
-    "role": "",
-    "body": "Pope and Dominican friar, remembered for reforming Church life and worship after the Council of Trent. The Church remembers him today; his life reflects the day’s word in its concern for faithfulness, order and perseverance during a divided age."
-  },
   "st_joseph_the_worker": {
     "name": "St Joseph the Worker",
     "dates": "1st century AD",
@@ -2421,22 +2287,25 @@ const amenCounted = {};
 function amenCheck(row) {
   const uid     = row.dataset.uid;
   const box     = document.getElementById('amen-box-' + uid);
+  const hero    = document.getElementById('amen-hero-' + uid);
   const word    = document.getElementById('amen-word-' + uid);
   const comm    = document.getElementById('amen-commission-' + uid);
   const share   = document.getElementById('amen-share-' + uid);
   const checked = box.classList.toggle('amen-checked');
   row.setAttribute('aria-checked', String(checked));
-  word.classList.toggle('amen-visible', checked);
   if (checked) {
     if (!amenCounted[uid]) { amenCounted[uid] = true; amenIncrementCount(); }
+    vigilRecordKept();
     amenPrebuildShareImage(uid);
-    setTimeout(() => comm.classList.add('amen-visible'), 700);
-    setTimeout(() => {
-      share.classList.add('amen-visible');
-    }, 1200);
+    setTimeout(() => { if (hero) hero.classList.add('amen-hero-checked'); },    0);
+    setTimeout(() => word.classList.add('amen-visible'),                       300);
+    setTimeout(() => comm.classList.add('amen-visible'),                       600);
+    setTimeout(() => share.classList.add('amen-visible'),                      900);
   } else {
-    comm.classList.remove('amen-visible');
     share.classList.remove('amen-visible');
+    setTimeout(() => comm.classList.remove('amen-visible'),                    300);
+    setTimeout(() => word.classList.remove('amen-visible'),                    600);
+    setTimeout(() => { if (hero) hero.classList.remove('amen-hero-checked'); }, 900);
     const initial   = document.getElementById('amen-share-initial-' + uid);
     const confirmed = document.getElementById('amen-share-confirmed-' + uid);
     if (initial)   initial.style.display = '';
