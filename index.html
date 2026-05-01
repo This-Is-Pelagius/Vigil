@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-01 12:03 · 1 May 2026 – 7 May 2026 (7 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-01 12:14 · 1 May 2026 – 7 May 2026 (7 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -2733,11 +2733,10 @@ function vigilGetNotifState() {
   if (!isIOS) return 'normal';
   // Installed PWA on iOS behaves like normal — notifications are supported.
   if (window.navigator.standalone === true) return 'normal';
-  // Detect Safari: has WebKit, does not have CriOS/FxiOS/EdgiOS/OPiOS/DuckDuckGo etc.
-  const isSafari = /WebKit/.test(ua) &&
-                   !/CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo|Brave|SamsungBrowser/.test(ua) &&
-                   typeof safari !== 'undefined';
-  return isSafari ? 'ios-safari' : 'ios-other';
+  // Other iOS browsers all inject their own token into the UA string.
+  // If none of those tokens are present, we are in Safari.
+  const isOtherBrowser = /CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo|Brave|SamsungBrowser|MiuiBrowser/.test(ua);
+  return isOtherBrowser ? 'ios-other' : 'ios-safari';
 }
 
 function vigilMaybeShowNotifPrompt(screenIndex) {
