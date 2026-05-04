@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-04 12:34 · 4 May 2026 – 7 May 2026 (4 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-04 12:47 · 4 May 2026 – 7 May 2026 (4 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -762,72 +762,6 @@ body { overflow: hidden; }
 }
 .amen-share-confirmed.amen-share-confirmed-visible { display: block; }
 
-.amen-invitation-section {
-  width: 100%; text-align: center;
-  padding: 1.4rem 0 0;
-  border-top: 1px solid var(--accent-soft);
-}
-.amen-invitation-trigger {
-  display: block; width: 100%;
-  cursor: pointer; -webkit-tap-highlight-color: transparent;
-  background: none; border: none; padding: 0;
-  font: inherit; text-decoration: none;
-  -webkit-user-select: none; user-select: none;
-  touch-action: manipulation;
-}
-.amen-invitation-trigger-inner {
-  display: flex; align-items: center; justify-content: center; gap: 0.45rem;
-  padding: 1.1rem 1rem;
-  border-bottom: 1px solid rgba(184,134,11,0.35);
-  transition: border-color 0.2s;
-}
-.amen-invitation-trigger:hover .amen-invitation-trigger-inner { border-color: var(--gold); }
-.amen-invitation-trigger:hover .amen-invitation-text { color: var(--accent); }
-.amen-invitation-text {
-  font-family: 'Cormorant Garamond', serif; font-size: 1.2rem;
-  font-weight: 400; font-style: italic; color: var(--text); line-height: 1.4;
-  transition: color 0.2s;
-}
-.amen-invitation-arrow {
-  font-size: 1.4rem; color: var(--gold); line-height: 1; font-style: normal;
-  display: inline-block;
-  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-  transform-origin: 45% 50%;
-}
-.amen-invitation-arrow.amen-inv-arrow-open { transform: rotate(90deg); }
-
-.amen-invitation-panel {
-  overflow: hidden; max-height: 0; opacity: 0;
-  transition: max-height 0.45s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease 0.08s;
-  width: 100%;
-}
-.amen-invitation-panel.amen-inv-open { max-height: 600px; opacity: 1; }
-.amen-invitation-panel-inner {
-  padding: 1.3rem 0 0.5rem;
-  display: flex; flex-direction: column; align-items: center; gap: 1rem;
-}
-.amen-invitation-message {
-  font-family: 'Libre Baskerville', serif; font-size: 0.95rem; font-style: italic;
-  color: var(--dim); line-height: 1.85;
-  border: 1px solid var(--accent-soft); padding: 1.1rem 1.2rem;
-  background: rgba(184,134,11,0.025); width: 100%; text-align: center;
-}
-.amen-invitation-send {
-  display: block; width: 100%;
-  font-family: 'Raleway', sans-serif; font-size: 0.62rem; font-weight: 600;
-  letter-spacing: 0.28em; text-transform: uppercase;
-  color: var(--bg); background: var(--gold);
-  border: none; padding: 1rem 1.5rem; cursor: pointer;
-  transition: opacity 0.2s; -webkit-tap-highlight-color: transparent;
-}
-.amen-invitation-send:hover { opacity: 0.85; }
-.amen-inv-confirmed {
-  display: none; font-family: 'Libre Baskerville', serif;
-  font-size: 0.95rem; font-style: italic; color: var(--dim);
-  line-height: 1.75; text-align: center;
-}
-.amen-inv-confirmed.amen-inv-confirmed-visible { display: block; }
-
 /* Post-liturgy layer — rises 3s after commission phrase */
 .amen-post-liturgy {
   width: 100%; text-align: center;
@@ -889,7 +823,8 @@ body { overflow: hidden; }
   padding: 2rem;
   background: rgba(200,190,170,0.55);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  animation: welcomeFadeIn 0.4s ease forwards;
+  opacity: 0;
+  animation: welcomeFadeIn 1s ease 2s forwards;
 }
 .palette-lent .welcome-overlay,
 .palette-goodfriday .welcome-overlay,
@@ -1133,28 +1068,6 @@ body { overflow: hidden; }
 
     </div>
 
-    <!-- Standing invitation — always present, independent of post-liturgy layer -->
-    <div class="amen-invitation-section" id="amen-inv-section-d1">
-      <button class="amen-invitation-trigger"
-              onclick="amenToggleInvitation('d1')"
-              aria-expanded="false" id="amen-inv-trigger-d1">
-        <div class="amen-invitation-trigger-inner">
-          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
-          <span class="amen-invitation-arrow" id="amen-inv-arrow-d1">&#8250;</span>
-        </div>
-      </button>
-      <div class="amen-invitation-panel" id="amen-inv-panel-d1">
-        <div class="amen-invitation-panel-inner">
-          <div class="amen-invitation-message">I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.</div>
-          <div id="amen-inv-actions-d1">
-            <button class="amen-invitation-send"
-                    onclick="amenSendInvitation('d1')">Send invitation</button>
-          </div>
-          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d1"></div>
-        </div>
-      </div>
-    </div>
-
     <div class="amen-spacer"></div></div>
       <div class="screen-fade-bottom"></div>
     </section>
@@ -1314,28 +1227,6 @@ Agapē is always more verb than noun — chosen, willed, and returned to again a
 
       </div>
 
-    </div>
-
-    <!-- Standing invitation — always present, independent of post-liturgy layer -->
-    <div class="amen-invitation-section" id="amen-inv-section-d2">
-      <button class="amen-invitation-trigger"
-              onclick="amenToggleInvitation('d2')"
-              aria-expanded="false" id="amen-inv-trigger-d2">
-        <div class="amen-invitation-trigger-inner">
-          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
-          <span class="amen-invitation-arrow" id="amen-inv-arrow-d2">&#8250;</span>
-        </div>
-      </button>
-      <div class="amen-invitation-panel" id="amen-inv-panel-d2">
-        <div class="amen-invitation-panel-inner">
-          <div class="amen-invitation-message">I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.</div>
-          <div id="amen-inv-actions-d2">
-            <button class="amen-invitation-send"
-                    onclick="amenSendInvitation('d2')">Send invitation</button>
-          </div>
-          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d2"></div>
-        </div>
-      </div>
     </div>
 
     <div class="amen-spacer"></div></div>
@@ -1501,28 +1392,6 @@ John 15:16 — NRSV</p></div>
 
     </div>
 
-    <!-- Standing invitation — always present, independent of post-liturgy layer -->
-    <div class="amen-invitation-section" id="amen-inv-section-d3">
-      <button class="amen-invitation-trigger"
-              onclick="amenToggleInvitation('d3')"
-              aria-expanded="false" id="amen-inv-trigger-d3">
-        <div class="amen-invitation-trigger-inner">
-          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
-          <span class="amen-invitation-arrow" id="amen-inv-arrow-d3">&#8250;</span>
-        </div>
-      </button>
-      <div class="amen-invitation-panel" id="amen-inv-panel-d3">
-        <div class="amen-invitation-panel-inner">
-          <div class="amen-invitation-message">I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.</div>
-          <div id="amen-inv-actions-d3">
-            <button class="amen-invitation-send"
-                    onclick="amenSendInvitation('d3')">Send invitation</button>
-          </div>
-          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d3"></div>
-        </div>
-      </div>
-    </div>
-
     <div class="amen-spacer"></div></div>
       <div class="screen-fade-bottom"></div>
     </section>
@@ -1684,28 +1553,6 @@ Hold those we bring today — the ones we are worried for, the ones we have almo
 
       </div>
 
-    </div>
-
-    <!-- Standing invitation — always present, independent of post-liturgy layer -->
-    <div class="amen-invitation-section" id="amen-inv-section-d4">
-      <button class="amen-invitation-trigger"
-              onclick="amenToggleInvitation('d4')"
-              aria-expanded="false" id="amen-inv-trigger-d4">
-        <div class="amen-invitation-trigger-inner">
-          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
-          <span class="amen-invitation-arrow" id="amen-inv-arrow-d4">&#8250;</span>
-        </div>
-      </button>
-      <div class="amen-invitation-panel" id="amen-inv-panel-d4">
-        <div class="amen-invitation-panel-inner">
-          <div class="amen-invitation-message">I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.</div>
-          <div id="amen-inv-actions-d4">
-            <button class="amen-invitation-send"
-                    onclick="amenSendInvitation('d4')">Send invitation</button>
-          </div>
-          <div class="amen-inv-confirmed" id="amen-inv-confirmed-d4"></div>
-        </div>
-      </div>
     </div>
 
     <div class="amen-spacer"></div></div>
@@ -2491,37 +2338,6 @@ function amenShareNotNow(uid) {
     share.style.opacity = '';
     share.style.transition = '';
   }, 320);
-}
-
-const amenInvOpen = {};
-
-function amenToggleInvitation(uid) {
-  amenInvOpen[uid] = !amenInvOpen[uid];
-  const panel = document.getElementById('amen-inv-panel-' + uid);
-  const arrow = document.getElementById('amen-inv-arrow-' + uid);
-  if (panel) panel.classList.toggle('amen-inv-open', amenInvOpen[uid]);
-  if (arrow) arrow.classList.toggle('amen-inv-arrow-open', amenInvOpen[uid]);
-  if (amenInvOpen[uid]) {
-    setTimeout(() => {
-      const inner = panel ? panel.closest('.screen-inner') : null;
-      if (inner) inner.scrollTo({ top: inner.scrollHeight, behavior: 'smooth' });
-    }, 480);
-  }
-}
-
-function amenSendInvitation(uid) {
-  const text = "I\u2019ve been using Vigil for my daily devotion \u2014 a beautiful app rooted in the Christian year. I thought you might like it.";
-  amenTriggerShare(text, 'https://dailyvigil.app',
-    () => amenShowInvConfirmed(uid, 'Invitation sent. Thank you for sharing Vigil.'),
-    () => amenShowInvConfirmed(uid, 'Copied to clipboard \u2014 ready to send.')
-  );
-}
-
-function amenShowInvConfirmed(uid, msg) {
-  const actions   = document.getElementById('amen-inv-actions-' + uid);
-  const confirmed = document.getElementById('amen-inv-confirmed-' + uid);
-  if (actions)   actions.style.display = 'none';
-  if (confirmed) { confirmed.textContent = msg; confirmed.classList.add('amen-inv-confirmed-visible'); }
 }
 
 function amenTriggerShare(text, url, onSuccess, onCopy) {
