@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-05 06:35 · 5 May 2026 – 7 May 2026 (3 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-05 06:47 · 5 May 2026 – 7 May 2026 (3 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -455,7 +455,7 @@ body { overflow: hidden; }
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
   z-index: 100;
   display: flex; align-items: center; justify-content: center; padding: 1.5rem;
-  opacity: 0; animation: welcomeFadeIn 0.4s ease forwards;
+  opacity: 0; animation: welcomeFadeIn 1s ease 1.5s forwards;
 }
 .palette-lent .welcome-overlay,
 .palette-goodfriday .welcome-overlay,
@@ -880,16 +880,13 @@ body { overflow: hidden; }
   width: 100%; text-align: center;
   opacity: 0; transform: translateY(-4px);
   max-height: 0; overflow: hidden; margin-bottom: 0;
-  border-top: 1px solid transparent;
   transition: opacity 0.9s ease, transform 0.9s ease,
-              max-height 0.9s ease, margin-bottom 0.9s ease,
-              border-top-color 0.9s ease;
+              max-height 0.9s ease, margin-bottom 0.9s ease;
   pointer-events: none;
 }
 .amen-post-liturgy.amen-visible {
   opacity: 1; transform: translateY(0);
   max-height: 1200px; margin-bottom: 1.6rem;
-  border-top-color: var(--accent-soft);
   pointer-events: auto;
 }
 
@@ -1938,11 +1935,6 @@ function amenShowPostLiturgy(uid, completionCount) {
   }
 
   post.classList.add('amen-visible');
-
-  setTimeout(() => {
-    const inner = post.closest('.screen-inner');
-    if (inner) inner.scrollTo({ top: inner.scrollHeight, behavior: 'smooth' });
-  }, 950);
 }
 
 // ── Share image: pre-render on checkbox tick, share synchronously on button tap ──
@@ -2398,10 +2390,6 @@ function amenTriggerDeferredShare(uid) {
     if (!shareDismissed) {
       setTimeout(() => {
         share.classList.add('amen-visible');
-        setTimeout(() => {
-          const inner = share.closest('.screen-inner');
-          if (inner) inner.scrollTo({ top: inner.scrollHeight, behavior: 'smooth' });
-        }, 950);
       }, 1500);
     }
   }
