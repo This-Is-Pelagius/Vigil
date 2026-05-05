@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-05 06:16 · 5 May 2026 – 7 May 2026 (3 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-05 06:35 · 5 May 2026 – 7 May 2026 (3 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -321,7 +321,7 @@ body { overflow: hidden; }
 }
 .scripture-text {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.35rem; font-style: italic; font-weight: 600;
+  font-size: 1.35rem; font-style: italic; font-weight: 400;
   line-height: 2.1; color: var(--text);
 }
 .scripture-text p + p { margin-top: 1rem; }
@@ -367,14 +367,14 @@ body { overflow: hidden; }
 }
 .prayer-body {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.3rem; font-style: italic; font-weight: 600;
+  font-size: 1.3rem; font-style: italic; font-weight: 400;
   line-height: 1.75; color: var(--text);
   margin-top: 1.2rem;
 }
 .prayer-body p + p { margin-top: 0.8rem; }
 .prayer-amen {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.3rem; font-style: italic; font-weight: 600;
+  font-size: 1.3rem; font-style: italic; font-weight: 400;
   letter-spacing: 0.05em; color: var(--text); margin-top: 1.2rem;
 }
 
@@ -447,6 +447,52 @@ body { overflow: hidden; }
 .palette-goodfriday .figure-overlay,
 .palette-pentecost .figure-overlay { background: rgba(5,3,8,0.78); }
 .figure-overlay.open { display: flex; }
+
+/* ── First-visit welcome overlay ── */
+.welcome-overlay {
+  position: fixed; inset: 0;
+  background: rgba(200,190,170,0.6);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  z-index: 100;
+  display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+  opacity: 0; animation: welcomeFadeIn 0.4s ease forwards;
+}
+.palette-lent .welcome-overlay,
+.palette-goodfriday .welcome-overlay,
+.palette-pentecost .welcome-overlay { background: rgba(5,3,8,0.78); }
+.welcome-overlay.welcome-hiding {
+  animation: welcomeFadeOut 0.3s ease forwards;
+}
+@keyframes welcomeFadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes welcomeFadeOut { from { opacity: 1; } to { opacity: 0; } }
+.welcome-card {
+  background: var(--bg); border: 1px solid var(--accent-soft);
+  max-width: 400px; width: 100%;
+  padding: 2.8rem 2rem 2.4rem;
+  text-align: center;
+  box-shadow: 0 16px 48px rgba(28,23,20,0.18);
+}
+.welcome-wordmark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.75rem; font-weight: 300;
+  letter-spacing: 0.38em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 1.8rem;
+}
+.welcome-body {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.05rem; font-weight: 400; line-height: 2;
+  color: var(--text); margin-bottom: 2rem;
+}
+.welcome-begin {
+  display: inline-block;
+  font-family: 'Raleway', sans-serif; font-size: 0.62rem;
+  font-weight: 600; letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--bg); background: var(--gold);
+  border: none; padding: 1.1rem 2.4rem;
+  cursor: pointer; transition: opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.welcome-begin:hover { opacity: 0.85; }
 .figure-card {
   background: var(--bg); border: 1px solid var(--accent-soft);
   max-width: 400px; width: 100%; max-height: 80vh; overflow-y: auto;
@@ -829,13 +875,30 @@ body { overflow: hidden; }
 }
 .amen-inv-confirmed.amen-inv-confirmed-visible { display: block; }
 
+/* ── Post-liturgy layer (notif + share — rises 3s after commission animates in) ── */
+.amen-post-liturgy {
+  width: 100%; text-align: center;
+  opacity: 0; transform: translateY(-4px);
+  max-height: 0; overflow: hidden; margin-bottom: 0;
+  border-top: 1px solid transparent;
+  transition: opacity 0.9s ease, transform 0.9s ease,
+              max-height 0.9s ease, margin-bottom 0.9s ease,
+              border-top-color 0.9s ease;
+  pointer-events: none;
+}
+.amen-post-liturgy.amen-visible {
+  opacity: 1; transform: translateY(0);
+  max-height: 1200px; margin-bottom: 1.6rem;
+  border-top-color: var(--accent-soft);
+  pointer-events: auto;
+}
+
 .amen-notif-section {
   display: none;
   width: 100%;
   text-align: center;
   padding: 1.4rem 0 0;
-  border-top: 1px solid var(--accent-soft);
-  margin-top: 0.2rem;
+  margin-bottom: 1rem;
 }
 .amen-notif-prompt {
   font-family: 'Libre Baskerville', serif;
@@ -1012,46 +1075,51 @@ body { overflow: hidden; }
       <div class="amen-count-label">people have kept vigil since Vigil began.</div>
     </div>
 
-    <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-d1">
+    <!-- Post-liturgy layer: rises 3s after commission animation completes -->
+    <div class="amen-post-liturgy" id="amen-post-d1">
 
-      <div id="amen-share-initial-d1">
-        <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
-        <button class="amen-share-btn-primary"
-                onclick="amenShareImage('d1')">Share today's Vigil</button>
-        <button class="amen-share-btn-secondary"
-                onclick="amenShareApp('d1')">Share the app</button>
-        <button class="amen-not-now-btn"
-                onclick="amenNotNow('d1')">Not now</button>
+      <!-- Notification prompt — shown once, only if not already subscribed -->
+      <!-- State is set by vigilMaybeShowNotifPrompt() based on browser/platform detection -->
+      <div class="amen-notif-section" id="amen-notif-d1">
+
+        <!-- State 1: normal — browser supports web push (Android, desktop) -->
+        <div id="amen-notif-normal-d1" style="display:none">
+          <div class="amen-notif-prompt">Would you like Vigil to meet you here again tomorrow?</div>
+          <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d1')">
+            Turn on notifications
+          </button>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('d1')">Not now</button>
+        </div>
+
+        <!-- State 2: iOS Safari in browser tab — can install as PWA -->
+        <div id="amen-notif-ios-safari-d1" style="display:none">
+          <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, tap the Share icon at the bottom of your screen and choose Add to Home Screen.</div>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('d1')">Dismiss</button>
+        </div>
+
+        <!-- State 3: iOS other browser — must switch to Safari -->
+        <div id="amen-notif-ios-other-d1" style="display:none">
+          <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, open <a href="https://dailyvigil.app" style="color:inherit">dailyvigil.app</a> in Safari and follow the instructions on the Amen screen.</div>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('d1')">Dismiss</button>
+        </div>
+
       </div>
 
-      <div class="amen-share-confirmed" id="amen-share-confirmed-d1"></div>
+      <!-- Share block — conditional on completion count ≥ 2 -->
+      <div class="amen-share-block" id="amen-share-d1">
 
-    </div>
+        <div id="amen-share-initial-d1">
+          <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
+          <button class="amen-share-btn-primary"
+                  onclick="amenShareImage('d1')">Share today&#8217;s Vigil</button>
+          <button class="amen-share-btn-secondary"
+                  onclick="amenShareApp('d1')">Share the app</button>
+          <button class="amen-not-now-btn"
+                  onclick="amenNotNow('d1')">Not now</button>
+        </div>
 
-    <!-- Notification prompt — shown once, only if not already subscribed -->
-    <!-- State is set by vigilMaybeShowNotifPrompt() based on browser/platform detection -->
-    <div class="amen-notif-section" id="amen-notif-d1">
+        <div class="amen-share-confirmed" id="amen-share-confirmed-d1"></div>
 
-      <!-- State 1: normal — browser supports web push (Android, desktop) -->
-      <div id="amen-notif-normal-d1" style="display:none">
-        <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-        <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d1')">
-          Turn on notifications
-        </button>
-        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d1')">Not now</button>
-      </div>
-
-      <!-- State 2: iOS Safari in browser tab — can install as PWA -->
-      <div id="amen-notif-ios-safari-d1" style="display:none">
-        <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, tap the Share icon at the bottom of your screen and choose Add to Home Screen.</div>
-        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d1')">Dismiss</button>
-      </div>
-
-      <!-- State 3: iOS other browser — must switch to Safari -->
-      <div id="amen-notif-ios-other-d1" style="display:none">
-        <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, open <a href="https://dailyvigil.app" style="color:inherit">dailyvigil.app</a> in Safari and follow the instructions on the Amen screen.</div>
-        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d1')">Dismiss</button>
       </div>
 
     </div>
@@ -1174,46 +1242,51 @@ body { overflow: hidden; }
       <div class="amen-count-label">people have kept vigil since Vigil began.</div>
     </div>
 
-    <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-d2">
+    <!-- Post-liturgy layer: rises 3s after commission animation completes -->
+    <div class="amen-post-liturgy" id="amen-post-d2">
 
-      <div id="amen-share-initial-d2">
-        <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
-        <button class="amen-share-btn-primary"
-                onclick="amenShareImage('d2')">Share today's Vigil</button>
-        <button class="amen-share-btn-secondary"
-                onclick="amenShareApp('d2')">Share the app</button>
-        <button class="amen-not-now-btn"
-                onclick="amenNotNow('d2')">Not now</button>
+      <!-- Notification prompt — shown once, only if not already subscribed -->
+      <!-- State is set by vigilMaybeShowNotifPrompt() based on browser/platform detection -->
+      <div class="amen-notif-section" id="amen-notif-d2">
+
+        <!-- State 1: normal — browser supports web push (Android, desktop) -->
+        <div id="amen-notif-normal-d2" style="display:none">
+          <div class="amen-notif-prompt">Would you like Vigil to meet you here again tomorrow?</div>
+          <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d2')">
+            Turn on notifications
+          </button>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('d2')">Not now</button>
+        </div>
+
+        <!-- State 2: iOS Safari in browser tab — can install as PWA -->
+        <div id="amen-notif-ios-safari-d2" style="display:none">
+          <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, tap the Share icon at the bottom of your screen and choose Add to Home Screen.</div>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('d2')">Dismiss</button>
+        </div>
+
+        <!-- State 3: iOS other browser — must switch to Safari -->
+        <div id="amen-notif-ios-other-d2" style="display:none">
+          <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, open <a href="https://dailyvigil.app" style="color:inherit">dailyvigil.app</a> in Safari and follow the instructions on the Amen screen.</div>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('d2')">Dismiss</button>
+        </div>
+
       </div>
 
-      <div class="amen-share-confirmed" id="amen-share-confirmed-d2"></div>
+      <!-- Share block — conditional on completion count ≥ 2 -->
+      <div class="amen-share-block" id="amen-share-d2">
 
-    </div>
+        <div id="amen-share-initial-d2">
+          <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
+          <button class="amen-share-btn-primary"
+                  onclick="amenShareImage('d2')">Share today&#8217;s Vigil</button>
+          <button class="amen-share-btn-secondary"
+                  onclick="amenShareApp('d2')">Share the app</button>
+          <button class="amen-not-now-btn"
+                  onclick="amenNotNow('d2')">Not now</button>
+        </div>
 
-    <!-- Notification prompt — shown once, only if not already subscribed -->
-    <!-- State is set by vigilMaybeShowNotifPrompt() based on browser/platform detection -->
-    <div class="amen-notif-section" id="amen-notif-d2">
+        <div class="amen-share-confirmed" id="amen-share-confirmed-d2"></div>
 
-      <!-- State 1: normal — browser supports web push (Android, desktop) -->
-      <div id="amen-notif-normal-d2" style="display:none">
-        <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-        <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d2')">
-          Turn on notifications
-        </button>
-        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d2')">Not now</button>
-      </div>
-
-      <!-- State 2: iOS Safari in browser tab — can install as PWA -->
-      <div id="amen-notif-ios-safari-d2" style="display:none">
-        <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, tap the Share icon at the bottom of your screen and choose Add to Home Screen.</div>
-        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d2')">Dismiss</button>
-      </div>
-
-      <!-- State 3: iOS other browser — must switch to Safari -->
-      <div id="amen-notif-ios-other-d2" style="display:none">
-        <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, open <a href="https://dailyvigil.app" style="color:inherit">dailyvigil.app</a> in Safari and follow the instructions on the Amen screen.</div>
-        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d2')">Dismiss</button>
       </div>
 
     </div>
@@ -1334,46 +1407,51 @@ body { overflow: hidden; }
       <div class="amen-count-label">people have kept vigil since Vigil began.</div>
     </div>
 
-    <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-d3">
+    <!-- Post-liturgy layer: rises 3s after commission animation completes -->
+    <div class="amen-post-liturgy" id="amen-post-d3">
 
-      <div id="amen-share-initial-d3">
-        <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
-        <button class="amen-share-btn-primary"
-                onclick="amenShareImage('d3')">Share today's Vigil</button>
-        <button class="amen-share-btn-secondary"
-                onclick="amenShareApp('d3')">Share the app</button>
-        <button class="amen-not-now-btn"
-                onclick="amenNotNow('d3')">Not now</button>
+      <!-- Notification prompt — shown once, only if not already subscribed -->
+      <!-- State is set by vigilMaybeShowNotifPrompt() based on browser/platform detection -->
+      <div class="amen-notif-section" id="amen-notif-d3">
+
+        <!-- State 1: normal — browser supports web push (Android, desktop) -->
+        <div id="amen-notif-normal-d3" style="display:none">
+          <div class="amen-notif-prompt">Would you like Vigil to meet you here again tomorrow?</div>
+          <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d3')">
+            Turn on notifications
+          </button>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('d3')">Not now</button>
+        </div>
+
+        <!-- State 2: iOS Safari in browser tab — can install as PWA -->
+        <div id="amen-notif-ios-safari-d3" style="display:none">
+          <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, tap the Share icon at the bottom of your screen and choose Add to Home Screen.</div>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('d3')">Dismiss</button>
+        </div>
+
+        <!-- State 3: iOS other browser — must switch to Safari -->
+        <div id="amen-notif-ios-other-d3" style="display:none">
+          <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, open <a href="https://dailyvigil.app" style="color:inherit">dailyvigil.app</a> in Safari and follow the instructions on the Amen screen.</div>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('d3')">Dismiss</button>
+        </div>
+
       </div>
 
-      <div class="amen-share-confirmed" id="amen-share-confirmed-d3"></div>
+      <!-- Share block — conditional on completion count ≥ 2 -->
+      <div class="amen-share-block" id="amen-share-d3">
 
-    </div>
+        <div id="amen-share-initial-d3">
+          <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
+          <button class="amen-share-btn-primary"
+                  onclick="amenShareImage('d3')">Share today&#8217;s Vigil</button>
+          <button class="amen-share-btn-secondary"
+                  onclick="amenShareApp('d3')">Share the app</button>
+          <button class="amen-not-now-btn"
+                  onclick="amenNotNow('d3')">Not now</button>
+        </div>
 
-    <!-- Notification prompt — shown once, only if not already subscribed -->
-    <!-- State is set by vigilMaybeShowNotifPrompt() based on browser/platform detection -->
-    <div class="amen-notif-section" id="amen-notif-d3">
+        <div class="amen-share-confirmed" id="amen-share-confirmed-d3"></div>
 
-      <!-- State 1: normal — browser supports web push (Android, desktop) -->
-      <div id="amen-notif-normal-d3" style="display:none">
-        <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-        <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d3')">
-          Turn on notifications
-        </button>
-        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d3')">Not now</button>
-      </div>
-
-      <!-- State 2: iOS Safari in browser tab — can install as PWA -->
-      <div id="amen-notif-ios-safari-d3" style="display:none">
-        <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, tap the Share icon at the bottom of your screen and choose Add to Home Screen.</div>
-        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d3')">Dismiss</button>
-      </div>
-
-      <!-- State 3: iOS other browser — must switch to Safari -->
-      <div id="amen-notif-ios-other-d3" style="display:none">
-        <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, open <a href="https://dailyvigil.app" style="color:inherit">dailyvigil.app</a> in Safari and follow the instructions on the Amen screen.</div>
-        <button class="amen-not-now-btn" onclick="vigilDismissNotification('d3')">Dismiss</button>
       </div>
 
     </div>
@@ -1405,6 +1483,15 @@ body { overflow: hidden; }
   <!-- Desktop screen navigation arrows (hidden on mobile via CSS) -->
   <button class="desktop-nav-arrow desktop-nav-prev" id="desktopPrev" aria-label="Previous screen">&#8249;</button>
   <button class="desktop-nav-arrow desktop-nav-next" id="desktopNext" aria-label="Next screen">&#8250;</button>
+
+  <!-- First-visit welcome overlay -->
+  <div class="welcome-overlay" id="welcomeOverlay" role="dialog" aria-modal="true" style="display:none">
+    <div class="welcome-card">
+      <div class="welcome-wordmark">V I G I L</div>
+      <div class="welcome-body">Vigil is a short daily devotional shaped by the Christian year. Each day gives you one word to carry through scripture, contemplation, prayer and practice. Move through the seven screens slowly. At the end, mark that you have kept Vigil and return tomorrow.</div>
+      <button class="welcome-begin" id="welcomeBegin">Begin</button>
+    </div>
+  </div>
 
 </div>
 
@@ -1786,6 +1873,7 @@ function amenCheck(row) {
   const hero    = document.getElementById('amen-hero-' + uid);
   const word    = document.getElementById('amen-word-' + uid);
   const comm    = document.getElementById('amen-commission-' + uid);
+  const post    = document.getElementById('amen-post-' + uid);
   const share   = document.getElementById('amen-share-' + uid);
   const checked = box.classList.toggle('amen-checked');
   row.setAttribute('aria-checked', String(checked));
@@ -1793,20 +1881,68 @@ function amenCheck(row) {
     if (!amenCounted[uid]) { amenCounted[uid] = true; amenIncrementCount(); }
     vigilRecordKept();
     amenPrebuildShareImage(uid);
-    setTimeout(() => { if (hero) hero.classList.add('amen-hero-checked'); },    0);
-    setTimeout(() => word.classList.add('amen-visible'),                       300);
-    setTimeout(() => comm.classList.add('amen-visible'),                       600);
-    setTimeout(() => share.classList.add('amen-visible'),                      900);
+
+    // Update completion count before deciding what to show
+    let count = parseInt(localStorage.getItem('vigil-completion-count') || '0', 10);
+    count = Math.max(0, count) + 1;
+    localStorage.setItem('vigil-completion-count', String(count));
+
+    setTimeout(() => { if (hero) hero.classList.add('amen-hero-checked'); }, 0);
+    setTimeout(() => word.classList.add('amen-visible'), 300);
+    // Commission appears 0.7s after tick; its own transition takes 0.9s
+    setTimeout(() => comm.classList.add('amen-visible'), 700);
+    // Post-liturgy layer rises 3s after commission animation completes: 700 + 900 + 3000
+    setTimeout(() => {
+      amenShowPostLiturgy(uid, count);
+    }, 4600);
   } else {
-    share.classList.remove('amen-visible');
-    setTimeout(() => comm.classList.remove('amen-visible'),                    300);
-    setTimeout(() => word.classList.remove('amen-visible'),                    600);
+    // Decrement count (min 0)
+    let count = parseInt(localStorage.getItem('vigil-completion-count') || '0', 10);
+    count = Math.max(0, count - 1);
+    localStorage.setItem('vigil-completion-count', String(count));
+
+    if (post)  post.classList.remove('amen-visible');
+    setTimeout(() => comm.classList.remove('amen-visible'), 300);
+    setTimeout(() => word.classList.remove('amen-visible'), 600);
     setTimeout(() => { if (hero) hero.classList.remove('amen-hero-checked'); }, 900);
     const initial   = document.getElementById('amen-share-initial-' + uid);
     const confirmed = document.getElementById('amen-share-confirmed-' + uid);
     if (initial)   initial.style.display = '';
     if (confirmed) { confirmed.textContent = ''; confirmed.classList.remove('amen-share-confirmed-visible'); }
   }
+}
+
+function amenShowPostLiturgy(uid, completionCount) {
+  const post  = document.getElementById('amen-post-' + uid);
+  const share = document.getElementById('amen-share-' + uid);
+  if (!post) return;
+
+  // Show the notif section if applicable
+  const notifShown = amenMaybeShowNotif(uid);
+
+  // Show the share ask if: count ≥ 2 AND share not permanently dismissed
+  const shareDismissed = localStorage.getItem('vigil-share-dismissed');
+  const showShare = !shareDismissed && completionCount >= 2;
+
+  if (showShare && share) {
+    // If notif was shown, delay share by 1.5s after the user resolves it;
+    // since we can't know when that is, we use a conservative minimum delay.
+    // The notif section hides itself when dismissed; share appears 1.5s later.
+    if (notifShown) {
+      // Mark that share should appear after notif resolves
+      share.dataset.pendingAfterNotif = '1';
+    } else {
+      // No notif — show share immediately as post-liturgy layer rises
+      share.classList.add('amen-visible');
+    }
+  }
+
+  post.classList.add('amen-visible');
+
+  setTimeout(() => {
+    const inner = post.closest('.screen-inner');
+    if (inner) inner.scrollTo({ top: inner.scrollHeight, behavior: 'smooth' });
+  }, 950);
 }
 
 // ── Share image: pre-render on checkbox tick, share synchronously on button tap ──
@@ -2233,16 +2369,41 @@ function vigilGetNotifState() {
 }
 
 function vigilMaybeShowNotifPrompt(screenIndex) {
-  if (screenIndex !== 6) return;
-  if (!vigilShouldShowNotifPrompt()) return;
-  const uid   = 'd' + (currentDay + 1);
+  // No longer shows on screen arrival — the post-liturgy layer handles this.
+  // Kept as a no-op stub so existing goTo hook calls do not error.
+}
+
+function amenMaybeShowNotif(uid) {
+  // Shows the notif section inside the post-liturgy layer if applicable.
+  // Returns true if it was shown, false if suppressed.
+  if (!vigilShouldShowNotifPrompt()) return false;
   const outer = document.getElementById('amen-notif-' + uid);
-  if (!outer) return;
+  if (!outer) return false;
   const state = vigilGetNotifState();
   const inner = document.getElementById('amen-notif-' + state + '-' + uid);
   if (inner) {
     outer.style.display = 'block';
     inner.style.display = 'block';
+    return true;
+  }
+  return false;
+}
+
+function amenTriggerDeferredShare(uid) {
+  // Called 1.5s after the notif section resolves, to show the share ask if pending.
+  const share = document.getElementById('amen-share-' + uid);
+  if (share && share.dataset.pendingAfterNotif) {
+    delete share.dataset.pendingAfterNotif;
+    const shareDismissed = localStorage.getItem('vigil-share-dismissed');
+    if (!shareDismissed) {
+      setTimeout(() => {
+        share.classList.add('amen-visible');
+        setTimeout(() => {
+          const inner = share.closest('.screen-inner');
+          if (inner) inner.scrollTo({ top: inner.scrollHeight, behavior: 'smooth' });
+        }, 950);
+      }, 1500);
+    }
   }
 }
 
@@ -2252,6 +2413,7 @@ function vigilRequestNotification(uid) {
       localStorage.setItem('vigil-notif-dismissed', 'granted');
       const el = document.getElementById('amen-notif-' + uid);
       if (el) el.style.display = 'none';
+      amenTriggerDeferredShare(uid);
     });
   }
   // By the time the user taps the button, the SDK will already be initialised.
@@ -2269,7 +2431,27 @@ function vigilDismissNotification(uid) {
   localStorage.setItem('vigil-notif-dismissed', vigilTodayISO());
   const el = document.getElementById('amen-notif-' + uid);
   if (el) el.style.display = 'none';
+  amenTriggerDeferredShare(uid);
 }
+
+// ── First-visit welcome overlay ───────────────────────────────────────────
+
+(function initWelcomeOverlay() {
+  const overlay = document.getElementById('welcomeOverlay');
+  const btn     = document.getElementById('welcomeBegin');
+  if (!overlay || !btn) return;
+
+  if (!localStorage.getItem('vigil-welcomed')) {
+    overlay.style.display = 'flex';
+    btn.addEventListener('click', function() {
+      overlay.classList.add('welcome-hiding');
+      setTimeout(function() {
+        overlay.style.display = 'none';
+      }, 320);
+      localStorage.setItem('vigil-welcomed', '1');
+    });
+  }
+})();
 
 // ── Production mode: today only ───────────────────────────────────────────
 
