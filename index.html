@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-10 08:05 · 10 May 2026 – 13 May 2026 (19 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-10 18:39 · 10 May 2026 – 13 May 2026 (19 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -794,6 +794,28 @@ body { overflow: hidden; }
   transition: opacity 0.2s, border-color 0.2s; -webkit-tap-highlight-color: transparent;
 }
 .amen-share-btn-secondary:hover { opacity: 0.75; border-color: var(--gold); }
+
+/* Half-width pair shown in state B (visits ≥ 5, no active patron) */
+.amen-btn-pair {
+  display: flex; gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+.amen-btn-half {
+  flex: 0 0 calc(50% - 0.25rem);
+  font-family: 'Raleway', sans-serif; font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  padding: 0.95rem 0.4rem;
+  cursor: pointer;
+  border: 1px solid rgba(184,134,11,0.4);
+  background: none; color: var(--gold);
+  transition: opacity 0.2s, border-color 0.2s;
+  text-decoration: none;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1.3; text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.amen-btn-half:hover { opacity: 0.75; border-color: var(--gold); }
+
 .amen-not-now-btn {
   display: block; width: 100%;
   font-family: 'Libre Baskerville', serif; font-size: 0.95rem; font-style: italic;
@@ -1104,8 +1126,18 @@ Or where might your life already be telling the truth about Christ before you fi
           <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
           <button class="amen-share-btn-primary"
                   onclick="amenShareImage('d1')">Share today&#8217;s Vigil</button>
-          <button class="amen-share-btn-secondary"
+          <!-- State A/C: full-width Share App (visits < 5, or active patron) -->
+          <button class="amen-share-btn-secondary" id="amen-share-app-full-d1"
                   onclick="amenShareApp('d1')">Share the app</button>
+          <!-- State B: half-width pair (visits ≥ 5, no active patron) -->
+          <div class="amen-btn-pair" id="amen-btn-pair-d1" style="display:none">
+            <button class="amen-btn-half"
+                    onclick="amenShareApp('d1')">Share the app</button>
+            <a class="amen-btn-half"
+               href="https://ko-fi.com/dailyvigil"
+               target="_blank"
+               rel="noopener noreferrer">Support Vigil</a>
+          </div>
           <button class="amen-not-now-btn"
                   onclick="amenNotNow('d1')">Not now</button>
         </div>
@@ -1267,8 +1299,18 @@ Or where might your life already be telling the truth about Christ before you fi
           <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
           <button class="amen-share-btn-primary"
                   onclick="amenShareImage('d2')">Share today&#8217;s Vigil</button>
-          <button class="amen-share-btn-secondary"
+          <!-- State A/C: full-width Share App (visits < 5, or active patron) -->
+          <button class="amen-share-btn-secondary" id="amen-share-app-full-d2"
                   onclick="amenShareApp('d2')">Share the app</button>
+          <!-- State B: half-width pair (visits ≥ 5, no active patron) -->
+          <div class="amen-btn-pair" id="amen-btn-pair-d2" style="display:none">
+            <button class="amen-btn-half"
+                    onclick="amenShareApp('d2')">Share the app</button>
+            <a class="amen-btn-half"
+               href="https://ko-fi.com/dailyvigil"
+               target="_blank"
+               rel="noopener noreferrer">Support Vigil</a>
+          </div>
           <button class="amen-not-now-btn"
                   onclick="amenNotNow('d2')">Not now</button>
         </div>
@@ -1430,8 +1472,18 @@ Or where might your life already be telling the truth about Christ before you fi
           <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
           <button class="amen-share-btn-primary"
                   onclick="amenShareImage('d3')">Share today&#8217;s Vigil</button>
-          <button class="amen-share-btn-secondary"
+          <!-- State A/C: full-width Share App (visits < 5, or active patron) -->
+          <button class="amen-share-btn-secondary" id="amen-share-app-full-d3"
                   onclick="amenShareApp('d3')">Share the app</button>
+          <!-- State B: half-width pair (visits ≥ 5, no active patron) -->
+          <div class="amen-btn-pair" id="amen-btn-pair-d3" style="display:none">
+            <button class="amen-btn-half"
+                    onclick="amenShareApp('d3')">Share the app</button>
+            <a class="amen-btn-half"
+               href="https://ko-fi.com/dailyvigil"
+               target="_blank"
+               rel="noopener noreferrer">Support Vigil</a>
+          </div>
           <button class="amen-not-now-btn"
                   onclick="amenNotNow('d3')">Not now</button>
         </div>
@@ -1599,8 +1651,18 @@ The Lord records, as he registers the peoples,
           <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
           <button class="amen-share-btn-primary"
                   onclick="amenShareImage('d4')">Share today&#8217;s Vigil</button>
-          <button class="amen-share-btn-secondary"
+          <!-- State A/C: full-width Share App (visits < 5, or active patron) -->
+          <button class="amen-share-btn-secondary" id="amen-share-app-full-d4"
                   onclick="amenShareApp('d4')">Share the app</button>
+          <!-- State B: half-width pair (visits ≥ 5, no active patron) -->
+          <div class="amen-btn-pair" id="amen-btn-pair-d4" style="display:none">
+            <button class="amen-btn-half"
+                    onclick="amenShareApp('d4')">Share the app</button>
+            <a class="amen-btn-half"
+               href="https://ko-fi.com/dailyvigil"
+               target="_blank"
+               rel="noopener noreferrer">Support Vigil</a>
+          </div>
           <button class="amen-not-now-btn"
                   onclick="amenNotNow('d4')">Not now</button>
         </div>
@@ -1763,8 +1825,18 @@ The Lord records, as he registers the peoples,
           <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
           <button class="amen-share-btn-primary"
                   onclick="amenShareImage('d5')">Share today&#8217;s Vigil</button>
-          <button class="amen-share-btn-secondary"
+          <!-- State A/C: full-width Share App (visits < 5, or active patron) -->
+          <button class="amen-share-btn-secondary" id="amen-share-app-full-d5"
                   onclick="amenShareApp('d5')">Share the app</button>
+          <!-- State B: half-width pair (visits ≥ 5, no active patron) -->
+          <div class="amen-btn-pair" id="amen-btn-pair-d5" style="display:none">
+            <button class="amen-btn-half"
+                    onclick="amenShareApp('d5')">Share the app</button>
+            <a class="amen-btn-half"
+               href="https://ko-fi.com/dailyvigil"
+               target="_blank"
+               rel="noopener noreferrer">Support Vigil</a>
+          </div>
           <button class="amen-not-now-btn"
                   onclick="amenNotNow('d5')">Not now</button>
         </div>
@@ -1927,8 +1999,18 @@ The Lord records, as he registers the peoples,
           <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
           <button class="amen-share-btn-primary"
                   onclick="amenShareImage('d6')">Share today&#8217;s Vigil</button>
-          <button class="amen-share-btn-secondary"
+          <!-- State A/C: full-width Share App (visits < 5, or active patron) -->
+          <button class="amen-share-btn-secondary" id="amen-share-app-full-d6"
                   onclick="amenShareApp('d6')">Share the app</button>
+          <!-- State B: half-width pair (visits ≥ 5, no active patron) -->
+          <div class="amen-btn-pair" id="amen-btn-pair-d6" style="display:none">
+            <button class="amen-btn-half"
+                    onclick="amenShareApp('d6')">Share the app</button>
+            <a class="amen-btn-half"
+               href="https://ko-fi.com/dailyvigil"
+               target="_blank"
+               rel="noopener noreferrer">Support Vigil</a>
+          </div>
           <button class="amen-not-now-btn"
                   onclick="amenNotNow('d6')">Not now</button>
         </div>
@@ -2089,8 +2171,18 @@ The Lord records, as he registers the peoples,
           <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
           <button class="amen-share-btn-primary"
                   onclick="amenShareImage('d7')">Share today&#8217;s Vigil</button>
-          <button class="amen-share-btn-secondary"
+          <!-- State A/C: full-width Share App (visits < 5, or active patron) -->
+          <button class="amen-share-btn-secondary" id="amen-share-app-full-d7"
                   onclick="amenShareApp('d7')">Share the app</button>
+          <!-- State B: half-width pair (visits ≥ 5, no active patron) -->
+          <div class="amen-btn-pair" id="amen-btn-pair-d7" style="display:none">
+            <button class="amen-btn-half"
+                    onclick="amenShareApp('d7')">Share the app</button>
+            <a class="amen-btn-half"
+               href="https://ko-fi.com/dailyvigil"
+               target="_blank"
+               rel="noopener noreferrer">Support Vigil</a>
+          </div>
           <button class="amen-not-now-btn"
                   onclick="amenNotNow('d7')">Not now</button>
         </div>
@@ -2253,8 +2345,18 @@ The Lord records, as he registers the peoples,
           <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
           <button class="amen-share-btn-primary"
                   onclick="amenShareImage('d8')">Share today&#8217;s Vigil</button>
-          <button class="amen-share-btn-secondary"
+          <!-- State A/C: full-width Share App (visits < 5, or active patron) -->
+          <button class="amen-share-btn-secondary" id="amen-share-app-full-d8"
                   onclick="amenShareApp('d8')">Share the app</button>
+          <!-- State B: half-width pair (visits ≥ 5, no active patron) -->
+          <div class="amen-btn-pair" id="amen-btn-pair-d8" style="display:none">
+            <button class="amen-btn-half"
+                    onclick="amenShareApp('d8')">Share the app</button>
+            <a class="amen-btn-half"
+               href="https://ko-fi.com/dailyvigil"
+               target="_blank"
+               rel="noopener noreferrer">Support Vigil</a>
+          </div>
           <button class="amen-not-now-btn"
                   onclick="amenNotNow('d8')">Not now</button>
         </div>
@@ -2415,8 +2517,18 @@ Galatians 5:22 (NRSV)</p></div>
           <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
           <button class="amen-share-btn-primary"
                   onclick="amenShareImage('d9')">Share today&#8217;s Vigil</button>
-          <button class="amen-share-btn-secondary"
+          <!-- State A/C: full-width Share App (visits < 5, or active patron) -->
+          <button class="amen-share-btn-secondary" id="amen-share-app-full-d9"
                   onclick="amenShareApp('d9')">Share the app</button>
+          <!-- State B: half-width pair (visits ≥ 5, no active patron) -->
+          <div class="amen-btn-pair" id="amen-btn-pair-d9" style="display:none">
+            <button class="amen-btn-half"
+                    onclick="amenShareApp('d9')">Share the app</button>
+            <a class="amen-btn-half"
+               href="https://ko-fi.com/dailyvigil"
+               target="_blank"
+               rel="noopener noreferrer">Support Vigil</a>
+          </div>
           <button class="amen-not-now-btn"
                   onclick="amenNotNow('d9')">Not now</button>
         </div>
@@ -2583,8 +2695,18 @@ Galatians 5:22 (NRSV)</p></div>
           <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
           <button class="amen-share-btn-primary"
                   onclick="amenShareImage('d10')">Share today&#8217;s Vigil</button>
-          <button class="amen-share-btn-secondary"
+          <!-- State A/C: full-width Share App (visits < 5, or active patron) -->
+          <button class="amen-share-btn-secondary" id="amen-share-app-full-d10"
                   onclick="amenShareApp('d10')">Share the app</button>
+          <!-- State B: half-width pair (visits ≥ 5, no active patron) -->
+          <div class="amen-btn-pair" id="amen-btn-pair-d10" style="display:none">
+            <button class="amen-btn-half"
+                    onclick="amenShareApp('d10')">Share the app</button>
+            <a class="amen-btn-half"
+               href="https://ko-fi.com/dailyvigil"
+               target="_blank"
+               rel="noopener noreferrer">Support Vigil</a>
+          </div>
           <button class="amen-not-now-btn"
                   onclick="amenNotNow('d10')">Not now</button>
         </div>
@@ -2754,8 +2876,18 @@ Galatians 5:22 (NRSV)</p></div>
           <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
           <button class="amen-share-btn-primary"
                   onclick="amenShareImage('d11')">Share today&#8217;s Vigil</button>
-          <button class="amen-share-btn-secondary"
+          <!-- State A/C: full-width Share App (visits < 5, or active patron) -->
+          <button class="amen-share-btn-secondary" id="amen-share-app-full-d11"
                   onclick="amenShareApp('d11')">Share the app</button>
+          <!-- State B: half-width pair (visits ≥ 5, no active patron) -->
+          <div class="amen-btn-pair" id="amen-btn-pair-d11" style="display:none">
+            <button class="amen-btn-half"
+                    onclick="amenShareApp('d11')">Share the app</button>
+            <a class="amen-btn-half"
+               href="https://ko-fi.com/dailyvigil"
+               target="_blank"
+               rel="noopener noreferrer">Support Vigil</a>
+          </div>
           <button class="amen-not-now-btn"
                   onclick="amenNotNow('d11')">Not now</button>
         </div>
@@ -2920,8 +3052,18 @@ Galatians 5:22 (NRSV)</p></div>
           <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
           <button class="amen-share-btn-primary"
                   onclick="amenShareImage('d12')">Share today&#8217;s Vigil</button>
-          <button class="amen-share-btn-secondary"
+          <!-- State A/C: full-width Share App (visits < 5, or active patron) -->
+          <button class="amen-share-btn-secondary" id="amen-share-app-full-d12"
                   onclick="amenShareApp('d12')">Share the app</button>
+          <!-- State B: half-width pair (visits ≥ 5, no active patron) -->
+          <div class="amen-btn-pair" id="amen-btn-pair-d12" style="display:none">
+            <button class="amen-btn-half"
+                    onclick="amenShareApp('d12')">Share the app</button>
+            <a class="amen-btn-half"
+               href="https://ko-fi.com/dailyvigil"
+               target="_blank"
+               rel="noopener noreferrer">Support Vigil</a>
+          </div>
           <button class="amen-not-now-btn"
                   onclick="amenNotNow('d12')">Not now</button>
         </div>
@@ -3084,8 +3226,18 @@ Galatians 5:22 (NRSV)</p></div>
           <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
           <button class="amen-share-btn-primary"
                   onclick="amenShareImage('d13')">Share today&#8217;s Vigil</button>
-          <button class="amen-share-btn-secondary"
+          <!-- State A/C: full-width Share App (visits < 5, or active patron) -->
+          <button class="amen-share-btn-secondary" id="amen-share-app-full-d13"
                   onclick="amenShareApp('d13')">Share the app</button>
+          <!-- State B: half-width pair (visits ≥ 5, no active patron) -->
+          <div class="amen-btn-pair" id="amen-btn-pair-d13" style="display:none">
+            <button class="amen-btn-half"
+                    onclick="amenShareApp('d13')">Share the app</button>
+            <a class="amen-btn-half"
+               href="https://ko-fi.com/dailyvigil"
+               target="_blank"
+               rel="noopener noreferrer">Support Vigil</a>
+          </div>
           <button class="amen-not-now-btn"
                   onclick="amenNotNow('d13')">Not now</button>
         </div>
@@ -3250,8 +3402,18 @@ Galatians 5:22 (NRSV)</p></div>
           <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
           <button class="amen-share-btn-primary"
                   onclick="amenShareImage('d14')">Share today&#8217;s Vigil</button>
-          <button class="amen-share-btn-secondary"
+          <!-- State A/C: full-width Share App (visits < 5, or active patron) -->
+          <button class="amen-share-btn-secondary" id="amen-share-app-full-d14"
                   onclick="amenShareApp('d14')">Share the app</button>
+          <!-- State B: half-width pair (visits ≥ 5, no active patron) -->
+          <div class="amen-btn-pair" id="amen-btn-pair-d14" style="display:none">
+            <button class="amen-btn-half"
+                    onclick="amenShareApp('d14')">Share the app</button>
+            <a class="amen-btn-half"
+               href="https://ko-fi.com/dailyvigil"
+               target="_blank"
+               rel="noopener noreferrer">Support Vigil</a>
+          </div>
           <button class="amen-not-now-btn"
                   onclick="amenNotNow('d14')">Not now</button>
         </div>
@@ -3415,8 +3577,18 @@ Galatians 5:22 (NRSV)</p></div>
           <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
           <button class="amen-share-btn-primary"
                   onclick="amenShareImage('d15')">Share today&#8217;s Vigil</button>
-          <button class="amen-share-btn-secondary"
+          <!-- State A/C: full-width Share App (visits < 5, or active patron) -->
+          <button class="amen-share-btn-secondary" id="amen-share-app-full-d15"
                   onclick="amenShareApp('d15')">Share the app</button>
+          <!-- State B: half-width pair (visits ≥ 5, no active patron) -->
+          <div class="amen-btn-pair" id="amen-btn-pair-d15" style="display:none">
+            <button class="amen-btn-half"
+                    onclick="amenShareApp('d15')">Share the app</button>
+            <a class="amen-btn-half"
+               href="https://ko-fi.com/dailyvigil"
+               target="_blank"
+               rel="noopener noreferrer">Support Vigil</a>
+          </div>
           <button class="amen-not-now-btn"
                   onclick="amenNotNow('d15')">Not now</button>
         </div>
@@ -3580,8 +3752,18 @@ Galatians 5:22 (NRSV)</p></div>
           <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
           <button class="amen-share-btn-primary"
                   onclick="amenShareImage('d16')">Share today&#8217;s Vigil</button>
-          <button class="amen-share-btn-secondary"
+          <!-- State A/C: full-width Share App (visits < 5, or active patron) -->
+          <button class="amen-share-btn-secondary" id="amen-share-app-full-d16"
                   onclick="amenShareApp('d16')">Share the app</button>
+          <!-- State B: half-width pair (visits ≥ 5, no active patron) -->
+          <div class="amen-btn-pair" id="amen-btn-pair-d16" style="display:none">
+            <button class="amen-btn-half"
+                    onclick="amenShareApp('d16')">Share the app</button>
+            <a class="amen-btn-half"
+               href="https://ko-fi.com/dailyvigil"
+               target="_blank"
+               rel="noopener noreferrer">Support Vigil</a>
+          </div>
           <button class="amen-not-now-btn"
                   onclick="amenNotNow('d16')">Not now</button>
         </div>
@@ -3755,8 +3937,18 @@ double for all her sins.&quot;</p></div>
           <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
           <button class="amen-share-btn-primary"
                   onclick="amenShareImage('d17')">Share today&#8217;s Vigil</button>
-          <button class="amen-share-btn-secondary"
+          <!-- State A/C: full-width Share App (visits < 5, or active patron) -->
+          <button class="amen-share-btn-secondary" id="amen-share-app-full-d17"
                   onclick="amenShareApp('d17')">Share the app</button>
+          <!-- State B: half-width pair (visits ≥ 5, no active patron) -->
+          <div class="amen-btn-pair" id="amen-btn-pair-d17" style="display:none">
+            <button class="amen-btn-half"
+                    onclick="amenShareApp('d17')">Share the app</button>
+            <a class="amen-btn-half"
+               href="https://ko-fi.com/dailyvigil"
+               target="_blank"
+               rel="noopener noreferrer">Support Vigil</a>
+          </div>
           <button class="amen-not-now-btn"
                   onclick="amenNotNow('d17')">Not now</button>
         </div>
@@ -3924,8 +4116,18 @@ double for all her sins.&quot;</p></div>
           <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
           <button class="amen-share-btn-primary"
                   onclick="amenShareImage('d18')">Share today&#8217;s Vigil</button>
-          <button class="amen-share-btn-secondary"
+          <!-- State A/C: full-width Share App (visits < 5, or active patron) -->
+          <button class="amen-share-btn-secondary" id="amen-share-app-full-d18"
                   onclick="amenShareApp('d18')">Share the app</button>
+          <!-- State B: half-width pair (visits ≥ 5, no active patron) -->
+          <div class="amen-btn-pair" id="amen-btn-pair-d18" style="display:none">
+            <button class="amen-btn-half"
+                    onclick="amenShareApp('d18')">Share the app</button>
+            <a class="amen-btn-half"
+               href="https://ko-fi.com/dailyvigil"
+               target="_blank"
+               rel="noopener noreferrer">Support Vigil</a>
+          </div>
           <button class="amen-not-now-btn"
                   onclick="amenNotNow('d18')">Not now</button>
         </div>
@@ -4096,8 +4298,18 @@ for you I wait all day long.&quot;</p></div>
           <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
           <button class="amen-share-btn-primary"
                   onclick="amenShareImage('d19')">Share today&#8217;s Vigil</button>
-          <button class="amen-share-btn-secondary"
+          <!-- State A/C: full-width Share App (visits < 5, or active patron) -->
+          <button class="amen-share-btn-secondary" id="amen-share-app-full-d19"
                   onclick="amenShareApp('d19')">Share the app</button>
+          <!-- State B: half-width pair (visits ≥ 5, no active patron) -->
+          <div class="amen-btn-pair" id="amen-btn-pair-d19" style="display:none">
+            <button class="amen-btn-half"
+                    onclick="amenShareApp('d19')">Share the app</button>
+            <a class="amen-btn-half"
+               href="https://ko-fi.com/dailyvigil"
+               target="_blank"
+               rel="noopener noreferrer">Support Vigil</a>
+          </div>
           <button class="amen-not-now-btn"
                   onclick="amenNotNow('d19')">Not now</button>
         </div>
@@ -4721,10 +4933,52 @@ function amenCheck(row) {
   }
 }
 
+// ── Patronage state ─────────────────────────────────────────────────────────
+// Reads vigil-completion-count and vigil-patron-until from localStorage and
+// shows the correct button layout inside the share block.
+//
+// State A  visits < 5               full-width Share App button
+// State B  visits >= 5, no patron   half-width pair (Share App | Support Vigil)
+// State C  active patron period     full-width Share App button
+//          (reverts to B when patron period expires if visits still >= 5)
+//
+// Ko-fi sets the patron period by redirecting to dailyvigil.app?patron=1m
+// or ?patron=12m after a successful payment. The param is read once on page
+// load and written to localStorage; the URL param itself plays no further role.
+
+(function vigilCheckPatronParam() {
+  const p = new URLSearchParams(window.location.search).get('patron');
+  if (p === '1m' || p === '12m') {
+    const days   = p === '12m' ? 365 : 30;
+    const expiry = Date.now() + days * 24 * 60 * 60 * 1000;
+    // Only write if this is a newer expiry than what is already stored
+    const existing = parseInt(localStorage.getItem('vigil-patron-until') || '0', 10);
+    if (expiry > existing) {
+      localStorage.setItem('vigil-patron-until', String(expiry));
+    }
+  }
+})();
+
+function amenApplyPatronState(uid) {
+  const count     = parseInt(localStorage.getItem('vigil-completion-count') || '0', 10);
+  const patronExp = parseInt(localStorage.getItem('vigil-patron-until')     || '0', 10);
+  const isPatron  = patronExp > Date.now();
+  const showPair  = count >= 5 && !isPatron;
+
+  const btnFull = document.getElementById('amen-share-app-full-' + uid);
+  const btnPair = document.getElementById('amen-btn-pair-'       + uid);
+
+  if (btnFull) btnFull.style.display = showPair ? 'none'  : 'block';
+  if (btnPair) btnPair.style.display = showPair ? 'flex'  : 'none';
+}
+
 function amenShowPostLiturgy(uid, completionCount) {
   const post  = document.getElementById('amen-post-' + uid);
   const share = document.getElementById('amen-share-' + uid);
   if (!post) return;
+
+  // Apply the correct button layout for this user's state
+  amenApplyPatronState(uid);
 
   // Show the notif section if applicable
   const notifShown = amenMaybeShowNotif(uid);
