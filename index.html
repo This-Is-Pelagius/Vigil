@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-11 13:11 · 11 May 2026 – 13 May 2026 (19 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-11 13:17 · 11 May 2026 – 13 May 2026 (19 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -5260,6 +5260,39 @@ function vigilDismissNotification(uid) {
       localStorage.setItem('vigil-welcomed', '1');
     });
   }
+})();
+
+// ── Desktop notification nudge in welcome overlay ────────────────────────
+// On desktop browsers only, adds a short sentence to the first-visit overlay
+// reminding the user that notifications can be turned on from the final screen.
+// Only shown if the user has not already granted or denied notification permission.
+
+(function addDesktopNotifNudge() {
+  // Desktop = not iOS, not Android (no touch-primary device).
+  const ua = navigator.userAgent;
+  const isIOS     = /iP(hone|ad|od)/.test(ua) ||
+                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isAndroid = /Android/.test(ua);
+  if (isIOS || isAndroid) return;
+
+  // Only show if notification permission is not yet decided.
+  if (typeof Notification !== 'undefined' &&
+      (Notification.permission === 'granted' || Notification.permission === 'denied')) return;
+
+  // Inject the nudge sentence before the Begin button.
+  const btn = document.getElementById('welcomeBegin');
+  if (!btn) return;
+  const nudge = document.createElement('p');
+  nudge.style.cssText = [
+    'font-family:\'Libre Baskerville\',serif',
+    'font-size:0.82rem',
+    'line-height:1.8',
+    'color:var(--dim)',
+    'margin:0 0 1.6rem 0',
+    'font-style:italic',
+  ].join(';');
+  nudge.textContent = 'You can also turn on morning notifications from the final screen.';
+  btn.parentNode.insertBefore(nudge, btn);
 })();
 
 // ── PWA first-launch overlay ──────────────────────────────────────────────
