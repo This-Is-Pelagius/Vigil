@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-10 20:31 · 10 May 2026 – 13 May 2026 (19 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-11 13:11 · 11 May 2026 – 13 May 2026 (19 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -4145,6 +4145,15 @@ for you I wait all day long.&quot;</p></div>
     </div>
   </div>
 
+  <!-- PWA first-launch overlay (shown once when opened from home screen icon) -->
+  <div class="welcome-overlay" id="pwaWelcomeOverlay" role="dialog" aria-modal="true" style="display:none">
+    <div class="welcome-card">
+      <div class="welcome-wordmark">V I G I L</div>
+      <div class="welcome-body">You&#8217;re now using Vigil as an app. To receive a word each morning, complete today&#8217;s devotions and &#8216;turn on notifications&#8217; on the final screen.</div>
+      <button class="welcome-begin" id="pwaWelcomeBegin">Begin</button>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -5249,6 +5258,29 @@ function vigilDismissNotification(uid) {
         overlay.style.display = 'none';
       }, 320);
       localStorage.setItem('vigil-welcomed', '1');
+    });
+  }
+})();
+
+// ── PWA first-launch overlay ──────────────────────────────────────────────
+// Shown once when the app is opened from the home screen icon for the first
+// time, reminding the user to complete the liturgy and turn on notifications.
+
+(function initPwaWelcomeOverlay() {
+  // Only fires when running as an installed PWA (standalone mode).
+  if (window.navigator.standalone !== true) return;
+  const overlay = document.getElementById('pwaWelcomeOverlay');
+  const btn     = document.getElementById('pwaWelcomeBegin');
+  if (!overlay || !btn) return;
+
+  if (!localStorage.getItem('vigil-pwa-welcomed')) {
+    overlay.style.display = 'flex';
+    btn.addEventListener('click', function() {
+      overlay.classList.add('welcome-hiding');
+      setTimeout(function() {
+        overlay.style.display = 'none';
+      }, 320);
+      localStorage.setItem('vigil-pwa-welcomed', '1');
     });
   }
 })();
