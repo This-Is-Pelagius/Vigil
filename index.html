@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-12 19:37 · 12 May 2026 – 16 May 2026 (22 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-13 07:16 · 13 May 2026 – 16 May 2026 (22 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -5941,6 +5941,30 @@ if (targetIdx === -1) {
   }
 }
 
+</script>
+<script>
+// ── Service worker registration and update reload ──────────────────────────
+// Registers service-worker.js and, when a newly-deployed worker activates,
+// reloads the page immediately so users always see today's content rather
+// than a cached copy from the previous day.
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js').then(function(reg) {
+    reg.addEventListener('updatefound', function() {
+      var newWorker = reg.installing;
+      newWorker.addEventListener('statechange', function() {
+        // 'activated' fires when the new worker has taken control.
+        // Reload so the freshly-cached index.html is served immediately.
+        if (newWorker.state === 'activated') {
+          window.location.reload();
+        }
+      });
+    });
+  });
+  // If the controller changes (e.g. skipWaiting was called), reload.
+  navigator.serviceWorker.addEventListener('controllerchange', function() {
+    window.location.reload();
+  });
+}
 </script>
 </body>
 </html>
