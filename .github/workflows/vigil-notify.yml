@@ -1,37 +1,38 @@
 name: Schedule Daily Notification
-
+ 
 # Runs automatically at 5:00 AM UTC every morning.
-# In BST (late March to late October) that is 6:00 AM London time.
-# In GMT (late October to late March) that is 5:00 AM London time.
-# vigil_notify.py detects BST/GMT automatically and adjusts the OneSignal
-# delivery timing accordingly. No manual changes are ever needed here.
-
+# This is before 7:45 AM in any timezone, so the notification is always
+# scheduled before it is due to deliver.
+#
+# vigil_notify.py sets send_after to midnight UTC on the target date, so
+# OneSignal always receives the request before the send_after time. It then
+# delivers to each user at 7:45 AM in their own local timezone.
+ 
 on:
   schedule:
     - cron: '0 5 * * *'   # 5:00 AM UTC daily
-
-  # Allows you to trigger a run manually from the Actions tab in GitHub,
-  # for example to re-schedule a missed day or test the workflow.
+ 
+  # Allows manual triggering from the Actions tab in GitHub.
   workflow_dispatch:
-
+ 
 jobs:
   notify:
     runs-on: ubuntu-latest
-
+ 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
           ref: v2-build
-
+ 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
+ 
       - name: Install dependencies
         run: pip install openpyxl requests
-
+ 
       - name: Schedule today's notification
         env:
           ONESIGNAL_API_KEY: ${{ secrets.ONESIGNAL_API_KEY }}
