@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-14 07:58 · 14 May 2026 – 19 May 2026 (25 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-15 10:17 · 15 May 2026 – 19 May 2026 (25 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -106,18 +106,27 @@ body { overflow: hidden; }
 
 .day-screens {
   position: absolute; top: 0; left: 0;
-  display: flex; flex-direction: row;
   width: 100%; height: 100%;
-  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
 }
 
 .screen {
-  min-width: 100vw; width: 100vw; height: 100%;
+  position: absolute; inset: 0;
   display: flex; flex-direction: column;
   justify-content: flex-start; align-items: flex-start;
-  position: relative; overflow: hidden;
-  background: var(--bg); flex-shrink: 0;
+  overflow: hidden;
+  background: var(--bg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.75s ease;
+}
+.screen.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.screen.leaving {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.75s ease;
 }
 .screen-word, .screen-contemplation, .screen-practice { background: var(--panel); }
 
@@ -235,16 +244,26 @@ body { overflow: hidden; }
 /* Desktop nav arrows — hidden by default */
 .desktop-nav-arrow { display: none; }
 
+/* ── Threshold veil: Screen 7 → 1 wrap ── */
+#thresholdVeil {
+  position: fixed; inset: 0; z-index: 60;
+  background: #100D0B;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+#thresholdVeil.threshold-closing { opacity: 1; transition: opacity 0.6s ease; }
+#thresholdVeil.threshold-opening { opacity: 0; transition: opacity 0.7s ease; }
+
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(14px); }
+  from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.screen.animating .screen-label                  { animation: fadeUp 0.5s ease forwards; animation-delay: 0.02s; opacity: 0; }
-.screen.animating .screen-inner > *:nth-child(1) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.08s; opacity: 0; }
-.screen.animating .screen-inner > *:nth-child(2) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.15s; opacity: 0; }
-.screen.animating .screen-inner > *:nth-child(3) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.22s; opacity: 0; }
-.screen.animating .screen-inner > *:nth-child(4) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.29s; opacity: 0; }
-.screen.animating .screen-inner > *:nth-child(5) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.36s; opacity: 0; }
+.screen.animating .screen-label                  { animation: fadeUp 0.5s ease forwards; animation-delay: 0.10s; opacity: 0; }
+.screen.animating .screen-inner > *:nth-child(1) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.18s; opacity: 0; }
+.screen.animating .screen-inner > *:nth-child(2) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.25s; opacity: 0; }
+.screen.animating .screen-inner > *:nth-child(3) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.32s; opacity: 0; }
+.screen.animating .screen-inner > *:nth-child(4) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.39s; opacity: 0; }
+.screen.animating .screen-inner > *:nth-child(5) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.46s; opacity: 0; }
 
 /* ── Screen 1: Season ── */
 .season-day {
@@ -5141,6 +5160,9 @@ The expected answer is: not much. The actual answer is stranger than that.</p>
   </div>
   </div>
 
+  <!-- Threshold veil: Screen 7 → Screen 1 wrap -->
+  <div id="thresholdVeil"></div>
+
   <!-- Navigation dots -->
   <nav class="nav-dots" id="dots" aria-label="Screen navigation"></nav>
   <div class="swipe-hint" id="swipeHint">&#8592; swipe &#8594;</div>
@@ -5499,47 +5521,86 @@ function getScreenWidth() {
   return appEl ? appEl.offsetWidth : window.innerWidth;
 }
 
+let _transitioning = false;
+
 function goTo(i, anim=true) {
+  if (_transitioning) return;
   if (i >= TOTAL_SCREENS) { wrapAmenToScreen1(); return; }
   if (i < 0) i = 0;
+
+  const screens = getCurrentScreens();
+  const prev    = screens[currentScreen];
+  const next    = screens[i];
+
+  if (prev === next) return;
+
   currentScreen = i;
-  const dayEl = document.querySelector(`.day-screens[data-day="${currentDay}"]`);
-  if (!dayEl) return;
-  const sw = getScreenWidth();
-  dayEl.style.transform = `translateX(-${i * sw}px)`;
   document.querySelectorAll('.dot').forEach((d, idx) => d.classList.toggle('active', idx === i));
   document.getElementById('counter').textContent = `${i + 1} / ${TOTAL_SCREENS}`;
   const hint = document.getElementById('swipeHint');
   if (hint && i > 0) hint.style.opacity = '0';
+
+  if (!anim) {
+    screens.forEach(s => s.classList.remove('active', 'leaving', 'animating'));
+    next.classList.add('active');
+    return;
+  }
+
+  _transitioning = true;
+
+  prev.style.zIndex = '2';
+  next.style.zIndex = '1';
+  prev.classList.remove('active');
+  prev.classList.add('leaving');
+  next.classList.add('active');
+
   if (anim) animateScreen(i);
+
+  setTimeout(() => {
+    prev.classList.remove('leaving');
+    prev.style.zIndex = '';
+    next.style.zIndex = '';
+    _transitioning = false;
+  }, 780);
 }
 
 function wrapAmenToScreen1() {
-  const dayEl = document.querySelector(`.day-screens[data-day="${currentDay}"]`);
-  if (!dayEl) return;
-  const screens = dayEl.querySelectorAll('.screen');
-  const s1 = screens[0];
-  const sw = getScreenWidth();
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:50;pointer-events:none;overflow:hidden;';
-  const clone = s1.cloneNode(true);
-  clone.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;
-    transform:translateX(100%);transition:transform 0.42s cubic-bezier(0.4,0,0.2,1);`;
-  overlay.appendChild(clone);
-  document.body.appendChild(overlay);
-  dayEl.style.transition = 'transform 0.42s cubic-bezier(0.4,0,0.2,1)';
-  dayEl.style.transform  = `translateX(-${TOTAL_SCREENS * sw}px)`;
-  requestAnimationFrame(() => requestAnimationFrame(() => { clone.style.transform = 'translateX(0)'; }));
+  if (_transitioning) return;
+  _transitioning = true;
+
+  const screens = getCurrentScreens();
+  const prev    = screens[currentScreen];
+  const veil    = document.getElementById('thresholdVeil');
+
+  // Fade dark veil in
+  veil.classList.remove('threshold-opening');
+  veil.classList.add('threshold-closing');
+  veil.style.pointerEvents = 'all';
+
+  // Silently switch to screen 1 while veil is opaque
   setTimeout(() => {
-    overlay.remove();
-    dayEl.style.transition = 'none';
-    dayEl.style.transform  = 'translateX(0)';
+    screens.forEach(s => s.classList.remove('active', 'leaving', 'animating'));
     currentScreen = 0;
+    screens[0].classList.add('active');
+    const inner = screens[0].querySelector('.screen-inner');
+    if (inner) inner.scrollTop = 0;
     document.querySelectorAll('.dot').forEach((d, idx) => d.classList.toggle('active', idx === 0));
     document.getElementById('counter').textContent = `1 / ${TOTAL_SCREENS}`;
+  }, 650);
+
+  // Lift the veil, revealing screen 1
+  setTimeout(() => {
+    veil.classList.remove('threshold-closing');
+    veil.classList.add('threshold-opening');
     animateScreen(0);
-    setTimeout(() => { dayEl.style.transition = ''; }, 50);
-  }, 440);
+  }, 750);
+
+  // Full reset
+  setTimeout(() => {
+    veil.classList.remove('threshold-opening', 'threshold-closing');
+    veil.style.pointerEvents = 'none';
+    _transitioning = false;
+  }, 1550);
 }
 
 function animateScreen(i) {
@@ -5738,14 +5799,8 @@ setTimeout(() => {
   updateScrollIndicator(0);
 }, 300);
 
-// Recalculate on resize
+// Recalculate word titles on resize
 window.addEventListener('resize', () => {
-  const dayEl = document.querySelector(`.day-screens[data-day="${currentDay}"]`);
-  if (!dayEl) return;
-  const sw = getScreenWidth();
-  dayEl.style.transition = 'none';
-  dayEl.style.transform = `translateX(-${currentScreen * sw}px)`;
-  setTimeout(() => { dayEl.style.transition = ''; }, 50);
   for (let d = 0; d < totalDays; d++) fitWordTitle(d);
 });
 
