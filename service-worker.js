@@ -4,7 +4,7 @@
  * When a new version is deployed, increment CACHE_VERSION to bust the cache.
  */
 
-const CACHE_VERSION = 'vigil-v42';
+const CACHE_VERSION = 'vigil-v43';
 
 const APP_SHELL = [
   '/',

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-15 10:17 · 15 May 2026 – 19 May 2026 (25 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-15 10:25 · 15 May 2026 – 19 May 2026 (25 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -117,7 +117,7 @@ body { overflow: hidden; }
   background: var(--bg);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.75s ease;
+  transition: opacity 0.85s ease;
 }
 .screen.active {
   opacity: 1;
@@ -126,7 +126,7 @@ body { overflow: hidden; }
 .screen.leaving {
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.75s ease;
+  transition: opacity 0.85s ease;
 }
 .screen-word, .screen-contemplation, .screen-practice { background: var(--panel); }
 
@@ -5532,8 +5532,6 @@ function goTo(i, anim=true) {
   const prev    = screens[currentScreen];
   const next    = screens[i];
 
-  if (prev === next) return;
-
   currentScreen = i;
   document.querySelectorAll('.dot').forEach((d, idx) => d.classList.toggle('active', idx === i));
   document.getElementById('counter').textContent = `${i + 1} / ${TOTAL_SCREENS}`;
@@ -5546,6 +5544,8 @@ function goTo(i, anim=true) {
     return;
   }
 
+  if (prev === next) return;
+
   _transitioning = true;
 
   prev.style.zIndex = '2';
@@ -5554,14 +5554,14 @@ function goTo(i, anim=true) {
   prev.classList.add('leaving');
   next.classList.add('active');
 
-  if (anim) animateScreen(i);
+  animateScreen(i);
 
   setTimeout(() => {
     prev.classList.remove('leaving');
     prev.style.zIndex = '';
     next.style.zIndex = '';
     _transitioning = false;
-  }, 780);
+  }, 880);
 }
 
 function wrapAmenToScreen1() {
