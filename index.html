@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-16 11:06 · 16 May 2026 – 19 May 2026 (25 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-16 11:10 · 16 May 2026 – 19 May 2026 (25 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -459,13 +459,15 @@ body { overflow: hidden; }
   position: fixed; inset: 0;
   background: rgba(200,190,170,0.6);
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  z-index: 100; display: none;
+  z-index: 100; display: flex;
   align-items: center; justify-content: center; padding: 1.5rem;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.75s ease;
 }
 .palette-lent .figure-overlay,
 .palette-goodfriday .figure-overlay,
 .palette-pentecost .figure-overlay { background: rgba(5,3,8,0.78); }
-.figure-overlay.open { display: flex; }
+.figure-overlay.open { opacity: 1; pointer-events: auto; }
 
 /* ── First-visit welcome overlay ── */
 .welcome-overlay {
@@ -518,7 +520,10 @@ body { overflow: hidden; }
   padding: 2rem 1.8rem 1.8rem; position: relative;
   box-shadow: 0 16px 48px rgba(28,23,20,0.18);
   text-transform: none; letter-spacing: normal;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 0.75s ease, transform 0.75s cubic-bezier(0.22,1,0.36,1);
 }
+.figure-overlay.open .figure-card {{ opacity: 1; transform: translateY(0); }}
 .figure-card .close {
   position: absolute; top: 0.8rem; right: 1rem;
   background: none; border: none; color: var(--dim);
@@ -5654,7 +5659,11 @@ function openFigure(key) {
   // Reading offsetHeight triggers layout before the next paint frame.
   void overlay.querySelector('.figure-card').offsetHeight;
 }
-function closeFigure() { document.getElementById('figureOverlay').classList.remove('open'); }
+function closeFigure() {{
+  const ov = document.getElementById('figureOverlay');
+  ov.style.opacity = '0';
+  setTimeout(() => {{ ov.classList.remove('open'); ov.style.opacity = ''; }}, 750);
+}}
 document.getElementById('figureClose').addEventListener('click', closeFigure);
 document.getElementById('figureOverlay').addEventListener('click', ev => {
   if (ev.target === document.getElementById('figureOverlay')) closeFigure();
