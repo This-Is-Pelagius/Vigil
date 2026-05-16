@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-16 11:15 · 16 May 2026 – 19 May 2026 (25 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-16 11:18 · 16 May 2026 – 19 May 2026 (25 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -520,10 +520,7 @@ body { overflow: hidden; }
   padding: 2rem 1.8rem 1.8rem; position: relative;
   box-shadow: 0 16px 48px rgba(28,23,20,0.18);
   text-transform: none; letter-spacing: normal;
-  opacity: 0; transform: translateY(10px);
-  transition: opacity 0.75s ease, transform 0.75s cubic-bezier(0.22,1,0.36,1);
 }
-.figure-overlay.open .figure-card {{ opacity: 1; transform: translateY(0); }}
 .figure-card .close {
   position: absolute; top: 0.8rem; right: 1rem;
   background: none; border: none; color: var(--dim);
@@ -5654,16 +5651,31 @@ function openFigure(key) {
   roleEl.style.display = fig.role ? '' : 'none';
   document.getElementById('figureBody').textContent  = fig.body;
   const overlay = document.getElementById('figureOverlay');
-  // Read offsetHeight before adding 'open' so the browser registers the
-  // starting state (opacity:0) before the transition to opacity:1 begins.
-  // This also forces iOS Safari to paint the card content correctly.
+  const card = overlay.querySelector('.figure-card');
+  // Start card off-position, then animate in after overlay fades up.
+  card.style.transition = 'none';
+  card.style.opacity = '0';
+  card.style.transform = 'translateY(10px)';
   void overlay.offsetHeight;
   overlay.classList.add('open');
+  // Let the overlay begin fading, then animate the card in.
+  setTimeout(() => {{
+    card.style.transition = 'opacity 0.75s ease, transform 0.75s cubic-bezier(0.22,1,0.36,1)';
+    card.style.opacity = '1';
+    card.style.transform = 'translateY(0)';
+  }}, 50);
 }
 function closeFigure() {{
   const ov = document.getElementById('figureOverlay');
   ov.style.opacity = '0';
-  setTimeout(() => {{ ov.classList.remove('open'); ov.style.opacity = ''; }}, 750);
+  setTimeout(() => {{
+    ov.classList.remove('open');
+    ov.style.opacity = '';
+    const card = ov.querySelector('.figure-card');
+    card.style.transition = 'none';
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(10px)';
+  }}, 750);
 }}
 document.getElementById('figureClose').addEventListener('click', closeFigure);
 document.getElementById('figureOverlay').addEventListener('click', ev => {
