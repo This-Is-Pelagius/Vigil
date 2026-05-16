@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-15 13:48 · 15 May 2026 – 19 May 2026 (25 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-16 10:39 · 16 May 2026 – 19 May 2026 (25 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -459,15 +459,13 @@ body { overflow: hidden; }
   position: fixed; inset: 0;
   background: rgba(200,190,170,0.6);
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  z-index: 100; display: flex;
+  z-index: 100; display: none;
   align-items: center; justify-content: center; padding: 1.5rem;
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.75s ease;
 }
 .palette-lent .figure-overlay,
 .palette-goodfriday .figure-overlay,
 .palette-pentecost .figure-overlay { background: rgba(5,3,8,0.78); }
-.figure-overlay.open { opacity: 1; pointer-events: auto; }
+.figure-overlay.open { display: flex; }
 
 /* ── First-visit welcome overlay ── */
 .welcome-overlay {
@@ -520,10 +518,7 @@ body { overflow: hidden; }
   padding: 2rem 1.8rem 1.8rem; position: relative;
   box-shadow: 0 16px 48px rgba(28,23,20,0.18);
   text-transform: none; letter-spacing: normal;
-  opacity: 0; transform: translateY(10px);
-  transition: opacity 0.75s ease, transform 0.75s cubic-bezier(0.22,1,0.36,1);
 }
-.figure-overlay.open .figure-card {{ opacity: 1; transform: translateY(0); }}
 .figure-card .close {
   position: absolute; top: 0.8rem; right: 1rem;
   background: none; border: none; color: var(--dim);
@@ -3146,7 +3141,7 @@ Galatians 5:22 (NRSV)</p></div>
 <div class="word-divider"></div>
 <div class="word-definition"><p>To witness is to have been present and to say so. It is not an argument or a performance. It is testimony: an account of what actually happened, given by someone who was there.</p>
 <p>The Greek martys (μάρτυς) lies behind both &quot;witness&quot; and &quot;martyr&quot; — the same root, because in the early Church the ultimate form of witness was to hold to your testimony at the cost of your life. The word travels from the courtroom into the life of faith carrying that weight: to witness is to stake something on what you have seen.</p>
-<p>In the book of <button type="button" class="figure-link" data-figure="author_acts_of_the_apostles">Acts</button>, the early Christians are not sent to construct the case for the resurrection. They are sent as people who encountered the risen Christ and cannot honestly say otherwise.</p></div></div>
+<p>In the book of <button type="button" class="figure-link" data-figure="acts_of_the_apostles">Acts</button>, the early Christians are not sent to construct the case for the resurrection. They are sent as people who encountered the risen Christ and cannot honestly say otherwise.</p></div></div>
       <div class="screen-fade-bottom"></div>
     </section>
     <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
@@ -3310,8 +3305,8 @@ Galatians 5:22 (NRSV)</p></div>
 <div class="word-pronunciation">[rest]</div>
 <div class="word-divider"></div>
 <div class="word-definition"><p>To rest is not to stop. It is to stop straining — to cease the effort of holding everything up by force and let yourself be held instead.</p>
-<p>The <button type="button" class="figure-link" data-figure="author_letter_to_the_hebrews">Letter</button> to the <button type="button" class="figure-link" data-figure="author_letter_to_the_hebrews">Hebrews</button> speaks of a sabbatismos (σαββατισμός) — a sabbath-rest — that remains for the people of God. The word is found nowhere else in the New Testament: the writer coins it, reaching for something that ordinary rest does not quite cover. This is not recuperation before the next effort. It is the rest of someone who has arrived: the ceasing that belongs not to exhaustion but to trust.</p>
-<p>In the Jewish tradition the <button type="button" class="figure-link" data-figure="author_letter_to_the_hebrews">Hebrews</button> writer is drawing on, the sabbath was not empty time. It was the day that gave all other days their meaning — the sign that human beings are not defined by what they produce, but by what they receive.</p></div></div>
+<p>The <button type="button" class="figure-link" data-figure="letter_to_the_hebrews">Letter to the Hebrews</button> speaks of a sabbatismos (σαββατισμός) — a sabbath-rest — that remains for the people of God. The word is found nowhere else in the New Testament: the writer coins it, reaching for something that ordinary rest does not quite cover. This is not recuperation before the next effort. It is the rest of someone who has arrived: the ceasing that belongs not to exhaustion but to trust.</p>
+<p>In the Jewish tradition the <button type="button" class="figure-link" data-figure="letter_to_the_hebrews">Hebrews</button> writer is drawing on, the sabbath was not empty time. It was the day that gave all other days their meaning — the sign that human beings are not defined by what they produce, but by what they receive.</p></div></div>
       <div class="screen-fade-bottom"></div>
     </section>
     <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
@@ -3331,7 +3326,7 @@ Galatians 5:22 (NRSV)</p></div>
       <div class="screen-label">Contemplation</div>
       <div class="screen-inner">
 <div class="contemplation-body"><p>There is a kind of tiredness that is not cured by sleep. It comes from the effort of sustaining everything by your own effort — the faith kept alive by willpower, the goodness maintained by discipline, the life held together because you have not yet allowed yourself to stop.</p>
-<p>The <button type="button" class="figure-link" data-figure="author_letter_to_the_hebrews">author</button> of <button type="button" class="figure-link" data-figure="author_letter_to_the_hebrews">Hebrews</button> is not offering a weekend. The rest that remains for the people of God is the rest of someone who has discovered they are not, finally, responsible for holding the world in place. God rested on the seventh day not from depletion, but from completion. The sabbath is the shape of a life that trusts the work is being held by someone other than yourself.</p>
+<p>The author of <button type="button" class="figure-link" data-figure="letter_to_the_hebrews">Hebrews</button> is not offering a weekend. The rest that remains for the people of God is the rest of someone who has discovered they are not, finally, responsible for holding the world in place. God rested on the seventh day not from depletion, but from completion. The sabbath is the shape of a life that trusts the work is being held by someone other than yourself.</p>
 <p>Eastertide is, among other things, the season in which the resurrection announces that the weight has already been carried — that the outcome is not finally in your hands.</p></div>
 <div class="contemplation-question">Where are you still straining to hold something up that has already been placed in God&#x27;s hands? And what would it mean, today, to simply let it rest there?</div></div>
       <div class="screen-fade-bottom"></div>
@@ -4010,9 +4005,9 @@ for you I wait all day long.&quot;</p></div>
       <div class="screen-fade-top"></div>
       <div class="screen-label">Contemplation</div>
       <div class="screen-inner">
-<div class="contemplation-body"><p>The Psalmist does not ask to understand truth, or to be given truth as a possession. The request is simpler and stranger than that: lead me in it. As though truth were a path already laid out ahead — not something the Psalmist constructs by thinking hard enough, but something that requires a guide.</p>
-<p>That is a different relationship to truth than most of us default to. We tend to treat truth as a destination we arrive at through <button type="button" class="figure-link" data-figure="our_lady_of_fatima">our</button> own effort — research, argument, certainty accumulated over time. The <button type="button" class="figure-link" data-figure="author_psalm_25">Psalm</button> imagines something less controlling and more trustworthy: truth as the territory God moves through, and the invitation to follow.</p></div>
-<div class="contemplation-question">What if the truths you have been trying hardest to work out are less in need of further effort, and more in need of a guide? The Psalmist does not ask to arrive — only to be moving in the right direction, with the right one leading.</div></div>
+<div class="contemplation-body"><p>The <button type="button" class="figure-link" data-figure="psalm_25">Psalmist</button> does not ask to understand truth, or to be given truth as a possession. The request is simpler and stranger than that: lead me in it. As though truth were a path already laid out ahead — not something the <button type="button" class="figure-link" data-figure="psalm_25">Psalmist</button> constructs by thinking hard enough, but something that requires a guide.</p>
+<p>That is a different relationship to truth than most of us default to. We tend to treat truth as a destination we arrive at through <button type="button" class="figure-link" data-figure="our_lady_of_fatima">our</button> own effort — research, argument, certainty accumulated over time. The <button type="button" class="figure-link" data-figure="psalm_25">Psalm</button> imagines something less controlling and more trustworthy: truth as the territory God moves through, and the invitation to follow.</p></div>
+<div class="contemplation-question">What if the truths you have been trying hardest to work out are less in need of further effort, and more in need of a guide? The <button type="button" class="figure-link" data-figure="psalm_25">Psalmist</button> does not ask to arrive — only to be moving in the right direction, with the right one leading.</div></div>
       <div class="screen-fade-bottom"></div>
     </section>
     <section class="screen screen-prayer" data-screen="4" aria-label="Prayer">
@@ -4526,10 +4521,10 @@ more than those who watch for the morning.&quot;</p></div>
       <div class="screen-fade-top"></div>
       <div class="screen-label">Contemplation</div>
       <div class="screen-inner">
-<div class="contemplation-body"><p>The Psalmist repeats the image — more than those who watch for the morning, more than those who watch for the morning — because saying it once is not enough. This is not a quick glance toward the horizon. It is a long watching, a posture held through the night.</p>
+<div class="contemplation-body"><p>The <button type="button" class="figure-link" data-figure="psalm_130">Psalmist</button> repeats the image — more than those who watch for the morning, more than those who watch for the morning — because saying it once is not enough. This is not a quick glance toward the horizon. It is a long watching, a posture held through the night.</p>
 <p>The disciples, in the days between the Ascension and the coming of the Spirit at Pentecost, are told to wait — not to go back to their old lives, not to manufacture what they need, but to remain and receive what is promised.</p>
 <p>That waiting is not wasted time. It is the necessary form of a trust that cannot be forced.</p></div>
-<div class="contemplation-question">Waiting feels unproductive because we measure time by what we make of it. But qavah — the stretched, taut waiting of the Psalmist — is not empty. It is oriented. Where are you being asked to stop producing and start receiving, and what would it cost you to trust that the waiting itself is the right response?</div></div>
+<div class="contemplation-question">Waiting feels unproductive because we measure time by what we make of it. But qavah — the stretched, taut waiting of the <button type="button" class="figure-link" data-figure="psalm_130">Psalmist</button> — is not empty. It is oriented. Where are you being asked to stop producing and start receiving, and what would it cost you to trust that the waiting itself is the right response?</div></div>
       <div class="screen-fade-bottom"></div>
     </section>
     <section class="screen screen-prayer" data-screen="4" aria-label="Prayer">
@@ -4554,7 +4549,7 @@ more than those who watch for the morning.&quot;</p></div>
       <div class="screen-inner">
 <div class="practice-body"><p>At some point today, when you feel the pull to check, to plan, to move on to the next thing — pause instead. Physically stop. Let thirty seconds become a minute.</p>
 <p>In that pause, name before God one thing you have been trying to force into resolution. Do not pray for a solution. Simply hold it open, as a question rather than a problem, and say: I am waiting for you in this.</p>
-<p>The Psalmist who watched for the morning did not make the sun rise. He simply remained awake and oriented until it did.</p></div>
+<p>The <button type="button" class="figure-link" data-figure="psalm_130">Psalmist</button> who watched for the morning did not make the sun rise. He simply remained awake and oriented until it did.</p></div>
 <div class="practice-anchor">That is the whole practice: to remain awake, and to stay facing the right direction.</div></div>
       <div class="screen-fade-bottom"></div>
     </section>
@@ -4700,10 +4695,10 @@ and crowned them with glory and honour.&quot;</p></div>
       <div class="screen-fade-top"></div>
       <div class="screen-label">Contemplation</div>
       <div class="screen-inner">
-<div class="contemplation-body"><p>The Psalmist starts where most of us start: with the sky, and the sudden sense of smallness. The moon and the stars that you established. Beside all that, what are we?
+<div class="contemplation-body"><p>The <button type="button" class="figure-link" data-figure="psalm_8">Psalmist</button> starts where most of us start: with the sky, and the sudden sense of smallness. The moon and the stars that you established. Beside all that, what are we?
 The expected answer is: not much. The actual answer is stranger than that.</p>
 <p>You have crowned them with glory and honour. The same word — kabod — that belongs to the presence of God is given here to human beings. Not because they have earned it, but because this is what it means to be human: to carry something of that weight in the world.</p>
-<p>Most of us do not feel glorious. We feel tired, partial, smaller than we hoped. And yet the Psalmist will not let that feeling be the last word.</p></div>
+<p>Most of us do not feel glorious. We feel tired, partial, smaller than we hoped. And yet the <button type="button" class="figure-link" data-figure="psalm_8">Psalmist</button> will not let that feeling be the last word.</p></div>
 <div class="contemplation-question">When did you last feel the full weight of your own life — not your achievements or your failures, but simply the fact of being someone God made and has not stopped being mindful of? And what has been quietly convincing you, since then, that it was a mistake rather than the truest thing about you?</div></div>
       <div class="screen-fade-bottom"></div>
     </section>
@@ -5329,18 +5324,18 @@ const FIGURES_BY_DAY = [
     }
   },
   {
-    "author_acts_of_the_apostles": {
-      "name": "Author · Acts of the Apostles",
+    "acts_of_the_apostles": {
+      "name": "Acts of the Apostles",
       "dates": "1st century AD",
-      "role": "",
+      "role": "Author",
       "body": "Traditionally identified as Luke, a physician and companion of St Paul, and as the author of both the synonymous Gospel and the Acts of the Apostles. He is featured today because Acts 1 gives the disciples — and the reader — their commission: to be witnesses to the risen Christ from Jerusalem to the ends of the earth."
     }
   },
   {
-    "author_letter_to_the_hebrews": {
-      "name": "Author · Letter to the Hebrews",
+    "letter_to_the_hebrews": {
+      "name": "Letter to the Hebrews",
       "dates": "1st century AD",
-      "role": "",
+      "role": "Author",
       "body": "A New Testament letter of uncertain authorship — traditionally attributed to St Paul, though this is disputed among scholars — addressed to early Jewish Christians and concerned with the fulfilment of the old covenant in Christ. It is featured today because Hebrews 4 gives the day's word its deepest register: not ordinary rest, but the sabbath-rest that belongs to those who have learned to trust rather than strain."
     }
   },
@@ -5387,10 +5382,10 @@ const FIGURES_BY_DAY = [
       "role": "",
       "body": "Title given to the Virgin Mary following reported apparitions to three shepherd children — Lúcia dos Santos, Francisco Marto and Jacinta Marto — at Fátima, Portugal, between May and October 1917. The Church remembers her today; the memorial falls on this date because 13 May 1917 was the date of the first apparition, and the message carried there was, at its heart, a call to witness and to prayer in a world shaped by conflict."
     },
-    "author_psalm_25": {
-      "name": "Author · Psalm 25",
+    "psalm_25": {
+      "name": "Psalm 25",
       "dates": "c. 10th century BC",
-      "role": "",
+      "role": "Author",
       "body": "Traditionally attributed to King David, this is a psalm of petition written in an acrostic form — each verse beginning with a successive letter of the Hebrew alphabet — addressed to God in a time of personal distress and uncertainty. It is featured today because Psalm 25 gives the day's word its deepest register: not truth as argument or possession, but truth as a path into which the Psalmist asks to be led by God."
     }
   },
@@ -5409,10 +5404,10 @@ const FIGURES_BY_DAY = [
       "role": "",
       "body": "Spanish agricultural labourer, canonised in 1622, patron saint of farmers and of Madrid. The Church remembers him today; his life gives the day's word its most concrete instance — faithfulness not as achievement but as daily, unglamorous tending of what has been given."
     },
-    "author_psalm_121": {
-      "name": "Author · Psalm 121",
+    "psalm_121": {
+      "name": "Psalm 121",
       "dates": "c. 10th–6th century BC",
-      "role": "",
+      "role": "Author",
       "body": "One of the Songs of Ascent — psalms sung by pilgrims travelling up to Jerusalem for the great feasts. It is featured today because Psalm 121 gives the word shamar its fullest devotional range: the God who tends his people with an attention that never fails."
     }
   },
@@ -5423,18 +5418,18 @@ const FIGURES_BY_DAY = [
       "role": "",
       "body": "English friar and prior general of the Carmelites, an order of religious life rooted in a tradition of solitary prayer and watchful waiting. The Church remembers him today; his life of contemplative perseverance gives the day's word its particular depth."
     },
-    "author_psalm_130": {
-      "name": "Author · Psalm 130",
+    "psalm_130": {
+      "name": "Psalm 130",
       "dates": "c. 10th–6th century BC",
-      "role": "",
+      "role": "Author",
       "body": "One of the seven Penitential Psalms and one of the Songs of Ascent — a psalm of waiting from within distress. It is featured today because Psalm 130 gives qavah its most concentrated expression: not passive endurance, but active, tensed hope held through the dark."
     }
   },
   {
-    "author_psalm_8": {
-      "name": "Author · Psalm 8",
+    "psalm_8": {
+      "name": "Psalm 8",
       "dates": "c. 10th century BC",
-      "role": "",
+      "role": "Author",
       "body": "Traditionally attributed to King David, this is a psalm of praise addressed to God as Creator. It is featured today because it contains one of scripture's most surprising claims: that kabod — the word for God's own weight and glory — belongs also to human beings, given by God before any achievement or merit."
     }
   },
@@ -5653,13 +5648,13 @@ function openFigure(key) {
   roleEl.textContent = fig.role || '';
   roleEl.style.display = fig.role ? '' : 'none';
   document.getElementById('figureBody').textContent  = fig.body;
-  document.getElementById('figureOverlay').classList.add('open');
+  const overlay = document.getElementById('figureOverlay');
+  overlay.classList.add('open');
+  // Force a repaint so iOS Safari renders the card content immediately.
+  // Reading offsetHeight triggers layout before the next paint frame.
+  void overlay.querySelector('.figure-card').offsetHeight;
 }
-function closeFigure() {{
-  const ov = document.getElementById('figureOverlay');
-  ov.style.opacity = '0';
-  setTimeout(() => {{ ov.classList.remove('open'); ov.style.opacity = ''; }}, 750);
-}}
+function closeFigure() { document.getElementById('figureOverlay').classList.remove('open'); }
 document.getElementById('figureClose').addEventListener('click', closeFigure);
 document.getElementById('figureOverlay').addEventListener('click', ev => {
   if (ev.target === document.getElementById('figureOverlay')) closeFigure();
@@ -5675,6 +5670,7 @@ let tx=0, ty=0, ta=false;
 document.addEventListener('touchstart', ev => {
   if (document.getElementById('figureOverlay').classList.contains('open')) return;
   if (ev.target.closest('.day-nav')) return;
+  if (ev.target.closest('.figure-link')) return;
   tx = ev.touches[0].clientX; ty = ev.touches[0].clientY; ta = true;
 }, {passive: true});
 document.addEventListener('touchend', ev => {
@@ -6553,14 +6549,20 @@ if (targetIdx === -1) {
 // reloads the page immediately so users always see today's content rather
 // than a cached copy from the previous day.
 if ('serviceWorker' in navigator) {
-  var _swReloading = false;
-  navigator.serviceWorker.register('/service-worker.js');
-  // Reload once when a new worker takes control, so users always get
-  // the freshly-cached page. The flag prevents a second reload if
-  // multiple events fire in the same activation cycle.
+  navigator.serviceWorker.register('/service-worker.js').then(function(reg) {
+    reg.addEventListener('updatefound', function() {
+      var newWorker = reg.installing;
+      newWorker.addEventListener('statechange', function() {
+        // 'activated' fires when the new worker has taken control.
+        // Reload so the freshly-cached index.html is served immediately.
+        if (newWorker.state === 'activated') {
+          window.location.reload();
+        }
+      });
+    });
+  });
+  // If the controller changes (e.g. skipWaiting was called), reload.
   navigator.serviceWorker.addEventListener('controllerchange', function() {
-    if (_swReloading) return;
-    _swReloading = true;
     window.location.reload();
   });
 }
