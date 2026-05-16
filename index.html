@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-16 11:10 · 16 May 2026 – 19 May 2026 (25 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-16 11:15 · 16 May 2026 – 19 May 2026 (25 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -5654,10 +5654,11 @@ function openFigure(key) {
   roleEl.style.display = fig.role ? '' : 'none';
   document.getElementById('figureBody').textContent  = fig.body;
   const overlay = document.getElementById('figureOverlay');
+  // Read offsetHeight before adding 'open' so the browser registers the
+  // starting state (opacity:0) before the transition to opacity:1 begins.
+  // This also forces iOS Safari to paint the card content correctly.
+  void overlay.offsetHeight;
   overlay.classList.add('open');
-  // Force a repaint so iOS Safari renders the card content immediately.
-  // Reading offsetHeight triggers layout before the next paint frame.
-  void overlay.querySelector('.figure-card').offsetHeight;
 }
 function closeFigure() {{
   const ov = document.getElementById('figureOverlay');
