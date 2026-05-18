@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-18 08:36 · 18 May 2026 – 19 May 2026 (25 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-18 17:25 · 18 May 2026 – 19 May 2026 (25 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -14,8 +14,16 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Vigil">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+
+/* ── Font-loading veil ── */
+/* Keeps the app invisible until fonts are ready, preventing the flash of
+   fallback text on first load. The JS below lifts this within 800ms. */
+.app { opacity: 0; transition: opacity 0.3s ease; }
+.app.fonts-ready { opacity: 1; }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -958,20 +966,25 @@ body { overflow: hidden; }
       safari_web_id: "web.onesignal.auto.0868f031-816f-4b4e-9724-08fcd0b320db",
       notifyButton: { enable: false },
     });
-    // Assign a stable anonymous ID to this user so that multiple installs
-    // on the same device are treated as one subscriber, preventing duplicate
-    // notifications when the app is added to the home screen more than once.
-    if (!localStorage.getItem('vigil-user-id')) {
-      var uid = (typeof crypto !== 'undefined' && crypto.randomUUID)
-        ? crypto.randomUUID()
-        : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = Math.random() * 16 | 0;
-            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-          });
-      localStorage.setItem('vigil-user-id', uid);
-    }
-    await OneSignal.login(localStorage.getItem('vigil-user-id'));
   });
+</script>
+<script>
+/* Lift the font-loading veil once fonts are ready, or after 800ms — whichever
+   comes first. This prevents the flash of fallback text on first visit while
+   ensuring the app never stays hidden on a slow connection. */
+(function() {
+  var TIMEOUT = 800;
+  function reveal() {
+    var app = document.getElementById('app');
+    if (app) app.classList.add('fonts-ready');
+  }
+  if (document.fonts && document.fonts.ready) {
+    var timer = setTimeout(reveal, TIMEOUT);
+    document.fonts.ready.then(function() { clearTimeout(timer); reveal(); });
+  } else {
+    setTimeout(reveal, TIMEOUT);
+  }
+})();
 </script>
 </head>
 <body>
@@ -5010,7 +5023,7 @@ The expected answer is: not much. The actual answer is stranger than that.</p>
 <div class="season-week">Eastertide · Week Seven</div>
 <div class="season-feast">Eve of Pentecost</div>
 <div class="season-divider"></div>
-<div class="season-body"><p>We are in Eastertide, on the eve of Pentecost — the last day of the great fifty, the threshold before the Spirit comes.</p>
+<div class="season-body"><p>We are in Eastertide, on the eve of Pentecost — the last few days of the great fifty, the threshold before the Spirit comes.</p>
 <p>Tomorrow the season ends and a new one begins. Today is a day for standing still before what is about to arrive.</p></div></div>
       <div class="screen-fade-bottom"></div>
     </section>
@@ -5021,7 +5034,7 @@ The expected answer is: not much. The actual answer is stranger than that.</p>
 <div class="word-title">HOLY</div>
 <div class="word-pronunciation">[HOH-lee]</div>
 <div class="word-divider"></div>
-<div class="word-definition"><p>The Hebrew root is qadosh (קָדוֹשׁ) — set apart, cut off from the ordinary, other than what surrounds it. In the Hebrew scriptures, the word first belongs to God alone: the sound of the one thing in existence that is wholly what it is, uncorrupted and unlike anything else.</p>
+<div class="word-definition"><p>The Hebrew root is qadosh (קָדוֹשׁ) and means that which is set apart, cut off from the ordinary, other than what surrounds it.  In the Hebrew scriptures, the word first belongs to God alone: the sound of the one thing in existence that is wholly what it is, uncorrupted and unlike anything else.</p>
 <p>But qadosh does not stay with God. It moves. The altar is holy because it is where God is approached. The day is holy because it is set aside for God. And in the New Testament, the people of God are holy — not because they have achieved moral perfection, but because they have been set apart: drawn into relation with the one who is qadosh in himself, and beginning, slowly, to be changed by that proximity.</p>
 <p>The Greek word for holy, hagios (ἅγιος), carries the same weight. The Holy Spirit is not only a spirit that is morally good. It is the Spirit who is other — who brings the presence of the utterly different into the ordinary life of the world.</p>
 <p>And tomorrow, on Pentecost, that Spirit arrives.</p></div></div>
