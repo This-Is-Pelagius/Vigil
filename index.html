@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-16 11:18 · 16 May 2026 – 19 May 2026 (25 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-18 08:36 · 18 May 2026 – 19 May 2026 (25 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -958,6 +958,19 @@ body { overflow: hidden; }
       safari_web_id: "web.onesignal.auto.0868f031-816f-4b4e-9724-08fcd0b320db",
       notifyButton: { enable: false },
     });
+    // Assign a stable anonymous ID to this user so that multiple installs
+    // on the same device are treated as one subscriber, preventing duplicate
+    // notifications when the app is added to the home screen more than once.
+    if (!localStorage.getItem('vigil-user-id')) {
+      var uid = (typeof crypto !== 'undefined' && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16 | 0;
+            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+          });
+      localStorage.setItem('vigil-user-id', uid);
+    }
+    await OneSignal.login(localStorage.getItem('vigil-user-id'));
   });
 </script>
 </head>
@@ -4523,10 +4536,10 @@ more than those who watch for the morning.&quot;</p></div>
       <div class="screen-fade-top"></div>
       <div class="screen-label">Contemplation</div>
       <div class="screen-inner">
-<div class="contemplation-body"><p>The <button type="button" class="figure-link" data-figure="psalm_130">Psalmist</button> repeats the image — more than those who watch for the morning, more than those who watch for the morning — because saying it once is not enough. This is not a quick glance toward the horizon. It is a long watching, a posture held through the night.</p>
+<div class="contemplation-body"><p>The <button type="button" class="figure-link" data-figure="psalmist">Psalmist</button> repeats the image — more than those who watch for the morning, more than those who watch for the morning — because saying it once is not enough. This is not a quick glance toward the horizon. It is a long watching, a posture held through the night.</p>
 <p>The disciples, in the days between the Ascension and the coming of the Spirit at Pentecost, are told to wait — not to go back to their old lives, not to manufacture what they need, but to remain and receive what is promised.</p>
 <p>That waiting is not wasted time. It is the necessary form of a trust that cannot be forced.</p></div>
-<div class="contemplation-question">Waiting feels unproductive because we measure time by what we make of it. But qavah — the stretched, taut waiting of the <button type="button" class="figure-link" data-figure="psalm_130">Psalmist</button> — is not empty. It is oriented. Where are you being asked to stop producing and start receiving, and what would it cost you to trust that the waiting itself is the right response?</div></div>
+<div class="contemplation-question">Waiting feels unproductive because we measure time by what we make of it. But qavah — the stretched, taut waiting of the <button type="button" class="figure-link" data-figure="psalmist">Psalmist</button> — is not empty. It is oriented. Where are you being asked to stop producing and start receiving, and what would it cost you to trust that the waiting itself is the right response?</div></div>
       <div class="screen-fade-bottom"></div>
     </section>
     <section class="screen screen-prayer" data-screen="4" aria-label="Prayer">
@@ -4551,7 +4564,7 @@ more than those who watch for the morning.&quot;</p></div>
       <div class="screen-inner">
 <div class="practice-body"><p>At some point today, when you feel the pull to check, to plan, to move on to the next thing — pause instead. Physically stop. Let thirty seconds become a minute.</p>
 <p>In that pause, name before God one thing you have been trying to force into resolution. Do not pray for a solution. Simply hold it open, as a question rather than a problem, and say: I am waiting for you in this.</p>
-<p>The <button type="button" class="figure-link" data-figure="psalm_130">Psalmist</button> who watched for the morning did not make the sun rise. He simply remained awake and oriented until it did.</p></div>
+<p>The <button type="button" class="figure-link" data-figure="psalmist">Psalmist</button> who watched for the morning did not make the sun rise. He simply remained awake and oriented until it did.</p></div>
 <div class="practice-anchor">That is the whole practice: to remain awake, and to stay facing the right direction.</div></div>
       <div class="screen-fade-bottom"></div>
     </section>
@@ -4697,10 +4710,10 @@ and crowned them with glory and honour.&quot;</p></div>
       <div class="screen-fade-top"></div>
       <div class="screen-label">Contemplation</div>
       <div class="screen-inner">
-<div class="contemplation-body"><p>The <button type="button" class="figure-link" data-figure="psalm_8">Psalmist</button> starts where most of us start: with the sky, and the sudden sense of smallness. The moon and the stars that you established. Beside all that, what are we?
+<div class="contemplation-body"><p>The <button type="button" class="figure-link" data-figure="psalmist">Psalmist</button> starts where most of us start: with the sky, and the sudden sense of smallness. The moon and the stars that you established. Beside all that, what are we?
 The expected answer is: not much. The actual answer is stranger than that.</p>
 <p>You have crowned them with glory and honour. The same word — kabod — that belongs to the presence of God is given here to human beings. Not because they have earned it, but because this is what it means to be human: to carry something of that weight in the world.</p>
-<p>Most of us do not feel glorious. We feel tired, partial, smaller than we hoped. And yet the <button type="button" class="figure-link" data-figure="psalm_8">Psalmist</button> will not let that feeling be the last word.</p></div>
+<p>Most of us do not feel glorious. We feel tired, partial, smaller than we hoped. And yet the <button type="button" class="figure-link" data-figure="psalmist">Psalmist</button> will not let that feeling be the last word.</p></div>
 <div class="contemplation-question">When did you last feel the full weight of your own life — not your achievements or your failures, but simply the fact of being someone God made and has not stopped being mindful of? And what has been quietly convincing you, since then, that it was a mistake rather than the truest thing about you?</div></div>
       <div class="screen-fade-bottom"></div>
     </section>
@@ -4832,7 +4845,7 @@ The expected answer is: not much. The actual answer is stranger than that.</p>
 <div class="season-day">Monday</div>
 <div class="season-week">Eastertide · Week Seven</div>
 <div class="season-divider"></div>
-<div class="season-body"><p>We are in the seventh and final week of Eastertide, two days from Pentecost.</p>
+<div class="season-body"><p>We are in the seventh and final week of Eastertide, with less than a week until Pentecost.</p>
 <p>The great fifty days are almost over. This week Vigil turns to a word that belongs to the threshold: what it means to come through something without being undone by it.</p></div></div>
       <div class="screen-fade-bottom"></div>
     </section>
@@ -5420,18 +5433,18 @@ const FIGURES_BY_DAY = [
       "role": "",
       "body": "English friar and prior general of the Carmelites, an order of religious life rooted in a tradition of solitary prayer and watchful waiting. The Church remembers him today; his life of contemplative perseverance gives the day's word its particular depth."
     },
-    "psalm_130": {
-      "name": "Psalm 130",
+    "psalmist": {
+      "name": "Psalmist",
       "dates": "c. 10th–6th century BC",
-      "role": "Author",
-      "body": "One of the seven Penitential Psalms and one of the Songs of Ascent — a psalm of waiting from within distress. It is featured today because Psalm 130 gives qavah its most concentrated expression: not passive endurance, but active, tensed hope held through the dark."
+      "role": "",
+      "body": "The Psalms were composed by many hands across the centuries and the identity of most authors is unknown.  Psalm 130 is one of the Penitential Psalms and the Songs of Ascent. It is featured today because it gives qavah its most concentrated expression: not passive endurance, but active, tensed hope held through the dark."
     }
   },
   {
-    "psalm_8": {
-      "name": "Psalm 8",
+    "psalmist": {
+      "name": "Psalmist",
       "dates": "c. 10th century BC",
-      "role": "Author",
+      "role": "",
       "body": "Traditionally attributed to King David, this is a psalm of praise addressed to God as Creator. It is featured today because it contains one of scripture's most surprising claims: that kabod — the word for God's own weight and glory — belongs also to human beings, given by God before any achievement or merit."
     }
   },
