@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-21 22:43 · 21 May 2026 – 24 May 2026 (30 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-23 20:16 · 23 May 2026 – 25 May 2026 (31 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -61,9 +61,9 @@ body { overflow: hidden; }
   --accent-soft: rgba(160,48,48,0.2);
 }
 .palette-pentecost {
-  --bg: #1A0A0A; --panel: #251010; --accent: #C04040; --gold: #C04040;
-  --text: #F0E0D0; --dim: #9A7060; --shell: #120505;
-  --accent-soft: rgba(192,64,64,0.2);
+  --bg: #8B1A1A; --panel: #7A1515; --accent: #F5D78E; --gold: #F5D78E;
+  --text: #FDF6EE; --dim: #E8B89A; --shell: #6B1010;
+  --accent-soft: rgba(245,215,142,0.22);
 }
 
 /* ── App shell ── */
@@ -81,7 +81,7 @@ body { overflow: hidden; }
 }
 .palette-lent .top-bar        { background: linear-gradient(to bottom, rgba(36,30,26,0.96) 0%, rgba(36,30,26,0) 100%); }
 .palette-goodfriday .top-bar  { background: linear-gradient(to bottom, rgba(14,12,11,0.96) 0%, rgba(14,12,11,0) 100%); }
-.palette-pentecost .top-bar   { background: linear-gradient(to bottom, rgba(26,10,10,0.96) 0%, rgba(26,10,10,0) 100%); }
+.palette-pentecost .top-bar   { background: linear-gradient(to bottom, rgba(139,26,26,0.96) 0%, rgba(139,26,26,0) 100%); }
 
 .top-bar-inner {
   display: flex;
@@ -235,19 +235,19 @@ body { overflow: hidden; }
 .palette-pentecost .screen-season .screen-fade-top,
 .palette-pentecost .screen-scripture .screen-fade-top,
 .palette-pentecost .screen-prayer .screen-fade-top
-  { background: linear-gradient(to bottom, #1A0A0A 40%, rgba(26,10,10,0)); }
+  { background: linear-gradient(to bottom, #8B1A1A 40%, rgba(139,26,26,0)); }
 .palette-pentecost .screen-season .screen-fade-bottom,
 .palette-pentecost .screen-scripture .screen-fade-bottom,
 .palette-pentecost .screen-prayer .screen-fade-bottom
-  { background: linear-gradient(to top, #1A0A0A 50%, rgba(26,10,10,0)); }
+  { background: linear-gradient(to top, #8B1A1A 50%, rgba(139,26,26,0)); }
 .palette-pentecost .screen-word .screen-fade-top,
 .palette-pentecost .screen-contemplation .screen-fade-top,
 .palette-pentecost .screen-practice .screen-fade-top
-  { background: linear-gradient(to bottom, #251010 40%, rgba(37,16,16,0)); }
+  { background: linear-gradient(to bottom, #7A1515 40%, rgba(122,21,21,0)); }
 .palette-pentecost .screen-word .screen-fade-bottom,
 .palette-pentecost .screen-contemplation .screen-fade-bottom,
 .palette-pentecost .screen-practice .screen-fade-bottom
-  { background: linear-gradient(to top, #251010 50%, rgba(37,16,16,0)); }
+  { background: linear-gradient(to top, #7A1515 50%, rgba(122,21,21,0)); }
 
 /* Desktop nav arrows — hidden by default */
 .desktop-nav-arrow { display: none; }
@@ -474,7 +474,7 @@ body { overflow: hidden; }
 }
 .palette-lent .figure-overlay,
 .palette-goodfriday .figure-overlay,
-.palette-pentecost .figure-overlay { background: rgba(5,3,8,0.78); }
+.palette-pentecost .figure-overlay { background: rgba(60,8,8,0.82); }
 .figure-overlay.open { opacity: 1; pointer-events: auto; }
 
 /* ── First-visit welcome overlay ── */
@@ -488,7 +488,7 @@ body { overflow: hidden; }
 }
 .palette-lent .welcome-overlay,
 .palette-goodfriday .welcome-overlay,
-.palette-pentecost .welcome-overlay { background: rgba(5,3,8,0.78); }
+.palette-pentecost .welcome-overlay { background: rgba(60,8,8,0.82); }
 .welcome-overlay.welcome-hiding {
   animation: welcomeFadeOut 0.3s ease forwards;
 }
@@ -949,9 +949,9 @@ body { overflow: hidden; }
 .palette-goodfriday .screen-amen .screen-fade-bottom
   { background: linear-gradient(to top, #0E0C0B 50%, rgba(14,12,11,0)); }
 .palette-pentecost .screen-amen .screen-fade-top
-  { background: linear-gradient(to bottom, #1A0A0A 40%, rgba(26,10,10,0)); }
+  { background: linear-gradient(to bottom, #8B1A1A 40%, rgba(139,26,26,0)); }
 .palette-pentecost .screen-amen .screen-fade-bottom
-  { background: linear-gradient(to top, #1A0A0A 50%, rgba(26,10,10,0)); }
+  { background: linear-gradient(to top, #8B1A1A 50%, rgba(139,26,26,0)); }
 
 /* Production top bar — centred */
 .top-bar-inner--prod { justify-content: center; }
@@ -6032,6 +6032,173 @@ Veni, Sancte Spiritus.</p></div>
       <div class="screen-fade-bottom"></div>
     </section>
   </div>
+  <div class="day-screens" data-day="30" style="display:none">
+    <section class="screen screen-season" data-screen="0" aria-label="Season">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Season</div>
+      <div class="screen-inner">
+<div class="season-day">Monday</div>
+<div class="season-week">Ordinary Time · Week One</div>
+<div class="season-feast">Memorial: The Blessed Virgin Mary, Mother of the Church</div>
+<div class="season-divider"></div>
+<div class="season-body"><p>We are at the beginning of Ordinary Time – the Monday after Pentecost, the first weekday of a new liturgical season.</p>
+<p>Yesterday, the Church celebrated the coming of the Holy Spirit. The great fifty days of Easter are over. Ordinary Time is not a diminishment of that; it is the season in which what was given at Easter and Pentecost is carried into the whole length of an ordinary life.</p>
+<p>The Church begins it today by remembering Mary, not as a figure at the margins of the story but as the one whi first said yest to what God was doing and who stands now ass the image of what the Church is called to be.</p></div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+    <section class="screen screen-word" data-screen="1" aria-label="Word">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Word</div>
+      <div class="screen-inner">
+<div class="word-title">MOTHERHOOD</div>
+<div class="word-pronunciation">[MU-thǝr-hud]</div>
+<div class="word-divider"></div>
+<div class="word-definition"><p>The word comes from the Old English modor meaning one who carries, tends and forms, and it has always meant more than a biological origin.  A mother is the one in whose care somethng comes to be itself.</p>
+<p>When the Church calles Mary the Mother of the Church, it is drawing on a long theological tradition, but also on something simpoer: that Mary is the first disciple, the first to receive the Word in faith, the first to carry Jesus Christ into the world. Her motherhood of Jesus and her motherhood of the Church are not two separate roles. They are the same role seen from two different perspectives.</p>
+<p>In the Gospel of <button type="button" class="figure-link" data-figure="st_john">John</button>, Jesus gives Mary to the Beloved Disciple from the cross.  The Early Church saw this not just as a dying man&#x27;s provision for his mother, but a new relationship: the community of believers being taken into Mary&#x27;s care at the moment the old world ended and the new one was being born.</p></div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+    <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Scripture</div>
+      <div class="screen-inner">
+<div class="scripture-passage">
+<div class="scripture-block">
+  <div class="scripture-text"><p>&quot;When Jesus saw his mother and the disciple whom he loved standing beside her, he said to his mother, &#x27;Woman, here is your son.&#x27; Then he said to the disciple, &#x27;Here is your mother.&#x27; And from that hour the disciple took her into his own home.&quot;</p></div>
+</div>
+<div class="scripture-translation">John 19:26-27 — NRSV</div>
+</div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+    <section class="screen screen-contemplation" data-screen="3" aria-label="Contemplation">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Contemplation</div>
+      <div class="screen-inner">
+<div class="contemplation-body"><p>At the moment of greatest desolation — the cross, the death, the apparent end of everything — Jesus is making a family. Not disbanding his community but reconstituting it. The disciple he loved is given a mother. His mother is given a son. Care and love is given precisely when everything else is breaking.</p>
+<p>That is a strange and specific thing to notice about the crucifixion. Not the suffering, though that is there. Not the theology of atonement, though that too is there. But that as he was drawing his last, painful breaths, Jesus was guiding who should look after whom.</p>
+<p>Motherhood in this sense is not sentiment. It is the refusal to let love stop simply because the situation has become catastrophic. It is the work of tending what is entrusted to your care, even when tending it is so costly.</p></div>
+<div class="contemplation-question">What has been placed in your care that you have found harder to tend as the cost has become clear? And what would it mean to keep choosing it anyway?</div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+    <section class="screen screen-prayer" data-screen="4" aria-label="Prayer">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Prayer</div>
+      <div class="screen-inner">
+<div class="prayer-block">
+  <div class="prayer-body">
+<p>Lord,</p>
+<p>You gave your mother to your people and your people to your mother at the moment everything was falling apart.</p>
+<p>Where we have pulled back because what we were given to tend because it has become too costly, steady us.</p>
+<p>Where love has felt to expenseive to continue, remind us that it was already paid for on the cross.</p>
+<p>Let what you entrusted to us remain in our care — not because we are sufficient but because you have made us so.</p>
+  </div>
+  <div class="prayer-amen">In Christ&#x27;s name, Amen.</div>
+</div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+    <section class="screen screen-practice" data-screen="5" aria-label="Practice">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Practice</div>
+      <div class="screen-inner">
+<div class="practice-body"><p>At some pont today, bring to mind one person or commitment that has been placed in your care — a relationship, a responsibility, a neighbour, a friend — that you have found harder to tend as the months have passed.</p>
+<p>Do one small, concrete act of care for it today. Not a resolution.  Not a plan.  One act.</p></div>
+<div class="practice-anchor">Motherhood, in the Gospel sense, is not a feeling.  It is the decision to keep showing up.</div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+    <section class="screen screen-amen" data-screen="6" aria-label="Amen">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Amen</div>
+      <div class="screen-inner">
+
+    <!-- Completion hero -->
+    <div class="amen-hero" id="amen-hero-d31">
+
+      <div class="amen-checkbox-row"
+           role="checkbox" aria-checked="false" tabindex="0"
+           data-uid="d31"
+           onclick="amenCheck(this)"
+           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenCheck(this)}">
+        <div class="amen-checkbox-outer" id="amen-box-d31">
+          <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <polyline points="3,9 7,13 15,4.5"
+              stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="amen-checkbox-label">I kept Vigil today.</div>
+      </div>
+
+      <div class="amen-word-block" id="amen-word-d31">
+        <div class="amen-word-name">MOTHERHOOD</div>
+      </div>
+
+    </div>
+
+    <!-- Commission phrase -->
+    <div class="amen-commission" id="amen-commission-d31">
+      <div class="amen-commission-line1">Go in peace.</div>
+      <div class="amen-commission-line1">And carry the Word with you.</div>
+    </div>
+
+    <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
+    <div class="amen-count-block" id="amen-count-d31">
+      <div class="amen-count-number" id="amen-count-num-d31">—</div>
+      <div class="amen-count-label">people have kept vigil since Vigil began.</div>
+    </div>
+
+    <!-- Post-liturgy layer: rises 3s after commission animation completes -->
+    <div class="amen-post-liturgy" id="amen-post-d31">
+
+      <!-- Notification prompt — shown once, only if not already subscribed -->
+      <!-- State is set by vigilMaybeShowNotifPrompt() based on browser/platform detection -->
+      <div class="amen-notif-section" id="amen-notif-d31">
+
+        <!-- State 1: normal — browser supports web push (Android, desktop) -->
+        <div id="amen-notif-normal-d31" style="display:none">
+          <div class="amen-notif-prompt">Would you like Vigil to meet you here again tomorrow?</div>
+          <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d31')">
+            Turn on notifications
+          </button>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('d31')">Not now</button>
+        </div>
+
+        <!-- State 2: iOS Safari in browser tab — can install as PWA -->
+        <div id="amen-notif-ios-safari-d31" style="display:none">
+          <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, tap the Share icon at the bottom of your screen and choose Add to Home Screen.</div>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('d31')">Dismiss</button>
+        </div>
+
+        <!-- State 3: iOS other browser — must switch to Safari -->
+        <div id="amen-notif-ios-other-d31" style="display:none">
+          <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, open <a href="https://dailyvigil.app" style="color:inherit">dailyvigil.app</a> in Safari and follow the instructions on the Amen screen.</div>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('d31')">Dismiss</button>
+        </div>
+
+      </div>
+
+      <!-- Share block — conditional on completion count ≥ 2 -->
+      <div class="amen-share-block" id="amen-share-d31">
+
+        <div id="amen-share-initial-d31">
+          <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
+          <button class="amen-share-btn-primary"
+                  onclick="amenShareImage('d31')">Share today&#8217;s Vigil</button>
+          <button class="amen-share-btn-secondary"
+                  onclick="amenShareApp('d31')">Share the app</button>
+          <button class="amen-not-now-btn"
+                  onclick="amenNotNow('d31')">Not now</button>
+        </div>
+
+        <div class="amen-share-confirmed" id="amen-share-confirmed-d31"></div>
+
+      </div>
+
+    </div>
+
+    <div class="amen-spacer"></div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+  </div>
   </div>
 
   <!-- Threshold veil: Screen 7 → Screen 1 wrap -->
@@ -6080,7 +6247,7 @@ Veni, Sancte Spiritus.</p></div>
 </div>
 
 <script>
-const DAYS           = [{"palette": "palette-eastertide", "label": "25 April 2026", "date": "25 April 2026"}, {"palette": "palette-eastertide", "label": "26 April 2026", "date": "26 April 2026"}, {"palette": "palette-eastertide", "label": "27 April 2026", "date": "27 April 2026"}, {"palette": "palette-eastertide", "label": "28 April 2026", "date": "28 April 2026"}, {"palette": "palette-eastertide", "label": "29 April 2026", "date": "29 April 2026"}, {"palette": "palette-eastertide", "label": "30 April 2026", "date": "30 April 2026"}, {"palette": "palette-eastertide", "label": "1 May 2026", "date": "1 May 2026"}, {"palette": "palette-eastertide", "label": "2 May 2026", "date": "2 May 2026"}, {"palette": "palette-eastertide", "label": "3 May 2026", "date": "3 May 2026"}, {"palette": "palette-eastertide", "label": "4 May 2026", "date": "4 May 2026"}, {"palette": "palette-eastertide", "label": "5 May 2026", "date": "5 May 2026"}, {"palette": "palette-eastertide", "label": "6 May 2026", "date": "6 May 2026"}, {"palette": "palette-eastertide", "label": "7 May 2026", "date": "7 May 2026"}, {"palette": "palette-eastertide", "label": "8 May 2026", "date": "8 May 2026"}, {"palette": "palette-eastertide", "label": "9 May 2026", "date": "9 May 2026"}, {"palette": "palette-eastertide", "label": "10 May 2026", "date": "10 May 2026"}, {"palette": "palette-eastertide", "label": "11 May 2026", "date": "11 May 2026"}, {"palette": "palette-eastertide", "label": "12 May 2026", "date": "12 May 2026"}, {"palette": "palette-eastertide", "label": "13 May 2026", "date": "13 May 2026"}, {"palette": "palette-eastertide", "label": "14 May 2026", "date": "14 May 2026"}, {"palette": "palette-eastertide", "label": "15 May 2026", "date": "15 May 2026"}, {"palette": "palette-eastertide", "label": "16 May 2026", "date": "16 May 2026"}, {"palette": "palette-eastertide", "label": "17 May 2026", "date": "17 May 2026"}, {"palette": "palette-eastertide", "label": "18 May 2026", "date": "18 May 2026"}, {"palette": "palette-eastertide", "label": "19 May 2026", "date": "19 May 2026"}, {"palette": "palette-eastertide", "label": "20 May 2026", "date": "20 May 2026"}, {"palette": "palette-eastertide", "label": "21 May 2026", "date": "21 May 2026"}, {"palette": "palette-eastertide", "label": "22 May 2026", "date": "22 May 2026"}, {"palette": "palette-eastertide", "label": "23 May 2026", "date": "23 May 2026"}, {"palette": "palette-eastertide", "label": "24 May 2026", "date": "24 May 2026"}];
+const DAYS           = [{"palette": "palette-eastertide", "label": "25 April 2026", "date": "25 April 2026"}, {"palette": "palette-eastertide", "label": "26 April 2026", "date": "26 April 2026"}, {"palette": "palette-eastertide", "label": "27 April 2026", "date": "27 April 2026"}, {"palette": "palette-eastertide", "label": "28 April 2026", "date": "28 April 2026"}, {"palette": "palette-eastertide", "label": "29 April 2026", "date": "29 April 2026"}, {"palette": "palette-eastertide", "label": "30 April 2026", "date": "30 April 2026"}, {"palette": "palette-eastertide", "label": "1 May 2026", "date": "1 May 2026"}, {"palette": "palette-eastertide", "label": "2 May 2026", "date": "2 May 2026"}, {"palette": "palette-eastertide", "label": "3 May 2026", "date": "3 May 2026"}, {"palette": "palette-eastertide", "label": "4 May 2026", "date": "4 May 2026"}, {"palette": "palette-eastertide", "label": "5 May 2026", "date": "5 May 2026"}, {"palette": "palette-eastertide", "label": "6 May 2026", "date": "6 May 2026"}, {"palette": "palette-eastertide", "label": "7 May 2026", "date": "7 May 2026"}, {"palette": "palette-eastertide", "label": "8 May 2026", "date": "8 May 2026"}, {"palette": "palette-eastertide", "label": "9 May 2026", "date": "9 May 2026"}, {"palette": "palette-eastertide", "label": "10 May 2026", "date": "10 May 2026"}, {"palette": "palette-eastertide", "label": "11 May 2026", "date": "11 May 2026"}, {"palette": "palette-eastertide", "label": "12 May 2026", "date": "12 May 2026"}, {"palette": "palette-eastertide", "label": "13 May 2026", "date": "13 May 2026"}, {"palette": "palette-eastertide", "label": "14 May 2026", "date": "14 May 2026"}, {"palette": "palette-eastertide", "label": "15 May 2026", "date": "15 May 2026"}, {"palette": "palette-eastertide", "label": "16 May 2026", "date": "16 May 2026"}, {"palette": "palette-eastertide", "label": "17 May 2026", "date": "17 May 2026"}, {"palette": "palette-eastertide", "label": "18 May 2026", "date": "18 May 2026"}, {"palette": "palette-eastertide", "label": "19 May 2026", "date": "19 May 2026"}, {"palette": "palette-eastertide", "label": "20 May 2026", "date": "20 May 2026"}, {"palette": "palette-eastertide", "label": "21 May 2026", "date": "21 May 2026"}, {"palette": "palette-eastertide", "label": "22 May 2026", "date": "22 May 2026"}, {"palette": "palette-eastertide", "label": "23 May 2026", "date": "23 May 2026"}, {"palette": "palette-eastertide", "label": "24 May 2026", "date": "24 May 2026"}, {"palette": "palette-eastertide", "label": "25 May 2026", "date": "25 May 2026"}];
 const FIGURES_BY_DAY = [
   {
     "st_mark_evangelist": {
@@ -6385,6 +6552,14 @@ const FIGURES_BY_DAY = [
       "dates": "1st century AD",
       "role": "",
       "body": "Traditionally identified as the author of the third Gospel and the Acts of the Apostles. He is featured today because the opening of Acts 2 is his account of the Spirit's arrival at Pentecost — the event that closes Eastertide and opens the life of the Church."
+    }
+  },
+  {
+    "st_john": {
+      "name": "St. John",
+      "dates": "1st century AD",
+      "role": "",
+      "body": "Traditionally identified as one of the Twelve Apostles, and the author of the fourth gospel, three letters and the book of Revelation. He is featured today because John 19 places the gift of Mary to the beloved disciple — and of the disciple to Mary — at the foot of the cross, in the moment that the Church traditionally understands as the origin of Mary's role as the Mother of the Church."
     }
   }
 ];
