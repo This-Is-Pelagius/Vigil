@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-24 17:59 · 24 May 2026 – 25 May 2026 (31 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-24 20:19 · 24 May 2026 – 26 May 2026 (32 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -66,6 +66,55 @@ body { overflow: hidden; }
   --accent-soft: rgba(245,215,142,0.22);
 }
 
+/* Ordinary Time — cream background, green accents */
+.palette-ordinarytime {
+  --bg: #FAF7F2; --panel: #F2EDE3; --accent: #4A7C59; --gold: #4A7C59;
+  --text: #1C1714; --dim: #8A7D6E; --shell: #F0EAE0;
+  --accent-soft: rgba(74,124,89,0.15);
+}
+
+/* Ordinary Time Major — dark green background, gold accents (green solemnities) */
+.palette-ordinarytime-major {
+  --bg: #1A2B1A; --panel: #162414; --accent: #C8A84B; --gold: #C8A84B;
+  --text: #EDE8DC; --dim: #8A9E82; --shell: #111E11;
+  --accent-soft: rgba(200,168,75,0.2);
+}
+
+/* White solemnity — pure white background, antique gold accents */
+.palette-white {
+  --bg: #FEFEFE; --panel: #F8F5EE; --accent: #7A5C10; --gold: #7A5C10;
+  --text: #1C1714; --dim: #8A7D6E; --shell: #EDE8DE;
+  --accent-soft: rgba(122,92,16,0.16);
+}
+
+/* White Major — TBD (Christmas, Easter). Provisional values. */
+.palette-white-major {
+  --bg: #FEFEFE; --panel: #F8F5EE; --accent: #7A5C10; --gold: #7A5C10;
+  --text: #1C1714; --dim: #8A7D6E; --shell: #EDE8DE;
+  --accent-soft: rgba(122,92,16,0.16);
+}
+
+/* Advent — TBD. Provisional purple values. */
+.palette-advent {
+  --bg: #FAF7F2; --panel: #F2EDE3; --accent: #6B4F9E; --gold: #6B4F9E;
+  --text: #1C1714; --dim: #8A7D6E; --shell: #F0EAE0;
+  --accent-soft: rgba(107,79,158,0.15);
+}
+
+/* Rose — TBD (Gaudete, Laetare). Provisional values. */
+.palette-rose {
+  --bg: #FAF7F2; --panel: #F2EDE3; --accent: #C4607A; --gold: #C4607A;
+  --text: #1C1714; --dim: #8A7D6E; --shell: #F0EAE0;
+  --accent-soft: rgba(196,96,122,0.15);
+}
+
+/* Black — All Souls. Provisional values. */
+.palette-black {
+  --bg: #1A1A1A; --panel: #222222; --accent: #888888; --gold: #888888;
+  --text: #F0F0F0; --dim: #AAAAAA; --shell: #101010;
+  --accent-soft: rgba(136,136,136,0.2);
+}
+
 /* ── App shell ── */
 .app {
   width: 100%; height: 100svh;
@@ -82,6 +131,13 @@ body { overflow: hidden; }
 .palette-lent .top-bar        { background: linear-gradient(to bottom, rgba(36,30,26,0.96) 0%, rgba(36,30,26,0) 100%); }
 .palette-goodfriday .top-bar  { background: linear-gradient(to bottom, rgba(14,12,11,0.96) 0%, rgba(14,12,11,0) 100%); }
 .palette-pentecost .top-bar   { background: linear-gradient(to bottom, rgba(139,26,26,0.96) 0%, rgba(139,26,26,0) 100%); }
+.palette-ordinarytime .top-bar         { background: linear-gradient(to bottom, rgba(250,247,242,0.96) 0%, rgba(250,247,242,0) 100%); }
+.palette-ordinarytime-major .top-bar   { background: linear-gradient(to bottom, rgba(26,43,26,0.96) 0%, rgba(26,43,26,0) 100%); }
+.palette-white .top-bar                { background: linear-gradient(to bottom, rgba(254,254,254,0.96) 0%, rgba(254,254,254,0) 100%); }
+.palette-white-major .top-bar          { background: linear-gradient(to bottom, rgba(254,254,254,0.96) 0%, rgba(254,254,254,0) 100%); }
+.palette-advent .top-bar               { background: linear-gradient(to bottom, rgba(250,247,242,0.96) 0%, rgba(250,247,242,0) 100%); }
+.palette-rose .top-bar                 { background: linear-gradient(to bottom, rgba(250,247,242,0.96) 0%, rgba(250,247,242,0) 100%); }
+.palette-black .top-bar                { background: linear-gradient(to bottom, rgba(26,26,26,0.96) 0%, rgba(26,26,26,0) 100%); }
 
 .top-bar-inner {
   display: flex;
@@ -248,6 +304,157 @@ body { overflow: hidden; }
 .palette-pentecost .screen-contemplation .screen-fade-bottom,
 .palette-pentecost .screen-practice .screen-fade-bottom
   { background: linear-gradient(to top, #7A1515 50%, rgba(122,21,21,0)); }
+
+.palette-pentecost .screen-season .screen-fade-top,
+.palette-pentecost .screen-scripture .screen-fade-top,
+.palette-pentecost .screen-prayer .screen-fade-top
+  { background: linear-gradient(to bottom, #8B1A1A 40%, rgba(139,26,26,0)); }
+.palette-pentecost .screen-season .screen-fade-bottom,
+.palette-pentecost .screen-scripture .screen-fade-bottom,
+.palette-pentecost .screen-prayer .screen-fade-bottom
+  { background: linear-gradient(to top, #8B1A1A 50%, rgba(139,26,26,0)); }
+.palette-pentecost .screen-word .screen-fade-top,
+.palette-pentecost .screen-contemplation .screen-fade-top,
+.palette-pentecost .screen-practice .screen-fade-top
+  { background: linear-gradient(to bottom, #7A1515 40%, rgba(122,21,21,0)); }
+.palette-pentecost .screen-word .screen-fade-bottom,
+.palette-pentecost .screen-contemplation .screen-fade-bottom,
+.palette-pentecost .screen-practice .screen-fade-bottom
+  { background: linear-gradient(to top, #7A1515 50%, rgba(122,21,21,0)); }
+
+/* Ordinary Time fades */
+.palette-ordinarytime .screen-season .screen-fade-top,
+.palette-ordinarytime .screen-scripture .screen-fade-top,
+.palette-ordinarytime .screen-prayer .screen-fade-top,
+.palette-ordinarytime .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #FAF7F2 40%, rgba(250,247,242,0)); }
+.palette-ordinarytime .screen-season .screen-fade-bottom,
+.palette-ordinarytime .screen-scripture .screen-fade-bottom,
+.palette-ordinarytime .screen-prayer .screen-fade-bottom,
+.palette-ordinarytime .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #FAF7F2 50%, rgba(250,247,242,0)); }
+.palette-ordinarytime .screen-word .screen-fade-top,
+.palette-ordinarytime .screen-contemplation .screen-fade-top,
+.palette-ordinarytime .screen-practice .screen-fade-top
+  { background: linear-gradient(to bottom, #F2EDE3 40%, rgba(242,237,227,0)); }
+.palette-ordinarytime .screen-word .screen-fade-bottom,
+.palette-ordinarytime .screen-contemplation .screen-fade-bottom,
+.palette-ordinarytime .screen-practice .screen-fade-bottom
+  { background: linear-gradient(to top, #F2EDE3 50%, rgba(242,237,227,0)); }
+
+/* Ordinary Time Major fades */
+.palette-ordinarytime-major .screen-season .screen-fade-top,
+.palette-ordinarytime-major .screen-scripture .screen-fade-top,
+.palette-ordinarytime-major .screen-prayer .screen-fade-top,
+.palette-ordinarytime-major .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #1A2B1A 40%, rgba(26,43,26,0)); }
+.palette-ordinarytime-major .screen-season .screen-fade-bottom,
+.palette-ordinarytime-major .screen-scripture .screen-fade-bottom,
+.palette-ordinarytime-major .screen-prayer .screen-fade-bottom,
+.palette-ordinarytime-major .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #1A2B1A 50%, rgba(26,43,26,0)); }
+.palette-ordinarytime-major .screen-word .screen-fade-top,
+.palette-ordinarytime-major .screen-contemplation .screen-fade-top,
+.palette-ordinarytime-major .screen-practice .screen-fade-top
+  { background: linear-gradient(to bottom, #162414 40%, rgba(22,36,20,0)); }
+.palette-ordinarytime-major .screen-word .screen-fade-bottom,
+.palette-ordinarytime-major .screen-contemplation .screen-fade-bottom,
+.palette-ordinarytime-major .screen-practice .screen-fade-bottom
+  { background: linear-gradient(to top, #162414 50%, rgba(22,36,20,0)); }
+
+/* White fades */
+.palette-white .screen-season .screen-fade-top,
+.palette-white .screen-scripture .screen-fade-top,
+.palette-white .screen-prayer .screen-fade-top,
+.palette-white .screen-amen .screen-fade-top,
+.palette-white-major .screen-season .screen-fade-top,
+.palette-white-major .screen-scripture .screen-fade-top,
+.palette-white-major .screen-prayer .screen-fade-top,
+.palette-white-major .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #FEFEFE 40%, rgba(254,254,254,0)); }
+.palette-white .screen-season .screen-fade-bottom,
+.palette-white .screen-scripture .screen-fade-bottom,
+.palette-white .screen-prayer .screen-fade-bottom,
+.palette-white .screen-amen .screen-fade-bottom,
+.palette-white-major .screen-season .screen-fade-bottom,
+.palette-white-major .screen-scripture .screen-fade-bottom,
+.palette-white-major .screen-prayer .screen-fade-bottom,
+.palette-white-major .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #FEFEFE 50%, rgba(254,254,254,0)); }
+.palette-white .screen-word .screen-fade-top,
+.palette-white .screen-contemplation .screen-fade-top,
+.palette-white .screen-practice .screen-fade-top,
+.palette-white-major .screen-word .screen-fade-top,
+.palette-white-major .screen-contemplation .screen-fade-top,
+.palette-white-major .screen-practice .screen-fade-top
+  { background: linear-gradient(to bottom, #F8F5EE 40%, rgba(248,245,238,0)); }
+.palette-white .screen-word .screen-fade-bottom,
+.palette-white .screen-contemplation .screen-fade-bottom,
+.palette-white .screen-practice .screen-fade-bottom,
+.palette-white-major .screen-word .screen-fade-bottom,
+.palette-white-major .screen-contemplation .screen-fade-bottom,
+.palette-white-major .screen-practice .screen-fade-bottom
+  { background: linear-gradient(to top, #F8F5EE 50%, rgba(248,245,238,0)); }
+
+/* Advent fades (provisional — cream bg) */
+.palette-advent .screen-season .screen-fade-top,
+.palette-advent .screen-scripture .screen-fade-top,
+.palette-advent .screen-prayer .screen-fade-top,
+.palette-advent .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #FAF7F2 40%, rgba(250,247,242,0)); }
+.palette-advent .screen-season .screen-fade-bottom,
+.palette-advent .screen-scripture .screen-fade-bottom,
+.palette-advent .screen-prayer .screen-fade-bottom,
+.palette-advent .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #FAF7F2 50%, rgba(250,247,242,0)); }
+.palette-advent .screen-word .screen-fade-top,
+.palette-advent .screen-contemplation .screen-fade-top,
+.palette-advent .screen-practice .screen-fade-top
+  { background: linear-gradient(to bottom, #F2EDE3 40%, rgba(242,237,227,0)); }
+.palette-advent .screen-word .screen-fade-bottom,
+.palette-advent .screen-contemplation .screen-fade-bottom,
+.palette-advent .screen-practice .screen-fade-bottom
+  { background: linear-gradient(to top, #F2EDE3 50%, rgba(242,237,227,0)); }
+
+/* Rose fades (provisional — cream bg) */
+.palette-rose .screen-season .screen-fade-top,
+.palette-rose .screen-scripture .screen-fade-top,
+.palette-rose .screen-prayer .screen-fade-top,
+.palette-rose .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #FAF7F2 40%, rgba(250,247,242,0)); }
+.palette-rose .screen-season .screen-fade-bottom,
+.palette-rose .screen-scripture .screen-fade-bottom,
+.palette-rose .screen-prayer .screen-fade-bottom,
+.palette-rose .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #FAF7F2 50%, rgba(250,247,242,0)); }
+.palette-rose .screen-word .screen-fade-top,
+.palette-rose .screen-contemplation .screen-fade-top,
+.palette-rose .screen-practice .screen-fade-top
+  { background: linear-gradient(to bottom, #F2EDE3 40%, rgba(242,237,227,0)); }
+.palette-rose .screen-word .screen-fade-bottom,
+.palette-rose .screen-contemplation .screen-fade-bottom,
+.palette-rose .screen-practice .screen-fade-bottom
+  { background: linear-gradient(to top, #F2EDE3 50%, rgba(242,237,227,0)); }
+
+/* Black fades (All Souls) */
+.palette-black .screen-season .screen-fade-top,
+.palette-black .screen-scripture .screen-fade-top,
+.palette-black .screen-prayer .screen-fade-top,
+.palette-black .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #1A1A1A 40%, rgba(26,26,26,0)); }
+.palette-black .screen-season .screen-fade-bottom,
+.palette-black .screen-scripture .screen-fade-bottom,
+.palette-black .screen-prayer .screen-fade-bottom,
+.palette-black .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #1A1A1A 50%, rgba(26,26,26,0)); }
+.palette-black .screen-word .screen-fade-top,
+.palette-black .screen-contemplation .screen-fade-top,
+.palette-black .screen-practice .screen-fade-top
+  { background: linear-gradient(to bottom, #222222 40%, rgba(34,34,34,0)); }
+.palette-black .screen-word .screen-fade-bottom,
+.palette-black .screen-contemplation .screen-fade-bottom,
+.palette-black .screen-practice .screen-fade-bottom
+  { background: linear-gradient(to top, #222222 50%, rgba(34,34,34,0)); }
 
 /* Desktop nav arrows — hidden by default */
 .desktop-nav-arrow { display: none; }
@@ -475,6 +682,8 @@ body { overflow: hidden; }
 .palette-lent .figure-overlay,
 .palette-goodfriday .figure-overlay,
 .palette-pentecost .figure-overlay { background: rgba(60,8,8,0.82); }
+.palette-ordinarytime-major .figure-overlay { background: rgba(5,12,5,0.82); }
+.palette-black .figure-overlay              { background: rgba(0,0,0,0.88); }
 .figure-overlay.open { opacity: 1; pointer-events: auto; }
 
 /* ── First-visit welcome overlay ── */
@@ -489,6 +698,8 @@ body { overflow: hidden; }
 .palette-lent .welcome-overlay,
 .palette-goodfriday .welcome-overlay,
 .palette-pentecost .welcome-overlay { background: rgba(60,8,8,0.82); }
+.palette-ordinarytime-major .welcome-overlay { background: rgba(5,12,5,0.82); }
+.palette-black .welcome-overlay              { background: rgba(0,0,0,0.88); }
 .welcome-overlay.welcome-hiding {
   animation: welcomeFadeOut 0.3s ease forwards;
 }
@@ -952,6 +1163,30 @@ body { overflow: hidden; }
   { background: linear-gradient(to bottom, #8B1A1A 40%, rgba(139,26,26,0)); }
 .palette-pentecost .screen-amen .screen-fade-bottom
   { background: linear-gradient(to top, #8B1A1A 50%, rgba(139,26,26,0)); }
+.palette-ordinarytime .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #FAF7F2 40%, rgba(250,247,242,0)); }
+.palette-ordinarytime .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #FAF7F2 50%, rgba(250,247,242,0)); }
+.palette-ordinarytime-major .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #1A2B1A 40%, rgba(26,43,26,0)); }
+.palette-ordinarytime-major .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #1A2B1A 50%, rgba(26,43,26,0)); }
+.palette-white .screen-amen .screen-fade-top,
+.palette-white-major .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #FEFEFE 40%, rgba(254,254,254,0)); }
+.palette-white .screen-amen .screen-fade-bottom,
+.palette-white-major .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #FEFEFE 50%, rgba(254,254,254,0)); }
+.palette-advent .screen-amen .screen-fade-top,
+.palette-rose .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #FAF7F2 40%, rgba(250,247,242,0)); }
+.palette-advent .screen-amen .screen-fade-bottom,
+.palette-rose .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #FAF7F2 50%, rgba(250,247,242,0)); }
+.palette-black .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #1A1A1A 40%, rgba(26,26,26,0)); }
+.palette-black .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #1A1A1A 50%, rgba(26,26,26,0)); }
 
 /* Production top bar — centred */
 .top-bar-inner--prod { justify-content: center; }
@@ -6202,6 +6437,178 @@ Veni, Sancte Spiritus.</p></div>
       <div class="screen-fade-bottom"></div>
     </section>
   </div>
+  <div class="day-screens" data-day="31" style="display:none">
+    <section class="screen screen-season" data-screen="0" aria-label="Season">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Season</div>
+      <div class="screen-inner">
+<div class="season-day">Tuesday</div>
+<div class="season-week">Ordinary Time · Week One</div>
+<div class="season-feast">Optional Memorial: <button type="button" class="figure-link" data-figure="st_philip_neri">St Philip Neri</button>, priest</div>
+<div class="season-divider"></div>
+<div class="season-body"><p>We are at the start of Ordinary Time, on the Tuesday after Pentecost.</p>
+<p>Today the Church remembers <button type="button" class="figure-link" data-figure="st_philip_neri">St Philip Neri</button>, a sixteenth-century priest who made holiness so attractive that people came looking for it.</p></div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+    <section class="screen screen-word" data-screen="1" aria-label="Word">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Word</div>
+      <div class="screen-inner">
+<div class="word-title">CHEERFUL</div>
+<div class="word-pronunciation">[CHEER-ful]</div>
+<div class="word-divider"></div>
+<div class="word-definition"><p>The Greek word is hilaros (ἱλαρός) — and it is the root of the English word &quot;hilarity.&quot; That connection is worth pausing on.</p>
+<p>Hilaros does not mean politely pleasant. It means radiantly, freely glad — the gladness of someone who has nothing left to protect.</p>
+<p>When <button type="button" class="figure-link" data-figure="st_paul">St Paul</button> uses it, as we shall see in today&#x27;s scripture, he uses it to describe a quality of giving: not the giving of someone discharging an obligation, but of someone who gives because they are genuinely free to.</p>
+<p><button type="button" class="figure-link" data-figure="st_philip_neri">St Philip Neri</button> spent decades in Rome doing exactly that — drawing people to God through prayer, music and long hours of conversation, with a quality of hilaritas that his contemporaries found disarming and, in the best sense, inexplicable. He did not perform joy. He had discovered the freedom that produces it.</p>
+<p>Cheerfulness, in this sense, is not a mood. It is the outward sign of an inward liberty.</p></div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+    <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Scripture</div>
+      <div class="screen-inner">
+<div class="scripture-passage">
+<div class="scripture-block">
+  <div class="scripture-text"><p>The point is this: the one who sows sparingly will also reap sparingly, and the one who sows bountifully will also reap bountifully.</p>
+<div class="scripture-inter-verse"></div>
+<p>Each of you must give as you have made up your mind, not reluctantly or under compulsion, for God loves a cheerful giver.</p></div>
+</div>
+<div class="scripture-translation">2 Corinthians 9:6–7 — NRSV</div>
+</div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+    <section class="screen screen-contemplation" data-screen="3" aria-label="Contemplation">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Contemplation</div>
+      <div class="screen-inner">
+<div class="contemplation-body"><p>Most of us know the difference between giving that is free and giving that is not. The free kind — the meal made with genuine pleasure, the time offered without calculating what it costs — feels different to the person receiving it. They can tell. And so can you.</p>
+<p><button type="button" class="figure-link" data-figure="st_philip_neri">St Philip Neri</button> drew people to God not by argument but by the quality of his attention. What they described, centuries later, was something close to delight: the sense that he was genuinely glad they were there.</p>
+<p>There is probably one person in your life it is easy to be generous toward — and one for whom the giving has quietly become a calculation. The difference rarely lies in what they deserve. It usually lies in something in you.</p></div>
+<div class="contemplation-question">What has made generosity toward that second person feel like expenditure rather than freedom — and what would change if you brought that tightness to God before you returned to the relationship?</div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+    <section class="screen screen-prayer" data-screen="4" aria-label="Prayer">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Prayer</div>
+      <div class="screen-inner">
+<div class="prayer-block">
+  <div class="prayer-body">
+<p>Lord,</p>
+<p>You love a cheerful giver — not because you need our gifts, but because the freedom to give freely is itself a form of knowing you.</p>
+<p>Where we have given under compulsion — from duty, guilt or the fear of what others will think — forgive us.</p>
+<p>Where we have become calculating with our time, our kindness, our attention: loosen the grip.</p>
+<p>Make us free enough to be generous — not by removing what it costs, but by drawing us close enough to you that the cost no longer has the last word.</p>
+  </div>
+  <div class="prayer-amen">In Christ&#x27;s name, Amen.</div>
+</div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+    <section class="screen screen-practice" data-screen="5" aria-label="Practice">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Practice</div>
+      <div class="screen-inner">
+<div class="practice-body"><p><button type="button" class="figure-link" data-figure="st_philip_neri">St Philip Neri</button>&#x27;s cheefulness had a very specific shape: he was never somewhere else. Not managing the conversation, not calculating what the other person was costing him, not half-present while protecting his time. His attention was the form his freedom took.</p>
+<p>Choose one person you will encounter today — in person, by message, or by phone. Decide now to give them your full attention when that moment comes.</p>
+<p>When it arrives, stop composing your reply while they are still speaking or typing. Be entirely there.</p>
+<p>Notice what happens in you as you do it. If it feels like freedom — easy, unguarded, genuinely glad — that is cheefulness.</p></div>
+<div class="practice-anchor">If it feels like effort or cost, that is not a failure. That is the place to pray from: Lord, this is where my grip is still tight. Please loosen it. Help me to become your cheerful servant.</div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+    <section class="screen screen-amen" data-screen="6" aria-label="Amen">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Amen</div>
+      <div class="screen-inner">
+
+    <!-- Completion hero -->
+    <div class="amen-hero" id="amen-hero-d32">
+
+      <div class="amen-checkbox-row"
+           role="checkbox" aria-checked="false" tabindex="0"
+           data-uid="d32"
+           onclick="amenCheck(this)"
+           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenCheck(this)}">
+        <div class="amen-checkbox-outer" id="amen-box-d32">
+          <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <polyline points="3,9 7,13 15,4.5"
+              stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="amen-checkbox-label">I kept Vigil today.</div>
+      </div>
+
+      <div class="amen-word-block" id="amen-word-d32">
+        <div class="amen-word-name">CHEERFUL</div>
+      </div>
+
+    </div>
+
+    <!-- Commission phrase -->
+    <div class="amen-commission" id="amen-commission-d32">
+      <div class="amen-commission-line1">Go in peace.</div>
+      <div class="amen-commission-line1">And carry the Word with you.</div>
+    </div>
+
+    <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
+    <div class="amen-count-block" id="amen-count-d32">
+      <div class="amen-count-number" id="amen-count-num-d32">—</div>
+      <div class="amen-count-label">people have kept vigil since Vigil began.</div>
+    </div>
+
+    <!-- Post-liturgy layer: rises 3s after commission animation completes -->
+    <div class="amen-post-liturgy" id="amen-post-d32">
+
+      <!-- Notification prompt — shown once, only if not already subscribed -->
+      <!-- State is set by vigilMaybeShowNotifPrompt() based on browser/platform detection -->
+      <div class="amen-notif-section" id="amen-notif-d32">
+
+        <!-- State 1: normal — browser supports web push (Android, desktop) -->
+        <div id="amen-notif-normal-d32" style="display:none">
+          <div class="amen-notif-prompt">Would you like Vigil to meet you here again tomorrow?</div>
+          <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d32')">
+            Turn on notifications
+          </button>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('d32')">Not now</button>
+        </div>
+
+        <!-- State 2: iOS Safari in browser tab — can install as PWA -->
+        <div id="amen-notif-ios-safari-d32" style="display:none">
+          <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, tap the Share icon at the bottom of your screen and choose Add to Home Screen.</div>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('d32')">Dismiss</button>
+        </div>
+
+        <!-- State 3: iOS other browser — must switch to Safari -->
+        <div id="amen-notif-ios-other-d32" style="display:none">
+          <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, open <a href="https://dailyvigil.app" style="color:inherit">dailyvigil.app</a> in Safari and follow the instructions on the Amen screen.</div>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('d32')">Dismiss</button>
+        </div>
+
+      </div>
+
+      <!-- Share block — conditional on completion count ≥ 2 -->
+      <div class="amen-share-block" id="amen-share-d32">
+
+        <div id="amen-share-initial-d32">
+          <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
+          <button class="amen-share-btn-primary"
+                  onclick="amenShareImage('d32')">Share today&#8217;s Vigil</button>
+          <button class="amen-share-btn-secondary"
+                  onclick="amenShareApp('d32')">Share the app</button>
+          <button class="amen-not-now-btn"
+                  onclick="amenNotNow('d32')">Not now</button>
+        </div>
+
+        <div class="amen-share-confirmed" id="amen-share-confirmed-d32"></div>
+
+      </div>
+
+    </div>
+
+    <div class="amen-spacer"></div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+  </div>
   </div>
 
   <!-- Threshold veil: Screen 7 → Screen 1 wrap -->
@@ -6250,7 +6657,7 @@ Veni, Sancte Spiritus.</p></div>
 </div>
 
 <script>
-const DAYS           = [{"palette": "palette-eastertide", "label": "25 April 2026", "date": "25 April 2026"}, {"palette": "palette-eastertide", "label": "26 April 2026", "date": "26 April 2026"}, {"palette": "palette-eastertide", "label": "27 April 2026", "date": "27 April 2026"}, {"palette": "palette-eastertide", "label": "28 April 2026", "date": "28 April 2026"}, {"palette": "palette-eastertide", "label": "29 April 2026", "date": "29 April 2026"}, {"palette": "palette-eastertide", "label": "30 April 2026", "date": "30 April 2026"}, {"palette": "palette-eastertide", "label": "1 May 2026", "date": "1 May 2026"}, {"palette": "palette-eastertide", "label": "2 May 2026", "date": "2 May 2026"}, {"palette": "palette-eastertide", "label": "3 May 2026", "date": "3 May 2026"}, {"palette": "palette-eastertide", "label": "4 May 2026", "date": "4 May 2026"}, {"palette": "palette-eastertide", "label": "5 May 2026", "date": "5 May 2026"}, {"palette": "palette-eastertide", "label": "6 May 2026", "date": "6 May 2026"}, {"palette": "palette-eastertide", "label": "7 May 2026", "date": "7 May 2026"}, {"palette": "palette-eastertide", "label": "8 May 2026", "date": "8 May 2026"}, {"palette": "palette-eastertide", "label": "9 May 2026", "date": "9 May 2026"}, {"palette": "palette-eastertide", "label": "10 May 2026", "date": "10 May 2026"}, {"palette": "palette-eastertide", "label": "11 May 2026", "date": "11 May 2026"}, {"palette": "palette-eastertide", "label": "12 May 2026", "date": "12 May 2026"}, {"palette": "palette-eastertide", "label": "13 May 2026", "date": "13 May 2026"}, {"palette": "palette-eastertide", "label": "14 May 2026", "date": "14 May 2026"}, {"palette": "palette-eastertide", "label": "15 May 2026", "date": "15 May 2026"}, {"palette": "palette-eastertide", "label": "16 May 2026", "date": "16 May 2026"}, {"palette": "palette-eastertide", "label": "17 May 2026", "date": "17 May 2026"}, {"palette": "palette-eastertide", "label": "18 May 2026", "date": "18 May 2026"}, {"palette": "palette-eastertide", "label": "19 May 2026", "date": "19 May 2026"}, {"palette": "palette-eastertide", "label": "20 May 2026", "date": "20 May 2026"}, {"palette": "palette-eastertide", "label": "21 May 2026", "date": "21 May 2026"}, {"palette": "palette-eastertide", "label": "22 May 2026", "date": "22 May 2026"}, {"palette": "palette-eastertide", "label": "23 May 2026", "date": "23 May 2026"}, {"palette": "palette-pentecost", "label": "24 May 2026", "date": "24 May 2026"}, {"palette": "palette-eastertide", "label": "25 May 2026", "date": "25 May 2026"}];
+const DAYS           = [{"palette": "palette-eastertide", "label": "25 April 2026", "date": "25 April 2026"}, {"palette": "palette-eastertide", "label": "26 April 2026", "date": "26 April 2026"}, {"palette": "palette-eastertide", "label": "27 April 2026", "date": "27 April 2026"}, {"palette": "palette-eastertide", "label": "28 April 2026", "date": "28 April 2026"}, {"palette": "palette-eastertide", "label": "29 April 2026", "date": "29 April 2026"}, {"palette": "palette-eastertide", "label": "30 April 2026", "date": "30 April 2026"}, {"palette": "palette-eastertide", "label": "1 May 2026", "date": "1 May 2026"}, {"palette": "palette-eastertide", "label": "2 May 2026", "date": "2 May 2026"}, {"palette": "palette-eastertide", "label": "3 May 2026", "date": "3 May 2026"}, {"palette": "palette-eastertide", "label": "4 May 2026", "date": "4 May 2026"}, {"palette": "palette-eastertide", "label": "5 May 2026", "date": "5 May 2026"}, {"palette": "palette-eastertide", "label": "6 May 2026", "date": "6 May 2026"}, {"palette": "palette-eastertide", "label": "7 May 2026", "date": "7 May 2026"}, {"palette": "palette-eastertide", "label": "8 May 2026", "date": "8 May 2026"}, {"palette": "palette-eastertide", "label": "9 May 2026", "date": "9 May 2026"}, {"palette": "palette-eastertide", "label": "10 May 2026", "date": "10 May 2026"}, {"palette": "palette-eastertide", "label": "11 May 2026", "date": "11 May 2026"}, {"palette": "palette-eastertide", "label": "12 May 2026", "date": "12 May 2026"}, {"palette": "palette-eastertide", "label": "13 May 2026", "date": "13 May 2026"}, {"palette": "palette-eastertide", "label": "14 May 2026", "date": "14 May 2026"}, {"palette": "palette-eastertide", "label": "15 May 2026", "date": "15 May 2026"}, {"palette": "palette-eastertide", "label": "16 May 2026", "date": "16 May 2026"}, {"palette": "palette-eastertide", "label": "17 May 2026", "date": "17 May 2026"}, {"palette": "palette-eastertide", "label": "18 May 2026", "date": "18 May 2026"}, {"palette": "palette-eastertide", "label": "19 May 2026", "date": "19 May 2026"}, {"palette": "palette-eastertide", "label": "20 May 2026", "date": "20 May 2026"}, {"palette": "palette-eastertide", "label": "21 May 2026", "date": "21 May 2026"}, {"palette": "palette-eastertide", "label": "22 May 2026", "date": "22 May 2026"}, {"palette": "palette-eastertide", "label": "23 May 2026", "date": "23 May 2026"}, {"palette": "palette-pentecost", "label": "24 May 2026", "date": "24 May 2026"}, {"palette": "palette-white", "label": "25 May 2026", "date": "25 May 2026"}, {"palette": "palette-white", "label": "26 May 2026", "date": "26 May 2026"}];
 const FIGURES_BY_DAY = [
   {
     "st_mark_evangelist": {
@@ -6563,6 +6970,26 @@ const FIGURES_BY_DAY = [
       "dates": "1st century AD",
       "role": "Author",
       "body": "Traditionally identified as Luke, a physician and companion of St Paul, and as the author of both the synonymous Gospel and the Acts of the Apostles. He is featured today because it is in Acts 1 that Mary appears for the last time in the New Testament, as the Church waits for the Spirit that will bring it to life."
+    },
+    "bede_the_venerable_c_673735": {
+      "name": "Bede the Venerable [c. 673–735]",
+      "dates": "",
+      "role": "",
+      "body": "An Anglo-Saxon monk, scholar and historian. The Church remembers him as one of the first and greatest interpreters of scripture in the Latin West — a man who spent almost his entire life within a few miles of the Benedictine monastery in Northumbria (northern England) where he was placed as a child."
+    }
+  },
+  {
+    "st_philip_neri": {
+      "name": "St Philip Neri",
+      "dates": "1515–1595 AD",
+      "role": "",
+      "body": "Italian priest and founder of the Congregation of the Oratory in Rome. The Church remembers him today; his life gave the word hilaritas its most sustained theological expression — a holiness so free and so glad that people came from across the city to be near it."
+    },
+    "st_paul": {
+      "name": "St Paul",
+      "dates": "1st century AD",
+      "role": "",
+      "body": "Apostle, missionary and author of letters central to the New Testament. He is featured today because his second letter to the Corinthians gives the day's word its precise scriptural ground: the hilaros-giver is not someone who has mastered generosity, but someone who has been freed from the compulsion not to give."
     }
   }
 ];
