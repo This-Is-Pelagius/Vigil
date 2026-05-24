@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-23 21:30 · 23 May 2026 – 25 May 2026 (31 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-24 17:59 · 24 May 2026 – 25 May 2026 (31 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -7053,7 +7053,10 @@ async function amenPrebuildShareImage(uid) {
 
   const wordEl   = document.getElementById('amen-word-' + uid);
   const wordName = wordEl ? (wordEl.querySelector('.amen-word-name')?.textContent?.trim() || '') : '';
-  const cs   = getComputedStyle(document.documentElement);
+  // Read palette colours from the app element, which carries the palette class.
+  // documentElement does not have the palette class and would return fallbacks.
+  const appEl = document.getElementById('app') || document.documentElement;
+  const cs   = getComputedStyle(appEl);
   const BG   = cs.getPropertyValue('--bg').trim()   || '#FAF7F2';
   const GOLD = cs.getPropertyValue('--gold').trim() || '#B8860B';
   const TEXT = cs.getPropertyValue('--text').trim() || '#1C1714';
