@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-25 09:18 · 25 May 2026 – 26 May 2026 (32 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-25 09:33 · 25 May 2026 – 26 May 2026 (32 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -900,14 +900,14 @@ body { overflow: hidden; }
 }
 .amen-checkbox-outer {
   width: 32px; height: 32px; flex-shrink: 0;
-  border: 1.5px solid rgba(184,134,11,0.4);
+  border: 1.5px solid var(--accent-soft);
   display: flex; align-items: center; justify-content: center;
   transition: border-color 0.25s ease, background 0.25s ease;
   color: transparent;
 }
 .amen-checkbox-outer.amen-checked {
   border-color: var(--gold);
-  background: rgba(184,134,11,0.06);
+  background: var(--accent-soft);
   color: var(--gold);
 }
 .amen-tick {
@@ -950,6 +950,7 @@ body { overflow: hidden; }
   font-size: clamp(2.6rem, 13vw, 3.6rem);
   font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--text); line-height: 1;
+  white-space: nowrap; display: block; max-width: 100%;
 }
 .amen-word-date {
   font-family: 'Raleway', sans-serif; font-size: 0.9rem; font-weight: 400;
@@ -1029,7 +1030,7 @@ body { overflow: hidden; }
   font-family: 'Raleway', sans-serif; font-size: 0.75rem; font-weight: 600;
   letter-spacing: 0.34em; text-transform: uppercase;
   color: var(--gold); background: none;
-  border: 1px solid rgba(184,134,11,0.4); padding: 0.95rem 1.5rem;
+  border: 1px solid var(--accent-soft); padding: 0.95rem 1.5rem;
   cursor: pointer; margin-bottom: 0.8rem;
   transition: opacity 0.2s, border-color 0.2s; -webkit-tap-highlight-color: transparent;
 }
@@ -1065,7 +1066,7 @@ body { overflow: hidden; }
 .amen-invitation-trigger-inner {
   display: flex; align-items: center; justify-content: center; gap: 0.45rem;
   padding: 1.1rem 1rem;
-  border-bottom: 1px solid rgba(184,134,11,0.35);
+  border-bottom: 1px solid var(--accent-soft);
   transition: border-color 0.2s;
 }
 .amen-invitation-trigger:hover .amen-invitation-trigger-inner { border-color: var(--gold); }
@@ -1097,7 +1098,7 @@ body { overflow: hidden; }
   font-family: 'Libre Baskerville', serif; font-size: 0.95rem; font-style: italic;
   color: var(--dim); line-height: 1.85;
   border: 1px solid var(--accent-soft); padding: 1.1rem 1.2rem;
-  background: rgba(184,134,11,0.025); width: 100%; text-align: center;
+  background: var(--accent-soft); width: 100%; text-align: center;
 }
 .amen-invitation-send {
   display: block; width: 100%;
@@ -7279,6 +7280,27 @@ function fitWordTitle(dayIndex) {
   });
 }
 
+function fitAmenWordName(dayIndex) {
+  const dayEl = document.querySelector(`.day-screens[data-day="${dayIndex}"]`);
+  if (!dayEl) return;
+  dayEl.querySelectorAll('.amen-word-name').forEach(el => {
+    el.style.fontSize = '';
+    const container = el.closest('.screen-inner') || el.parentElement;
+    if (!container) return;
+    const style = getComputedStyle(container);
+    const usable = container.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    // Cap at 3.6rem (58px at 16px base) — match the clamp maximum
+    const maxPx = parseFloat(getComputedStyle(document.documentElement).fontSize) * 3.6;
+    let lo = 14, hi = Math.min(maxPx, 128);
+    for (let iter = 0; iter < 14; iter++) {
+      const mid = (lo + hi) / 2;
+      el.style.fontSize = mid + 'px';
+      if (el.scrollWidth <= usable) lo = mid; else hi = mid;
+    }
+    el.style.fontSize = Math.floor(lo) + 'px';
+  });
+}
+
 // ── Desktop navigation arrows ──────────────────────────────────────────────
 
 const desktopPrev = document.getElementById('desktopPrev');
@@ -7356,14 +7378,14 @@ goTo = function(i, anim=true) {
 
 // Initialise: fit word titles, update arrows, start scroll indicator
 setTimeout(() => {
-  for (let d = 0; d < totalDays; d++) fitWordTitle(d);
+  for (let d = 0; d < totalDays; d++) { fitWordTitle(d); fitAmenWordName(d); }
   updateDesktopArrows();
   updateScrollIndicator(0);
 }, 300);
 
 // Recalculate word titles on resize
 window.addEventListener('resize', () => {
-  for (let d = 0; d < totalDays; d++) fitWordTitle(d);
+  for (let d = 0; d < totalDays; d++) { fitWordTitle(d); fitAmenWordName(d); }
 });
 
 // ── Screen 7: Amen ─────────────────────────────────────────────────────────
