@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-05-30 19:56 · 30 May 2026 – 2 June 2026 (39 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-05-31 12:32 · 31 May 2026 – 3 June 2026 (40 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -80,6 +80,13 @@ body { overflow: hidden; }
   --accent-soft: rgba(200,168,75,0.2);
 }
 
+/* Red — martyrs' optional memorials. Cream bg, red accent. */
+.palette-red {
+  --bg: #FAF7F2; --panel: #F2EDE3; --accent: #9B3535; --gold: #9B3535;
+  --text: #1C1714; --dim: #8A7D6E; --shell: #F0EAE0;
+  --accent-soft: rgba(155,53,53,0.15);
+}
+
 /* White solemnity — pure white background, antique gold accents */
 .palette-white {
   --bg: #FEFEFE; --panel: #FEFEFE; --accent: #9AAAB8; --gold: #9AAAB8;
@@ -133,6 +140,7 @@ body { overflow: hidden; }
 .palette-pentecost .top-bar   { background: linear-gradient(to bottom, rgba(139,26,26,0.96) 0%, rgba(139,26,26,0) 100%); }
 .palette-ordinarytime .top-bar         { background: linear-gradient(to bottom, rgba(250,247,242,0.96) 0%, rgba(250,247,242,0) 100%); }
 .palette-ordinarytime-major .top-bar   { background: linear-gradient(to bottom, rgba(26,43,26,0.96) 0%, rgba(26,43,26,0) 100%); }
+.palette-red .top-bar                  { background: linear-gradient(to bottom, rgba(250,247,242,0.96) 0%, rgba(250,247,242,0) 100%); }
 .palette-white .top-bar                { background: linear-gradient(to bottom, rgba(254,254,254,0.96) 0%, rgba(254,254,254,0) 100%); }
 .palette-white-major .top-bar          { background: linear-gradient(to bottom, rgba(254,254,254,0.96) 0%, rgba(254,254,254,0) 100%); }
 .palette-advent .top-bar               { background: linear-gradient(to bottom, rgba(250,247,242,0.96) 0%, rgba(250,247,242,0) 100%); }
@@ -326,20 +334,34 @@ body { overflow: hidden; }
 .palette-ordinarytime .screen-season .screen-fade-top,
 .palette-ordinarytime .screen-scripture .screen-fade-top,
 .palette-ordinarytime .screen-prayer .screen-fade-top,
-.palette-ordinarytime .screen-amen .screen-fade-top
+.palette-ordinarytime .screen-amen .screen-fade-top,
+.palette-red .screen-season .screen-fade-top,
+.palette-red .screen-scripture .screen-fade-top,
+.palette-red .screen-prayer .screen-fade-top,
+.palette-red .screen-amen .screen-fade-top
   { background: linear-gradient(to bottom, #FAF7F2 40%, rgba(250,247,242,0)); }
 .palette-ordinarytime .screen-season .screen-fade-bottom,
 .palette-ordinarytime .screen-scripture .screen-fade-bottom,
 .palette-ordinarytime .screen-prayer .screen-fade-bottom,
-.palette-ordinarytime .screen-amen .screen-fade-bottom
+.palette-ordinarytime .screen-amen .screen-fade-bottom,
+.palette-red .screen-season .screen-fade-bottom,
+.palette-red .screen-scripture .screen-fade-bottom,
+.palette-red .screen-prayer .screen-fade-bottom,
+.palette-red .screen-amen .screen-fade-bottom
   { background: linear-gradient(to top, #FAF7F2 50%, rgba(250,247,242,0)); }
 .palette-ordinarytime .screen-word .screen-fade-top,
 .palette-ordinarytime .screen-contemplation .screen-fade-top,
-.palette-ordinarytime .screen-practice .screen-fade-top
+.palette-ordinarytime .screen-practice .screen-fade-top,
+.palette-red .screen-word .screen-fade-top,
+.palette-red .screen-contemplation .screen-fade-top,
+.palette-red .screen-practice .screen-fade-top
   { background: linear-gradient(to bottom, #F2EDE3 40%, rgba(242,237,227,0)); }
 .palette-ordinarytime .screen-word .screen-fade-bottom,
 .palette-ordinarytime .screen-contemplation .screen-fade-bottom,
-.palette-ordinarytime .screen-practice .screen-fade-bottom
+.palette-ordinarytime .screen-practice .screen-fade-bottom,
+.palette-red .screen-word .screen-fade-bottom,
+.palette-red .screen-contemplation .screen-fade-bottom,
+.palette-red .screen-practice .screen-fade-bottom
   { background: linear-gradient(to top, #F2EDE3 50%, rgba(242,237,227,0)); }
 
 /* Ordinary Time Major fades */
@@ -7484,7 +7506,7 @@ but as the thing we most want to find.</p>
       <div class="screen-label">Season</div>
       <div class="screen-inner">
 <div class="season-day">Monday</div>
-<div class="season-week">Ordinary Time · Week Two</div>
+<div class="season-week">Ninth Week • Ordinary Time</div>
 <div class="season-feast">Memorial: <button type="button" class="figure-link" data-figure="st_justin_martyr">St Justin Martyr</button></div>
 <div class="season-divider"></div>
 <div class="season-body"><p>We are at the start of Ordinary Time — the season in which the life of the Spirit is carried into the full ordinary length of a day.</p>
@@ -7657,7 +7679,7 @@ but as the thing we most want to find.</p>
       <div class="screen-label">Season</div>
       <div class="screen-inner">
 <div class="season-day">Tuesday</div>
-<div class="season-week">Ordinary Time · Week Two</div>
+<div class="season-week">Ninth Week • Ordinary Time</div>
 <div class="season-feast">Optional Memorial: St <button type="button" class="figure-link" data-figure="sts_marcellinus_and_peter">Marcellinus</button> and St <button type="button" class="figure-link" data-figure="sts_marcellinus_and_peter">Peter</button>, martyrs</div>
 <div class="season-divider"></div>
 <div class="season-body"><p>We are at the start of Ordinary Time — the second week of the green season, when the Church carries the life of Easter into the ordinary length of a day.</p>
@@ -7819,6 +7841,177 @@ but as the thing we most want to find.</p>
       <div class="screen-fade-bottom"></div>
     </section>
   </div>
+  <div class="day-screens" data-day="39" style="display:none">
+    <section class="screen screen-season" data-screen="0" aria-label="Season">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Season</div>
+      <div class="screen-inner">
+<div class="season-day">Wednesday</div>
+<div class="season-week">Ninth Week • Ordinary Time</div>
+<div class="season-feast">Memorial: St <button type="button" class="figure-link" data-figure="saint_charles_lwanga_c_18601886_and_his_companions_martyrs">Charles</button> <button type="button" class="figure-link" data-figure="saint_charles_lwanga_c_18601886_and_his_companions_martyrs">Lwanga</button> and <button type="button" class="figure-link" data-figure="saint_charles_lwanga_c_18601886_and_his_companions_martyrs">his</button> <button type="button" class="figure-link" data-figure="saint_charles_lwanga_c_18601886_and_his_companions_martyrs">companions</button>, martyrs</div>
+<div class="season-divider"></div>
+<div class="season-body"><p>We are in Ordinary Time, on the Wednesday of its second week — the long green season in which the life given at Easter and Pentecost is worked into the ordinary length of a day.</p>
+<p>Today the Church remembers St <button type="button" class="figure-link" data-figure="saint_charles_lwanga_c_18601886_and_his_companions_martyrs">Charles</button> <button type="button" class="figure-link" data-figure="saint_charles_lwanga_c_18601886_and_his_companions_martyrs">Lwanga</button> and <button type="button" class="figure-link" data-figure="saint_charles_lwanga_c_18601886_and_his_companions_martyrs">his</button> <button type="button" class="figure-link" data-figure="saint_charles_lwanga_c_18601886_and_his_companions_martyrs">companions</button>: young men and boys in a royal court in what is now Uganda, many of them new to the faith, who would not deny it when denial was the price of their lives. Vigil turns today to what their deaths were made of — the act of saying openly, and at cost, whose you are.</p></div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+    <section class="screen screen-word" data-screen="1" aria-label="Word">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Word</div>
+      <div class="screen-inner">
+<div class="word-title">CONFESS</div>
+<div class="word-pronunciation">[kən-FESS]</div>
+<div class="word-divider"></div>
+<div class="word-definition"><p>The word has both a courtroom and a church in it. We confess to a crime; we confess our faith. Both senses are in the original Greek.</p>
+<p>homologeō (ὁμολογέω) is built from homos (same) and legō (to say): to say the same thing — to agree out loud, to let your word match what is already true. To confess is not to reveal a secret. It is to stop keeping one.</p>
+<p>In the early Church, the distinction between a confessor and a martyr was narrow. The confessor was the one who acknowledged Christ under questioning and lived. The martyr was the one who acknowledged him and did not. The same act, the same word — only the cost differed.</p>
+<p>Which is why English keeps the older sense in its other translation. homologeō is often rendered not &quot;confess&quot; but &quot;acknowledge&quot;: simply to say, before others, to whom you belong.</p>
+<p>To confess, then, is not chiefly about admitting fault. It is about admitting allegiance: owning in the open the thing you already hold in private.</p></div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+    <section class="screen screen-scripture" data-screen="2" aria-label="Scripture">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Scripture</div>
+      <div class="screen-inner">
+<div class="scripture-passage">
+<div class="scripture-block">
+  <div class="scripture-text"><p>Everyone therefore who acknowledges me before others, I also will acknowledge before my Father in heaven; but whoever denies me before others, I also will deny before my Father in heaven.</p></div>
+</div>
+<div class="scripture-translation">Matthew 10:32–33 — NRSV</div>
+</div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+    <section class="screen screen-contemplation" data-screen="3" aria-label="Contemplation">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Contemplation</div>
+      <div class="screen-inner">
+<div class="contemplation-body"><p>Most of us do not deny Christ. We edit him. The sentence that would have mentioned him gets shortened; the belief that would have surfaced stays just below the waterline; the conversation moves on and nothing untrue has been said.</p>
+<p>St <button type="button" class="figure-link" data-figure="saint_charles_lwanga_c_18601886_and_his_companions_martyrs">Charles</button> <button type="button" class="figure-link" data-figure="saint_charles_lwanga_c_18601886_and_his_companions_martyrs">Lwanga</button> and <button type="button" class="figure-link" data-figure="saint_charles_lwanga_c_18601886_and_his_companions_martyrs">his</button> <button type="button" class="figure-link" data-figure="saint_charles_lwanga_c_18601886_and_his_companions_martyrs">companions</button> were handed the cleaner version of the choice — say it or die — and they said it.</p>
+<p>The version most of us are given is quieter, and in some ways harder to notice: a hundred small economies of truth that never feel like denial, because each one is so small.</p>
+<p>Where has your faith become something you hold without quite acknowledging — true in private, edited in public?</p></div>
+<div class="contemplation-question">And what might change between you and God if, in one of those small places, you simply let your word match what you already believe?</div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+    <section class="screen screen-prayer" data-screen="4" aria-label="Prayer">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Prayer</div>
+      <div class="screen-inner">
+<div class="prayer-block">
+  <div class="prayer-body">
+<p>Lord,</p>
+<p>You promise to acknowledge before the Father everyone who acknowledges you — and you ask of us nothing we have not already been given.</p>
+<p>Where we have edited you out of the day to keep ourselves safe, forgive us.</p>
+<p>Where our faith has gone quiet — not from doubt, but from caution — give us back our voice.</p>
+<p>Teach us to let our words match what we believe, in the small places before the large ones.</p>
+<p>And keep us mindful of those, like the martyrs we remember today, for whom confessing your name still costs everything.</p>
+  </div>
+  <div class="prayer-amen">In Christ&#x27;s name, Amen.</div>
+</div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+    <section class="screen screen-practice" data-screen="5" aria-label="Practice">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Practice</div>
+      <div class="screen-inner">
+<div class="practice-body"><p>Today someone will ask you an ordinary question whose honest answer brushes against your faith — how your weekend was, why you do a thing you do, what you make of something difficult.</p>
+<p>You will feel the familiar pull to give the edited version, the one that leaves God out to keep things smooth.</p>
+<p>When it comes, give the unedited answer instead. Not a sermon, just the true sentence you would otherwise have trimmed.</p></div>
+<div class="practice-anchor">A faith never said aloud can thin, over time, into something you only think you hold — so the small true word is worth saying.</div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+    <section class="screen screen-amen" data-screen="6" aria-label="Amen">
+      <div class="screen-fade-top"></div>
+      <div class="screen-label">Amen</div>
+      <div class="screen-inner">
+
+    <!-- Completion hero -->
+    <div class="amen-hero" id="amen-hero-d40">
+
+      <div class="amen-checkbox-row"
+           role="checkbox" aria-checked="false" tabindex="0"
+           data-uid="d40"
+           onclick="amenCheck(this)"
+           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();amenCheck(this)}">
+        <div class="amen-checkbox-outer" id="amen-box-d40">
+          <svg class="amen-tick" width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <polyline points="3,9 7,13 15,4.5"
+              stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="amen-checkbox-label">I kept Vigil today.</div>
+      </div>
+
+      <div class="amen-word-block" id="amen-word-d40">
+        <div class="amen-word-name">CONFESS</div>
+      </div>
+
+    </div>
+
+    <!-- Commission phrase -->
+    <div class="amen-commission" id="amen-commission-d40">
+      <div class="amen-commission-line1">Go in peace.</div>
+      <div class="amen-commission-line1">And carry the Word with you.</div>
+    </div>
+
+    <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
+    <div class="amen-count-block" id="amen-count-d40">
+      <div class="amen-count-number" id="amen-count-num-d40">—</div>
+      <div class="amen-count-label">people have kept vigil since Vigil began.</div>
+    </div>
+
+    <!-- Post-liturgy layer: rises 3s after commission animation completes -->
+    <div class="amen-post-liturgy" id="amen-post-d40">
+
+      <!-- Notification prompt — shown once, only if not already subscribed -->
+      <!-- State is set by vigilMaybeShowNotifPrompt() based on browser/platform detection -->
+      <div class="amen-notif-section" id="amen-notif-d40">
+
+        <!-- State 1: normal — browser supports web push (Android, desktop) -->
+        <div id="amen-notif-normal-d40" style="display:none">
+          <div class="amen-notif-prompt">Would you like Vigil to meet you here again tomorrow?</div>
+          <button class="amen-share-btn-primary" onclick="vigilRequestNotification('d40')">
+            Turn on notifications
+          </button>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('d40')">Not now</button>
+        </div>
+
+        <!-- State 2: iOS Safari in browser tab — can install as PWA -->
+        <div id="amen-notif-ios-safari-d40" style="display:none">
+          <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, tap the Share icon at the bottom of your screen and choose Add to Home Screen.</div>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('d40')">Dismiss</button>
+        </div>
+
+        <!-- State 3: iOS other browser — must switch to Safari -->
+        <div id="amen-notif-ios-other-d40" style="display:none">
+          <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, open <a href="https://dailyvigil.app" style="color:inherit">dailyvigil.app</a> in Safari and follow the instructions on the Amen screen.</div>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('d40')">Dismiss</button>
+        </div>
+
+      </div>
+
+      <!-- Share block — conditional on completion count ≥ 2 -->
+      <div class="amen-share-block" id="amen-share-d40">
+
+        <div id="amen-share-initial-d40">
+          <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
+          <button class="amen-share-btn-primary"
+                  onclick="amenShareImage('d40')">Share today&#8217;s Vigil</button>
+          <button class="amen-share-btn-secondary"
+                  onclick="amenShareApp('d40')">Share the app</button>
+          <button class="amen-not-now-btn"
+                  onclick="amenNotNow('d40')">Not now</button>
+        </div>
+
+        <div class="amen-share-confirmed" id="amen-share-confirmed-d40"></div>
+
+      </div>
+
+    </div>
+
+    <div class="amen-spacer"></div></div>
+      <div class="screen-fade-bottom"></div>
+    </section>
+  </div>
   </div>
 
   <!-- Threshold veil: Screen 7 → Screen 1 wrap -->
@@ -7867,7 +8060,7 @@ but as the thing we most want to find.</p>
 </div>
 
 <script>
-const DAYS           = [{"palette": "palette-eastertide", "label": "25 April 2026", "date": "25 April 2026"}, {"palette": "palette-eastertide", "label": "26 April 2026", "date": "26 April 2026"}, {"palette": "palette-eastertide", "label": "27 April 2026", "date": "27 April 2026"}, {"palette": "palette-eastertide", "label": "28 April 2026", "date": "28 April 2026"}, {"palette": "palette-eastertide", "label": "29 April 2026", "date": "29 April 2026"}, {"palette": "palette-eastertide", "label": "30 April 2026", "date": "30 April 2026"}, {"palette": "palette-eastertide", "label": "1 May 2026", "date": "1 May 2026"}, {"palette": "palette-eastertide", "label": "2 May 2026", "date": "2 May 2026"}, {"palette": "palette-eastertide", "label": "3 May 2026", "date": "3 May 2026"}, {"palette": "palette-eastertide", "label": "4 May 2026", "date": "4 May 2026"}, {"palette": "palette-eastertide", "label": "5 May 2026", "date": "5 May 2026"}, {"palette": "palette-eastertide", "label": "6 May 2026", "date": "6 May 2026"}, {"palette": "palette-eastertide", "label": "7 May 2026", "date": "7 May 2026"}, {"palette": "palette-eastertide", "label": "8 May 2026", "date": "8 May 2026"}, {"palette": "palette-eastertide", "label": "9 May 2026", "date": "9 May 2026"}, {"palette": "palette-eastertide", "label": "10 May 2026", "date": "10 May 2026"}, {"palette": "palette-eastertide", "label": "11 May 2026", "date": "11 May 2026"}, {"palette": "palette-eastertide", "label": "12 May 2026", "date": "12 May 2026"}, {"palette": "palette-eastertide", "label": "13 May 2026", "date": "13 May 2026"}, {"palette": "palette-eastertide", "label": "14 May 2026", "date": "14 May 2026"}, {"palette": "palette-eastertide", "label": "15 May 2026", "date": "15 May 2026"}, {"palette": "palette-eastertide", "label": "16 May 2026", "date": "16 May 2026"}, {"palette": "palette-eastertide", "label": "17 May 2026", "date": "17 May 2026"}, {"palette": "palette-eastertide", "label": "18 May 2026", "date": "18 May 2026"}, {"palette": "palette-eastertide", "label": "19 May 2026", "date": "19 May 2026"}, {"palette": "palette-eastertide", "label": "20 May 2026", "date": "20 May 2026"}, {"palette": "palette-eastertide", "label": "21 May 2026", "date": "21 May 2026"}, {"palette": "palette-eastertide", "label": "22 May 2026", "date": "22 May 2026"}, {"palette": "palette-eastertide", "label": "23 May 2026", "date": "23 May 2026"}, {"palette": "palette-pentecost", "label": "24 May 2026", "date": "24 May 2026"}, {"palette": "palette-white", "label": "25 May 2026", "date": "25 May 2026"}, {"palette": "palette-white", "label": "26 May 2026", "date": "26 May 2026"}, {"palette": "palette-white", "label": "27 May 2026", "date": "27 May 2026"}, {"palette": "palette-ordinarytime", "label": "28 May 2026", "date": "28 May 2026"}, {"palette": "palette-ordinarytime", "label": "29 May 2026", "date": "29 May 2026"}, {"palette": "palette-ordinarytime", "label": "30 May 2026", "date": "30 May 2026"}, {"palette": "palette-white", "label": "31 May 2026", "date": "31 May 2026"}, {"palette": "palette-pentecost", "label": "1 June 2026", "date": "1 June 2026"}, {"palette": "palette-ordinarytime", "label": "2 June 2026", "date": "2 June 2026"}];
+const DAYS           = [{"palette": "palette-eastertide", "label": "25 April 2026", "date": "25 April 2026"}, {"palette": "palette-eastertide", "label": "26 April 2026", "date": "26 April 2026"}, {"palette": "palette-eastertide", "label": "27 April 2026", "date": "27 April 2026"}, {"palette": "palette-eastertide", "label": "28 April 2026", "date": "28 April 2026"}, {"palette": "palette-eastertide", "label": "29 April 2026", "date": "29 April 2026"}, {"palette": "palette-eastertide", "label": "30 April 2026", "date": "30 April 2026"}, {"palette": "palette-eastertide", "label": "1 May 2026", "date": "1 May 2026"}, {"palette": "palette-eastertide", "label": "2 May 2026", "date": "2 May 2026"}, {"palette": "palette-eastertide", "label": "3 May 2026", "date": "3 May 2026"}, {"palette": "palette-eastertide", "label": "4 May 2026", "date": "4 May 2026"}, {"palette": "palette-eastertide", "label": "5 May 2026", "date": "5 May 2026"}, {"palette": "palette-eastertide", "label": "6 May 2026", "date": "6 May 2026"}, {"palette": "palette-eastertide", "label": "7 May 2026", "date": "7 May 2026"}, {"palette": "palette-eastertide", "label": "8 May 2026", "date": "8 May 2026"}, {"palette": "palette-eastertide", "label": "9 May 2026", "date": "9 May 2026"}, {"palette": "palette-eastertide", "label": "10 May 2026", "date": "10 May 2026"}, {"palette": "palette-eastertide", "label": "11 May 2026", "date": "11 May 2026"}, {"palette": "palette-eastertide", "label": "12 May 2026", "date": "12 May 2026"}, {"palette": "palette-eastertide", "label": "13 May 2026", "date": "13 May 2026"}, {"palette": "palette-eastertide", "label": "14 May 2026", "date": "14 May 2026"}, {"palette": "palette-eastertide", "label": "15 May 2026", "date": "15 May 2026"}, {"palette": "palette-eastertide", "label": "16 May 2026", "date": "16 May 2026"}, {"palette": "palette-eastertide", "label": "17 May 2026", "date": "17 May 2026"}, {"palette": "palette-eastertide", "label": "18 May 2026", "date": "18 May 2026"}, {"palette": "palette-eastertide", "label": "19 May 2026", "date": "19 May 2026"}, {"palette": "palette-eastertide", "label": "20 May 2026", "date": "20 May 2026"}, {"palette": "palette-eastertide", "label": "21 May 2026", "date": "21 May 2026"}, {"palette": "palette-eastertide", "label": "22 May 2026", "date": "22 May 2026"}, {"palette": "palette-eastertide", "label": "23 May 2026", "date": "23 May 2026"}, {"palette": "palette-pentecost", "label": "24 May 2026", "date": "24 May 2026"}, {"palette": "palette-white", "label": "25 May 2026", "date": "25 May 2026"}, {"palette": "palette-white", "label": "26 May 2026", "date": "26 May 2026"}, {"palette": "palette-white", "label": "27 May 2026", "date": "27 May 2026"}, {"palette": "palette-ordinarytime", "label": "28 May 2026", "date": "28 May 2026"}, {"palette": "palette-ordinarytime", "label": "29 May 2026", "date": "29 May 2026"}, {"palette": "palette-ordinarytime", "label": "30 May 2026", "date": "30 May 2026"}, {"palette": "palette-white", "label": "31 May 2026", "date": "31 May 2026"}, {"palette": "palette-pentecost", "label": "1 June 2026", "date": "1 June 2026"}, {"palette": "palette-red", "label": "2 June 2026", "date": "2 June 2026"}, {"palette": "palette-red", "label": "3 June 2026", "date": "3 June 2026"}];
 const FIGURES_BY_DAY = [
   {
     "st_mark_evangelist": {
@@ -8322,6 +8515,20 @@ const FIGURES_BY_DAY = [
       "dates": "d. c. 62 AD",
       "role": "",
       "body": "Traditionally identified as the brother of Jesus and leader of the early Christian community in Jerusalem. He is featured today because his letter — addressed to believers facing hardship — gives the day's word its most precise theological definition: endurance not as resignation, but as what the testing of faith actively produces."
+    }
+  },
+  {
+    "saint_charles_lwanga_c_18601886_and_his_companions_martyrs": {
+      "name": "Saint Charles Lwanga (c. 1860–1886) and his Companions, martyrs",
+      "dates": "",
+      "role": "",
+      "body": "Converts to Christianity at the royal court of the kingdom of Buganda, in what is now Uganda. Lwanga had charge of the king's pages and protected the younger boys among them; he and his companions — several baptised only shortly before — were put to death, many by burning at Namugongo, for refusing to renounce their faith. The Church remembers them today as among the first modern martyrs of sub-Saharan Africa. Catholic and Anglican converts died together in the same persecution, and both Churches honour them."
+    },
+    "saint_matthew": {
+      "name": "Saint Matthew",
+      "dates": "1st century AD",
+      "role": "",
+      "body": "Traditionally identified as one of the Twelve Apostles — a tax collector called by Jesus — and as the author of the first Gospel. He is featured today because his Gospel records Jesus' words to his closest followers about acknowledging him before others: the promise, and the warning, on which the day's word turns."
     }
   }
 ];
