@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated 2026-06-01 11:39 · 1 June 2026 – 4 June 2026 (41 day(s)) -->
+<!-- Vigil · Production MVP · Generated 2026-06-01 19:24 · 1 June 2026 – 4 June 2026 (41 day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -691,6 +691,135 @@ body { overflow: hidden; }
   transition: opacity 0.5s ease;
 }
 
+/* ── Install nudge ── */
+.install-nudge {
+  position: fixed; bottom: 4.8rem; left: 0; right: 0;
+  padding: 0 1.4rem;
+  z-index: 30;
+  pointer-events: none;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+.install-nudge-rule {
+  border: none;
+  border-top: 1px solid var(--accent-soft);
+  margin-bottom: 0.55rem;
+}
+.install-nudge-text {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--dim);
+  pointer-events: none;
+}
+.install-nudge-link {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--gold);
+  padding: 0;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+.install-nudge-link:hover { opacity: 0.8; }
+.install-modal-open .install-nudge {
+  filter: blur(2px);
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ── Install modal ── */
+.install-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(200,190,170,0.55);
+  display: flex; align-items: flex-end; justify-content: center;
+  z-index: 110;
+  opacity: 0; pointer-events: none;
+}
+.install-modal-overlay.install-modal-visible {
+  opacity: 1; pointer-events: auto;
+}
+.palette-lent .install-modal-overlay,
+.palette-goodfriday .install-modal-overlay,
+.palette-pentecost .install-modal-overlay { background: rgba(5,3,8,0.72); }
+.install-modal-card {
+  background: var(--bg);
+  border: 1px solid var(--accent-soft);
+  border-bottom: none;
+  width: 100%;
+  max-width: 480px;
+  padding: 2rem 1.8rem 2.4rem;
+  position: relative;
+  box-shadow: 0 -12px 48px rgba(28,23,20,0.14);
+  transform: translateY(100%);
+}
+.install-modal-close {
+  position: absolute; top: 1rem; right: 1.2rem;
+  background: none; border: none;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem; font-weight: 300;
+  color: var(--dim); line-height: 1;
+  cursor: pointer; padding: 0.2rem 0.4rem;
+  transition: color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.install-modal-close:hover { color: var(--text); }
+.install-modal-wordmark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.75rem; font-weight: 400;
+  letter-spacing: 0.42em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 1.1rem;
+}
+.install-modal-intro {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.05rem; line-height: 2;
+  color: var(--text); margin-bottom: 1.3rem;
+}
+.install-modal-steps {
+  display: flex; flex-direction: column; gap: 0.9rem;
+}
+.install-modal-step {
+  display: flex; align-items: flex-start; gap: 1rem;
+}
+.install-modal-step-num {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 0.1em; color: var(--gold);
+  margin-top: 0.2rem; flex-shrink: 0;
+  width: 1rem; text-align: right;
+}
+.install-modal-step-text {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.05rem; line-height: 2;
+  color: var(--text);
+}
+.install-modal-step-text strong { font-weight: 700; }
+.install-dots-pill {
+  display: inline-block;
+  font-family: -apple-system, 'SF Pro Text', sans-serif;
+  font-size: 0.95rem; font-weight: 500;
+  background: rgba(184,134,11,0.1); color: var(--gold);
+  padding: 0.1rem 0.5rem; border-radius: 4px;
+  letter-spacing: 0.05em; line-height: 1.5;
+  vertical-align: baseline;
+}
+.install-modal-rule {
+  border: none;
+  border-top: 1px solid var(--accent-soft);
+  margin: 1.2rem 0 1.1rem;
+}
+.install-modal-footnote {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.05rem; font-style: italic;
+  color: var(--dim); line-height: 2;
+}
+
 /* ── Figure modal ── */
 .figure-overlay {
   position: fixed; inset: 0;
@@ -1243,12 +1372,6 @@ body { overflow: hidden; }
     setTimeout(reveal, TIMEOUT);
   }
 })();
-</script>
-<!-- Privacy-friendly analytics by Plausible -->
-<script async src="https://plausible.io/js/pa-gSh3KT8YuKzGLNRV432im.js"></script>
-<script>
-  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
-  plausible.init()
 </script>
 </head>
 <body>
@@ -8237,6 +8360,41 @@ but as the thing we most want to find.</p>
     </div>
   </div>
 
+  <!-- Install nudge — hidden when running as installed PWA -->
+  <div class="install-nudge" id="installNudge" style="display:none">
+    <div class="install-nudge-rule"></div>
+    <div class="install-nudge-text">Keep Vigil close — <button class="install-nudge-link" id="installNudgeLink">add it to your home screen</button></div>
+  </div>
+
+  <!-- Install modal -->
+  <div class="install-modal-overlay" id="installModalOverlay">
+    <div class="install-modal-card" id="installModalCard">
+      <button class="install-modal-close" id="installModalClose" aria-label="Close">&times;</button>
+      <div class="install-modal-wordmark">V I G I L</div>
+      <div class="install-modal-intro">Adding Vigil to your iPhone home screen is quick and easy. Just follow these steps.</div>
+      <div class="install-modal-steps">
+        <div class="install-modal-step">
+          <div class="install-modal-step-num">1</div>
+          <div class="install-modal-step-text">Tap <span class="install-dots-pill">&middot;&middot;&middot;</span> at the bottom right of this screen.</div>
+        </div>
+        <div class="install-modal-step">
+          <div class="install-modal-step-num">2</div>
+          <div class="install-modal-step-text">Tap <strong>Share</strong> at the top of the menu.</div>
+        </div>
+        <div class="install-modal-step">
+          <div class="install-modal-step-num">3</div>
+          <div class="install-modal-step-text">Scroll down and tap <strong>Add to Home Screen.</strong> (You may need to tap <strong>View More</strong> to see it).</div>
+        </div>
+        <div class="install-modal-step">
+          <div class="install-modal-step-num">4</div>
+          <div class="install-modal-step-text">Tap <strong>Add</strong> in the top right corner.</div>
+        </div>
+      </div>
+      <div class="install-modal-rule"></div>
+      <div class="install-modal-footnote">Once installed, Vigil will send you a quiet word each morning.</div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -9849,6 +10007,99 @@ if (targetIdx === -1) {
     scheduleMidnightAdvance();
   }
 }
+
+// ── Install nudge ─────────────────────────────────────────────────────────────
+// Shows a persistent footer nudge on every screen until the app is installed.
+// On iOS Safari: tapping the link shows a modal with step-by-step instructions.
+// On Android Chrome: tapping the link triggers the native install prompt.
+// Hidden permanently once running in standalone mode (installed PWA).
+
+(function initInstallNudge() {
+  const nudge    = document.getElementById('installNudge');
+  const link     = document.getElementById('installNudgeLink');
+  const overlay  = document.getElementById('installModalOverlay');
+  const card     = document.getElementById('installModalCard');
+  const closeBtn = document.getElementById('installModalClose');
+  const app      = document.getElementById('app');
+  if (!nudge || !link || !overlay || !card || !closeBtn) return;
+
+  // Detect standalone mode — if installed, hide nudge permanently.
+  const isStandalone = window.navigator.standalone === true ||
+                       window.matchMedia('(display-mode: standalone)').matches;
+  if (isStandalone) return;
+
+  // Show the nudge.
+  nudge.style.display = 'block';
+
+  // Capture Android Chrome install prompt.
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+
+  // Detect iOS Safari (to show modal rather than native prompt).
+  const ua = navigator.userAgent;
+  const isIOS = /iP(hone|ad|od)/.test(ua) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isOtherBrowser = /CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo|Brave|SamsungBrowser/.test(ua);
+  const isIOSSafari = isIOS && !isOtherBrowser;
+
+  // Animation keyframes.
+  const styleEl = document.createElement('style');
+  styleEl.textContent = [
+    '@keyframes installOverlayIn  { from { opacity:0; } to { opacity:1; } }',
+    '@keyframes installOverlayOut { from { opacity:1; } to { opacity:0; } }',
+    '@keyframes installCardUp     { from { transform:translateY(100%); opacity:0.6; } to { transform:translateY(0); opacity:1; } }',
+    '@keyframes installCardDown   { from { transform:translateY(0); opacity:1; } to { transform:translateY(100%); opacity:0.6; } }',
+  ].join('');
+  document.head.appendChild(styleEl);
+
+  function openModal() {
+    card.style.animation = 'none';
+    card.offsetHeight;
+    overlay.style.opacity = '0';
+    overlay.classList.add('install-modal-visible');
+    overlay.offsetHeight;
+    overlay.style.animation = 'installOverlayIn 0.32s ease forwards';
+    card.style.animation = 'installCardUp 0.55s cubic-bezier(0.22,1,0.36,1) forwards';
+    app.classList.add('install-modal-open');
+  }
+
+  function closeModal() {
+    overlay.style.animation = 'installOverlayOut 0.32s ease forwards';
+    card.style.animation = 'installCardDown 0.32s cubic-bezier(0.4,0,1,1) forwards';
+    setTimeout(function() {
+      overlay.classList.remove('install-modal-visible');
+      app.classList.remove('install-modal-open');
+    }, 320);
+  }
+
+  link.addEventListener('click', function() {
+    if (deferredPrompt) {
+      // Android Chrome — trigger native prompt directly.
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function(result) {
+        if (result.outcome === 'accepted') nudge.style.display = 'none';
+        deferredPrompt = null;
+      });
+    } else {
+      // iOS Safari and all other browsers — show the modal.
+      openModal();
+    }
+  });
+
+  closeBtn.addEventListener('click', closeModal);
+
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) closeModal();
+  });
+
+  // Hide nudge permanently once installed.
+  window.addEventListener('appinstalled', function() {
+    nudge.style.display = 'none';
+  });
+})();
 
 </script>
 <script>
