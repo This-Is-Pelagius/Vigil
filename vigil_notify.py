@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 vigil_notify.py
-Vigil notification scheduler — Version 2.1
+Vigil notification scheduler — Version 2.0
 
 Reads Vigil_Content_v2.0.xlsx and schedules Word of the Day push notifications
 via the OneSignal API.
@@ -28,16 +28,10 @@ Configuration:
     When running via GitHub Actions: the API key is read from the repository
     secret ONESIGNAL_API_KEY. No config file is needed.
 
-Delivery timing:
-    OneSignal's "Intelligent Delivery" / timezone option is used. The
-    'send_after' field is set to midnight UTC on the target date — well before
-    any user's 7:45 AM arrives. OneSignal then holds the notification and
-    delivers it at DELIVERY_HOUR:DELIVERY_MINUTE in each user's own timezone.
-
-    This means the script can be run at any point during the day before midnight
-    UTC and the notification will still deliver correctly at 7:45 AM local time
-    for every user. The GitHub Actions workflow runs at 5:00 AM UTC daily, which
-    gives a comfortable margin.
+BST/GMT:
+    The script automatically detects whether London is currently on British
+    Summer Time (UTC+1) or GMT (UTC+0) and adjusts delivery timing accordingly.
+    No manual changes are ever needed.
 """
 
 import re
@@ -57,20 +51,24 @@ except ImportError:
     print("Error: requests is required. Run: pip3 install requests")
     sys.exit(1)
 
+try:
+    from zoneinfo import ZoneInfo
+    _LONDON_TZ = ZoneInfo("Europe/London")
+except ImportError:
+    _LONDON_TZ = None
+
 # ── Configuration ─────────────────────────────────────────────────────────────
 
 SPREADSHEET       = "Vigil_Content_v2.0.xlsx"
 ONESIGNAL_APP_ID  = "ee15b094-145a-4b1e-9b6c-6a29fa0a469e"
 ONESIGNAL_API_URL = "https://onesignal.com/api/v1/notifications"
 
-# Delivery time: 7:45 AM in each user's local timezone.
+# Delivery time: 7:00 AM in each user's local timezone.
 DELIVERY_HOUR   = 7
-DELIVERY_MINUTE = 45
+DELIVERY_MINUTE = 0
 
-# The GitHub Actions workflow runs at 5:00 AM UTC. We set send_after to
-# midnight UTC of the target date so the API call always precedes the
-# send_after time, regardless of BST/GMT or the runner's clock.
-# OneSignal then handles per-timezone delivery via delayed_option + delivery_time_of_day.
+# How many hours before the delivery time the API call must be made.
+BUFFER_HOURS = 1
 
 # Default: schedule today only. Pass a number on the command line to schedule
 # further ahead (e.g. python3 vigil_notify.py 7).
@@ -84,10 +82,12 @@ def load_api_key():
     Checks the environment variable first (for GitHub Actions), then falls
     back to vigil_notify_config.py (for local use).
     """
+    # GitHub Actions sets secrets as environment variables.
     key = os.environ.get("ONESIGNAL_API_KEY")
     if key:
         return key
 
+    # Local use: read from vigil_notify_config.py.
     try:
         from vigil_notify_config import ONESIGNAL_API_KEY
         return ONESIGNAL_API_KEY
@@ -107,6 +107,39 @@ def load_api_key():
     print("Your REST API key is in the OneSignal dashboard under")
     print("Settings → Keys & IDs → API Keys.")
     sys.exit(1)
+
+
+# ── BST/GMT detection ─────────────────────────────────────────────────────────
+
+def london_utc_offset_hours(date):
+    """
+    Returns the UTC offset for London on the given date: 1 during BST, 0 during GMT.
+    Uses Python's zoneinfo module (Python 3.9+) for accurate DST detection.
+    Falls back to a manual approximation if zoneinfo is unavailable.
+    """
+    if _LONDON_TZ is not None:
+        # zoneinfo gives the definitive answer.
+        dt = datetime.datetime(date.year, date.month, date.day, 12, 0, tzinfo=_LONDON_TZ)
+        offset = dt.utcoffset()
+        return int(offset.total_seconds() / 3600)
+
+    # Fallback: approximate BST as last Sunday in March to last Sunday in October.
+    # This matches the UK rule precisely for all years since 2002.
+    def last_sunday(year, month):
+        # Find the last day of the month, then back up to Sunday.
+        import calendar
+        last_day = calendar.monthrange(year, month)[1]
+        d = datetime.date(year, month, last_day)
+        # weekday(): Monday=0, Sunday=6
+        d -= datetime.timedelta(days=(d.weekday() + 1) % 7)
+        return d
+
+    bst_start = last_sunday(date.year, 3)   # Last Sunday in March
+    bst_end   = last_sunday(date.year, 10)  # Last Sunday in October
+
+    if bst_start <= date < bst_end:
+        return 1
+    return 0
 
 
 # ── Spreadsheet parsing ───────────────────────────────────────────────────────
@@ -211,6 +244,8 @@ def parse_word(word_raw):
 def parse_scripture(scripture_raw):
     """
     Extract the scripture reference from the last non-empty line of the cell.
+    The cell contains the full passage text followed by the reference on the
+    last line, e.g. 'John 15:4–5 (NRSV)' or 'Mark 16:15, 20 — NRSV'.
     Returns only the reference, stripping the translation label.
     """
     lines = [l.strip() for l in scripture_raw.strip().split("\n") if l.strip()]
@@ -240,17 +275,20 @@ def delivery_send_after(date):
     """
     Returns the OneSignal 'send_after' timestamp for the given date.
 
-    We set send_after to midnight UTC at the start of the target date.
-    This ensures the API call is always made BEFORE the send_after time
-    (the workflow runs at 5:00 AM UTC), so OneSignal queues the notification
-    correctly and then delivers it at delivery_time_of_day in each user's
-    own timezone.
+    We want OneSignal to begin delivery at (DELIVERY_HOUR - BUFFER_HOURS) in
+    London local time, which gives it a one-hour head start before 7:00 AM
+    arrives in the earliest timezone where Vigil has users.
 
-    Important: do NOT set send_after to the actual delivery time in UTC.
-    If send_after has already passed when the API call arrives, OneSignal
-    silently discards the notification. Midnight UTC is safe for any timezone.
+    The UTC offset is detected automatically from the date: +1 in BST, +0 in GMT.
     """
-    send_dt = datetime.datetime(date.year, date.month, date.day, 0, 0, 0)
+    utc_offset = london_utc_offset_hours(date)
+    send_hour_utc = (DELIVERY_HOUR - BUFFER_HOURS) - utc_offset
+
+    send_dt = datetime.datetime(
+        date.year, date.month, date.day,
+        send_hour_utc, 0, 0,
+    )
+    # OneSignal format: "2026-05-01 05:00:00 GMT+0000"
     return send_dt.strftime("%Y-%m-%d %H:%M:%S GMT+0000")
 
 
@@ -259,12 +297,14 @@ def delivery_send_after(date):
 def is_too_late(date):
     """
     Returns True if it is too late to schedule today's notification.
-    Since we rely on OneSignal's timezone delivery, 'too late' means it is
-    already past midnight UTC on the target date (i.e. the date has passed).
-    Running today's script on today's date is always fine.
+    'Too late' means the current local time has passed the buffer cutoff.
     """
-    today_utc = datetime.datetime.utcnow().date()
-    return date < today_utc
+    now = datetime.datetime.now()
+    cutoff = datetime.datetime(
+        date.year, date.month, date.day,
+        DELIVERY_HOUR - BUFFER_HOURS, DELIVERY_MINUTE, 0,
+    )
+    return date == datetime.date.today() and now >= cutoff
 
 
 # ── OneSignal API call ─────────────────────────────────────────────────────────
@@ -274,6 +314,9 @@ def schedule_notification(date, word, scripture, api_key, dry_run=False):
     message_name = format_message_name(date, word)
     message_body = format_message(word, parse_scripture(scripture))
     send_after   = delivery_send_after(date)
+
+    utc_offset   = london_utc_offset_hours(date)
+    tz_label     = "BST (UTC+1)" if utc_offset == 1 else "GMT (UTC+0)"
 
     payload = {
         "app_id":               ONESIGNAL_APP_ID,
@@ -285,14 +328,15 @@ def schedule_notification(date, word, scripture, api_key, dry_run=False):
         "send_after":           send_after,
         "delayed_option":       "timezone",
         "delivery_time_of_day": f"{DELIVERY_HOUR:02d}:{DELIVERY_MINUTE:02d}",
+        "collapse_id":          f"vigil-daily-{date.isoformat()}",
     }
 
     date_display = date.strftime("%-d %b %Y")
 
     if dry_run:
         print(f"  [DRY RUN] {date_display} · {message_body}")
-        print(f"            send_after: {send_after} (midnight UTC — safe for all timezones)")
-        print(f"            Deliver at: {DELIVERY_HOUR:02d}:{DELIVERY_MINUTE:02d} per user's local timezone")
+        print(f"            Send after: {send_after}  ({tz_label})")
+        print(f"            Deliver at: {DELIVERY_HOUR:02d}:{DELIVERY_MINUTE:02d} per user timezone")
         return True
 
     headers = {
@@ -307,8 +351,7 @@ def schedule_notification(date, word, scripture, api_key, dry_run=False):
         if response.status_code == 200 and "id" in data:
             notif_id = data["id"]
             print(f"  ✓ {date_display} · {message_body}")
-            print(f"    Notification ID: {notif_id}")
-            print(f"    Delivers at: {DELIVERY_HOUR:02d}:{DELIVERY_MINUTE:02d} per user's local timezone")
+            print(f"    Notification ID: {notif_id}  ({tz_label})")
             return True
         else:
             errors = data.get("errors", [data])
@@ -329,7 +372,7 @@ def main():
     num_days = int(day_args[0]) if day_args else DEFAULT_DAYS
 
     mode_label = " (DRY RUN — no notifications will be sent)" if dry_run else ""
-    print(f"Vigil Notification Scheduler v2.1{mode_label}")
+    print(f"Vigil Notification Scheduler{mode_label}")
     if num_days == 1:
         print("Scheduling today's notification")
     else:
@@ -345,7 +388,7 @@ def main():
         print("Error: No content rows found in the spreadsheet.")
         sys.exit(1)
 
-    today = datetime.datetime.utcnow().date()
+    today = datetime.date.today()
 
     # Find today's index in the spreadsheet.
     today_idx = -1
@@ -395,7 +438,7 @@ def main():
             continue
 
         if is_too_late(date):
-            print(f"  ⚠ {date.strftime('%-d %b %Y')} · {word} — date has already passed (UTC), skipping")
+            print(f"  ⚠ {date.strftime('%-d %b %Y')} · {word} — too late to schedule today's notification (past {DELIVERY_HOUR - BUFFER_HOURS}:00), skipping")
             skipped += 1
             continue
 

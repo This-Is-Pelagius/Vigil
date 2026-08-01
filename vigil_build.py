@@ -29,16 +29,50 @@ except ImportError:
 SPREADSHEET = "Vigil_Content_v2.0.xlsx"
 OUTPUT_FILE = "index.html"
 
+# Number of days to embed ahead of today.
+# The app selects today's content at runtime, so users only see today.
+# Embedding future days means the midnight reload finds tomorrow already
+# in the file, giving automatic time-zone-correct daily advance without
+# requiring a new deployment every day.
+DAYS_WINDOW = 14
+
 # Liturgical season → CSS palette class mapping
+# Used as fallback when the Palette column in the spreadsheet is blank.
 PALETTE_MAP = {
     "eastertide":    "palette-eastertide",
     "lent":          "palette-lent",
     "good friday":   "palette-goodfriday",
     "holy saturday": "palette-goodfriday",
     "pentecost":     "palette-pentecost",
-    # Fallback
-    "ordinary time": "palette-eastertide",
-    "advent":        "palette-eastertide",
+    "ordinary time": "palette-ordinarytime",
+    "advent":        "palette-advent",
+}
+
+# Spreadsheet Palette column value → CSS palette class
+# This is the primary palette control. When a value is present in the
+# spreadsheet Palette column, it takes precedence over everything else.
+SPREADSHEET_PALETTE_MAP = {
+    "eastertide":   "palette-eastertide",
+    "red major":    "palette-pentecost",
+    "red":          "palette-red",
+    "green major":  "palette-ordinarytime-major",
+    "green":        "palette-ordinarytime",
+    "white major":  "palette-white-major",
+    "white":        "palette-white",
+    "purple major": "palette-lent",
+    "purple":       "palette-advent",
+    "rose":         "palette-rose",
+    "black":        "palette-black",
+    "good friday":  "palette-goodfriday",
+    "lent":         "palette-lent",
+}
+
+# Feast/solemnity names in the feast line that override the season palette.
+# Used as a secondary fallback when the Palette column is blank and the
+# season key alone is insufficient (e.g. Pentecost within Eastertide).
+FEAST_PALETTE_OVERRIDE = {
+    "pentecost":   "palette-pentecost",
+    "good friday": "palette-goodfriday",
 }
 
 # Abbreviated month names for the day label and word echo date
@@ -83,6 +117,8 @@ def load_spreadsheet(path):
             hl = h.lower()
             if "version" in hl:
                 col["version"] = i
+            elif "palette" in hl:
+                col["palette"] = i
             elif "liturgical day" in hl:
                 col["liturgical_day"] = i
             elif "screen 1" in hl or "season" in hl:
@@ -130,6 +166,7 @@ def load_spreadsheet(path):
 
             day = {
                 "version":      get("version"),
+                "palette":      get("palette"),
                 "liturgical_day": get("liturgical_day"),
                 "season":       get("season"),
                 "word":         get("word"),
@@ -280,10 +317,24 @@ def parse_hover_links(hover_links_text):
         role = ""
 
         # Pipe format: Role | Name (dates).
+        # Also accepts middle dot (·, U+00B7) as separator, e.g. "Author · Psalm 130 (dates)."
+        pipe_sep = None
         if "|" in header:
-            parts = header.split("|", 1)
+            pipe_sep = "|"
+        elif "\u00b7" in header:
+            pipe_sep = "\u00b7"
+        if pipe_sep:
+            parts = header.split(pipe_sep, 1)
             role = parts[0].strip()
             header = parts[1].strip()
+            # Special case: when role and name represent the same figure
+            # (e.g. "Psalmist · Psalm 130"), use the role as the display name
+            # and suppress the role line so the card reads cleanly.
+            if role.lower() == "psalmist":
+                # Preserve dates from the name field (e.g. "Psalm 130 (dates)")
+                # but display as "Psalmist" with those dates.
+                header = "Psalmist" + (" (" + header.split("(", 1)[1] if "(" in header else "")
+                role = ""
 
         # Extract name and dates: Name (dates). or Name (dates)
         m = re.match(r'^(.+?)\s*\(([^)]+)\)\.?\s*$', header)
@@ -333,21 +384,35 @@ def build_figure_link_pattern(figures):
         return None, {}
 
     # Also add short-name variants: "St Mark, Evangelist" → also match "Mark"
-    # Extract the last proper name token(s) from each figure name
+    # For joint entries like "Sts Nereus and Achilleus", register every proper
+    # name token so both names are hover-linked in the body copy.
+    SKIP_WORDS = {'and', 'of', 'the', 'sts', 'st', 'saint', 'blessed', 'fr',
+                  'dr', 'pope', 'bishop'}
     extra = {}
     for name_lower, slug in list(name_to_slug.items()):
-        # e.g. "st mark, evangelist" → "mark"
         # Strip honorifics and role suffixes
-        clean = re.sub(r'\b(st|saint|blessed|fr|dr|pope|bishop)\b', '', name_lower)
+        clean = re.sub(r'\b(st|sts|saint|blessed|fr|dr|pope|bishop)\b', '', name_lower)
         clean = re.sub(r',.*$', '', clean)  # remove role suffix after comma
         clean = clean.strip()
         tokens = clean.split()
-        if tokens:
-            short = tokens[-1]  # last name token
-            if len(short) >= 3 and short not in JESUS_NAMES and short not in name_to_slug:
-                extra[short] = slug
+        # Register every proper-name token (length ≥ 3, not a connective word)
+        for token in tokens:
+            if (len(token) >= 3
+                    and token not in SKIP_WORDS
+                    and token not in JESUS_NAMES
+                    and token not in name_to_slug):
+                extra[token] = slug
 
     name_to_slug.update(extra)
+
+    # Psalmist alias: a figure named "Psalmist" should be linked on the word
+    # "Psalmist" wherever it appears in the body copy. "Psalm" is not linked
+    # as it is too common a word to link safely across all content.
+    for slug, fig in figures.items():
+        name_l = fig["name"].lower()
+        if name_l == "psalmist" or re.match(r'^psalm\s+\d', name_l):
+            if "psalmist" not in name_to_slug:
+                name_to_slug["psalmist"] = slug
 
     # Sort by length descending so longer names match before shorter substrings
     sorted_names = sorted(name_to_slug.keys(), key=len, reverse=True)
@@ -730,52 +795,56 @@ def build_screen7_amen(day, uid):
     <!-- Counter block — hidden until COUNT_THRESHOLD reached -->
     <div class="amen-count-block" id="amen-count-{u}">
       <div class="amen-count-number" id="amen-count-num-{u}">—</div>
-      <div class="amen-count-label">people have kept vigil since Vigil began.<br>Invite someone to keep Vigil with you.</div>
+      <div class="amen-count-label">people have kept vigil since Vigil began.</div>
     </div>
 
-    <!-- Share block — appears after checkbox is ticked -->
-    <div class="amen-share-block" id="amen-share-{u}">
+    <!-- Post-liturgy layer: rises 3s after commission animation completes -->
+    <div class="amen-post-liturgy" id="amen-post-{u}">
 
-      <div id="amen-share-initial-{u}">
-        <div class="amen-share-prompt">Would you like to share that you kept Vigil today?</div>
-        <button class="amen-share-btn-primary"
-                onclick="amenShareImage('{u}')">Share today's Vigil</button>
-        <button class="amen-share-btn-secondary"
-                onclick="amenShareApp('{u}')">Share the app</button>
-        <button class="amen-not-now-btn"
-                onclick="amenNotNow('{u}')">Not now</button>
+      <!-- Notification prompt — shown once, only if not already subscribed -->
+      <!-- State is set by vigilMaybeShowNotifPrompt() based on browser/platform detection -->
+      <div class="amen-notif-section" id="amen-notif-{u}">
+
+        <!-- State 1: normal — browser supports web push (Android, desktop) -->
+        <div id="amen-notif-normal-{u}" style="display:none">
+          <div class="amen-notif-prompt">Would you like Vigil to meet you here again tomorrow?</div>
+          <button class="amen-share-btn-primary" onclick="vigilRequestNotification('{u}')">
+            Turn on notifications
+          </button>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('{u}')">Not now</button>
+        </div>
+
+        <!-- State 2: iOS Safari in browser tab — can install as PWA -->
+        <div id="amen-notif-ios-safari-{u}" style="display:none">
+          <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, tap the Share icon at the bottom of your screen and choose Add to Home Screen.</div>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('{u}')">Dismiss</button>
+        </div>
+
+        <!-- State 3: iOS other browser — must switch to Safari -->
+        <div id="amen-notif-ios-other-{u}" style="display:none">
+          <div class="amen-notif-prompt">Morning notifications are only available when Vigil is set as an app on your iPhone.<br>To do this, open <a href="https://dailyvigil.app" style="color:inherit">dailyvigil.app</a> in Safari and follow the instructions on the Amen screen.</div>
+          <button class="amen-not-now-btn" onclick="vigilDismissNotification('{u}')">Dismiss</button>
+        </div>
+
       </div>
 
-      <div class="amen-share-confirmed" id="amen-share-confirmed-{u}"></div>
+      <!-- Share block — conditional on completion count ≥ 2 -->
+      <div class="amen-share-block" id="amen-share-{u}">
 
-    </div>
+        <div id="amen-share-initial-{u}">
+          <div class="amen-share-prompt">Has Vigil become part of your day?<br>Share it with someone who might find value in it too.</div>
+          <button class="amen-share-btn-primary"
+                  onclick="amenShareImage('{u}')">Share today&#8217;s Vigil</button>
+          <button class="amen-share-btn-secondary"
+                  onclick="amenShareApp('{u}')">Share the app</button>
+          <button class="amen-not-now-btn"
+                  onclick="amenNotNow('{u}')">Not now</button>
+        </div>
 
-    <!-- Standing invitation -->
-    <div class="amen-invitation-section">
-      <button class="amen-invitation-trigger" onclick="amenToggleInvitation('{u}')" tabindex="0">
-        <div class="amen-invitation-trigger-inner">
-          <span class="amen-invitation-text">Invite someone to keep Vigil with you</span>
-          <span class="amen-invitation-arrow" id="amen-inv-arrow-{u}">›</span>
-        </div>
-      </button>
-      <div class="amen-invitation-panel" id="amen-inv-panel-{u}">
-        <div class="amen-invitation-panel-inner">
-          <div class="amen-invitation-message">I&#8217;ve been using Vigil for my daily devotion &#8212; a beautiful app rooted in the Christian year. I thought you might like it.</div>
-          <div id="amen-inv-actions-{u}">
-            <button class="amen-invitation-send" onclick="amenSendInvitation('{u}')">Send invitation</button>
-          </div>
-          <div class="amen-inv-confirmed" id="amen-inv-confirmed-{u}"></div>
-        </div>
+        <div class="amen-share-confirmed" id="amen-share-confirmed-{u}"></div>
+
       </div>
-    </div>
 
-    <!-- Notification prompt — shown once, only if not already subscribed -->
-    <div class="amen-notif-section" id="amen-notif-{u}">
-      <div class="amen-notif-prompt">Receive the Word of the Day as a morning notification.</div>
-      <button class="amen-share-btn-primary" onclick="vigilRequestNotification('{u}')">
-        Turn on notifications
-      </button>
-      <button class="amen-not-now-btn" onclick="vigilDismissNotification('{u}')">Not now</button>
     </div>
 
     <div class="amen-spacer"></div>"""
@@ -827,33 +896,68 @@ def build_day_html(day, day_index, figures):
         screens_html.append(build_screen_html(i, inner, SCREEN_CLASSES[i]))
 
     all_screens = "\n".join(screens_html)
-    return f'  <div class="day-screens" data-day="0">\n{all_screens}\n  </div>'
+    return f'  <div class="day-screens" data-day="{day_index}">\n{all_screens}\n  </div>'
 
 
-def build_days_js(day, figures):
-    """Build the DAYS and FIGURES JavaScript data objects for a single day."""
+def build_all_days_html(days_window):
+    """Build the HTML for all days in the window.
+    Each day-screens block is hidden by default; the JS shows the correct one."""
+    blocks = []
+    for i, (day, figures) in enumerate(days_window):
+        block = build_day_html(day, i, figures)
+        # All blocks hidden at load time — JS calls showDay() to reveal the right one
+        block = block.replace(
+            f'data-day="{i}">',
+            f'data-day="{i}" style="display:none">',
+            1
+        )
+        blocks.append(block)
+    return "\n".join(blocks)
+
+
+def build_days_js(days_window):
+    """Build the DAYS and FIGURES_BY_DAY JavaScript data objects for all days in the window.
+
+    FIGURES_BY_DAY is an array parallel to DAYS — each entry is a dict of figures
+    for that specific day only.  This prevents a figure name shared across multiple
+    days (e.g. 'John') from having later days' content overwrite earlier days'.
+    """
     import json
 
-    season_name, position_line, _, season_key = parse_liturgical_day(day["liturgical_day"])
-    palette = PALETTE_MAP.get(season_key, "palette-eastertide")
-    label   = format_day_label(season_name, position_line)
-    d       = parse_date_from_liturgical_day(day["liturgical_day"])
-    date_str = d.strftime("%-d %B %Y") if d else ""
+    days_obj       = []
+    figures_by_day = []
 
-    days_obj = [{"palette": palette, "label": label, "date": date_str}]
+    for day, figures in days_window:
+        season_name, position_line, feast_line, season_key = parse_liturgical_day(day["liturgical_day"])
 
-    # Build FIGURES from parsed hover links
-    figs_obj = {}
-    for slug, fig in figures.items():
-        figs_obj[slug] = {
-            "name":  fig["name"],
-            "dates": fig["dates"],
-            "role":  fig["role"],
-            "body":  fig["body"],
-        }
+        # Priority 1 — Palette column in spreadsheet (explicit instruction)
+        spreadsheet_palette = day.get("palette", "").strip().lower()
+        if spreadsheet_palette and spreadsheet_palette in SPREADSHEET_PALETTE_MAP:
+            palette = SPREADSHEET_PALETTE_MAP[spreadsheet_palette]
+        else:
+            # Priority 2 — Feast line override (e.g. Pentecost within Eastertide)
+            palette = PALETTE_MAP.get(season_key, "palette-ordinarytime")
+            feast_lower = feast_line.lower()
+            for feast_key, feast_palette in FEAST_PALETTE_OVERRIDE.items():
+                if feast_key in feast_lower:
+                    palette = feast_palette
+                    break
+        label    = format_day_label(season_name, position_line)
+        d        = parse_date_from_liturgical_day(day["liturgical_day"])
+        date_str = d.strftime("%-d %B %Y") if d else ""
+        days_obj.append({"palette": palette, "label": label, "date": date_str})
+        day_figs = {}
+        for slug, fig in figures.items():
+            day_figs[slug] = {
+                "name":  fig["name"],
+                "dates": fig["dates"],
+                "role":  fig["role"],
+                "body":  fig["body"],
+            }
+        figures_by_day.append(day_figs)
 
-    days_js    = f"const DAYS    = {json.dumps(days_obj, ensure_ascii=False)};"
-    figures_js = f"const FIGURES = {json.dumps(figs_obj, ensure_ascii=False, indent=2)};"
+    days_js    = f"const DAYS           = {json.dumps(days_obj, ensure_ascii=False)};"
+    figures_js = f"const FIGURES_BY_DAY = {json.dumps(figures_by_day, ensure_ascii=False, indent=2)};"
 
     return days_js, figures_js
 
@@ -861,6 +965,12 @@ def build_days_js(day, figures):
 # ── Full page assembly ────────────────────────────────────────────────────────
 
 CSS = r"""
+/* ── Font-loading veil ── */
+/* Keeps the app invisible until fonts are ready, preventing the flash of
+   fallback text on first load. The JS below lifts this within 800ms. */
+.app { opacity: 0; transition: opacity 0.3s ease; }
+.app.fonts-ready { opacity: 1; }
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -897,9 +1007,65 @@ body { overflow: hidden; }
   --accent-soft: rgba(160,48,48,0.2);
 }
 .palette-pentecost {
-  --bg: #1A0A0A; --panel: #251010; --accent: #C04040; --gold: #C04040;
-  --text: #F0E0D0; --dim: #9A7060; --shell: #120505;
-  --accent-soft: rgba(192,64,64,0.2);
+  --bg: #8B1A1A; --panel: #7A1515; --accent: #F5D78E; --gold: #F5D78E;
+  --text: #FDF6EE; --dim: #E8B89A; --shell: #6B1010;
+  --accent-soft: rgba(245,215,142,0.22);
+}
+
+/* Ordinary Time — cream background, green accents */
+.palette-ordinarytime {
+  --bg: #FAF7F2; --panel: #F2EDE3; --accent: #4A7C59; --gold: #4A7C59;
+  --text: #1C1714; --dim: #8A7D6E; --shell: #F0EAE0;
+  --accent-soft: rgba(74,124,89,0.15);
+}
+
+/* Ordinary Time Major — dark green background, gold accents (green solemnities) */
+.palette-ordinarytime-major {
+  --bg: #1A2B1A; --panel: #162414; --accent: #C8A84B; --gold: #C8A84B;
+  --text: #EDE8DC; --dim: #8A9E82; --shell: #111E11;
+  --accent-soft: rgba(200,168,75,0.2);
+}
+
+/* Red — martyrs' optional memorials. Cream bg, red accent. */
+.palette-red {
+  --bg: #FAF7F2; --panel: #F2EDE3; --accent: #9B3535; --gold: #9B3535;
+  --text: #1C1714; --dim: #8A7D6E; --shell: #F0EAE0;
+  --accent-soft: rgba(155,53,53,0.15);
+}
+
+/* White solemnity — pure white background, antique gold accents */
+.palette-white {
+  --bg: #FEFEFE; --panel: #FEFEFE; --accent: #9AAAB8; --gold: #9AAAB8;
+  --text: #1C1714; --dim: #8A8E94; --shell: #EAEBEC;
+  --accent-soft: rgba(154,170,184,0.22);
+}
+
+/* White Major — TBD (Christmas, Easter). Provisional values matching palette-white. */
+.palette-white-major {
+  --bg: #FEFEFE; --panel: #FEFEFE; --accent: #9AAAB8; --gold: #9AAAB8;
+  --text: #1C1714; --dim: #8A8E94; --shell: #EAEBEC;
+  --accent-soft: rgba(154,170,184,0.22);
+}
+
+/* Advent — TBD. Provisional purple values. */
+.palette-advent {
+  --bg: #FAF7F2; --panel: #F2EDE3; --accent: #6B4F9E; --gold: #6B4F9E;
+  --text: #1C1714; --dim: #8A7D6E; --shell: #F0EAE0;
+  --accent-soft: rgba(107,79,158,0.15);
+}
+
+/* Rose — TBD (Gaudete, Laetare). Provisional values. */
+.palette-rose {
+  --bg: #FAF7F2; --panel: #F2EDE3; --accent: #C4607A; --gold: #C4607A;
+  --text: #1C1714; --dim: #8A7D6E; --shell: #F0EAE0;
+  --accent-soft: rgba(196,96,122,0.15);
+}
+
+/* Black — All Souls. Provisional values. */
+.palette-black {
+  --bg: #1A1A1A; --panel: #222222; --accent: #888888; --gold: #888888;
+  --text: #F0F0F0; --dim: #AAAAAA; --shell: #101010;
+  --accent-soft: rgba(136,136,136,0.2);
 }
 
 /* ── App shell ── */
@@ -917,7 +1083,15 @@ body { overflow: hidden; }
 }
 .palette-lent .top-bar        { background: linear-gradient(to bottom, rgba(36,30,26,0.96) 0%, rgba(36,30,26,0) 100%); }
 .palette-goodfriday .top-bar  { background: linear-gradient(to bottom, rgba(14,12,11,0.96) 0%, rgba(14,12,11,0) 100%); }
-.palette-pentecost .top-bar   { background: linear-gradient(to bottom, rgba(26,10,10,0.96) 0%, rgba(26,10,10,0) 100%); }
+.palette-pentecost .top-bar   { background: linear-gradient(to bottom, rgba(139,26,26,0.96) 0%, rgba(139,26,26,0) 100%); }
+.palette-ordinarytime .top-bar         { background: linear-gradient(to bottom, rgba(250,247,242,0.96) 0%, rgba(250,247,242,0) 100%); }
+.palette-ordinarytime-major .top-bar   { background: linear-gradient(to bottom, rgba(26,43,26,0.96) 0%, rgba(26,43,26,0) 100%); }
+.palette-red .top-bar                  { background: linear-gradient(to bottom, rgba(250,247,242,0.96) 0%, rgba(250,247,242,0) 100%); }
+.palette-white .top-bar                { background: linear-gradient(to bottom, rgba(254,254,254,0.96) 0%, rgba(254,254,254,0) 100%); }
+.palette-white-major .top-bar          { background: linear-gradient(to bottom, rgba(254,254,254,0.96) 0%, rgba(254,254,254,0) 100%); }
+.palette-advent .top-bar               { background: linear-gradient(to bottom, rgba(250,247,242,0.96) 0%, rgba(250,247,242,0) 100%); }
+.palette-rose .top-bar                 { background: linear-gradient(to bottom, rgba(250,247,242,0.96) 0%, rgba(250,247,242,0) 100%); }
+.palette-black .top-bar                { background: linear-gradient(to bottom, rgba(26,26,26,0.96) 0%, rgba(26,26,26,0) 100%); }
 
 .top-bar-inner {
   display: flex;
@@ -950,18 +1124,27 @@ body { overflow: hidden; }
 
 .day-screens {
   position: absolute; top: 0; left: 0;
-  display: flex; flex-direction: row;
   width: 100%; height: 100%;
-  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
 }
 
 .screen {
-  min-width: 100vw; width: 100vw; height: 100%;
+  position: absolute; inset: 0;
   display: flex; flex-direction: column;
   justify-content: flex-start; align-items: flex-start;
-  position: relative; overflow: hidden;
-  background: var(--bg); flex-shrink: 0;
+  overflow: hidden;
+  background: var(--bg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.85s ease;
+}
+.screen.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.screen.leaving {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.85s ease;
 }
 .screen-word, .screen-contemplation, .screen-practice { background: var(--panel); }
 
@@ -1062,33 +1245,208 @@ body { overflow: hidden; }
 .palette-pentecost .screen-season .screen-fade-top,
 .palette-pentecost .screen-scripture .screen-fade-top,
 .palette-pentecost .screen-prayer .screen-fade-top
-  { background: linear-gradient(to bottom, #1A0A0A 40%, rgba(26,10,10,0)); }
+  { background: linear-gradient(to bottom, #8B1A1A 40%, rgba(139,26,26,0)); }
 .palette-pentecost .screen-season .screen-fade-bottom,
 .palette-pentecost .screen-scripture .screen-fade-bottom,
 .palette-pentecost .screen-prayer .screen-fade-bottom
-  { background: linear-gradient(to top, #1A0A0A 50%, rgba(26,10,10,0)); }
+  { background: linear-gradient(to top, #8B1A1A 50%, rgba(139,26,26,0)); }
 .palette-pentecost .screen-word .screen-fade-top,
 .palette-pentecost .screen-contemplation .screen-fade-top,
 .palette-pentecost .screen-practice .screen-fade-top
-  { background: linear-gradient(to bottom, #251010 40%, rgba(37,16,16,0)); }
+  { background: linear-gradient(to bottom, #7A1515 40%, rgba(122,21,21,0)); }
 .palette-pentecost .screen-word .screen-fade-bottom,
 .palette-pentecost .screen-contemplation .screen-fade-bottom,
 .palette-pentecost .screen-practice .screen-fade-bottom
-  { background: linear-gradient(to top, #251010 50%, rgba(37,16,16,0)); }
+  { background: linear-gradient(to top, #7A1515 50%, rgba(122,21,21,0)); }
+
+.palette-pentecost .screen-season .screen-fade-top,
+.palette-pentecost .screen-scripture .screen-fade-top,
+.palette-pentecost .screen-prayer .screen-fade-top
+  { background: linear-gradient(to bottom, #8B1A1A 40%, rgba(139,26,26,0)); }
+.palette-pentecost .screen-season .screen-fade-bottom,
+.palette-pentecost .screen-scripture .screen-fade-bottom,
+.palette-pentecost .screen-prayer .screen-fade-bottom
+  { background: linear-gradient(to top, #8B1A1A 50%, rgba(139,26,26,0)); }
+.palette-pentecost .screen-word .screen-fade-top,
+.palette-pentecost .screen-contemplation .screen-fade-top,
+.palette-pentecost .screen-practice .screen-fade-top
+  { background: linear-gradient(to bottom, #7A1515 40%, rgba(122,21,21,0)); }
+.palette-pentecost .screen-word .screen-fade-bottom,
+.palette-pentecost .screen-contemplation .screen-fade-bottom,
+.palette-pentecost .screen-practice .screen-fade-bottom
+  { background: linear-gradient(to top, #7A1515 50%, rgba(122,21,21,0)); }
+
+/* Ordinary Time fades */
+.palette-ordinarytime .screen-season .screen-fade-top,
+.palette-ordinarytime .screen-scripture .screen-fade-top,
+.palette-ordinarytime .screen-prayer .screen-fade-top,
+.palette-ordinarytime .screen-amen .screen-fade-top,
+.palette-red .screen-season .screen-fade-top,
+.palette-red .screen-scripture .screen-fade-top,
+.palette-red .screen-prayer .screen-fade-top,
+.palette-red .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #FAF7F2 40%, rgba(250,247,242,0)); }
+.palette-ordinarytime .screen-season .screen-fade-bottom,
+.palette-ordinarytime .screen-scripture .screen-fade-bottom,
+.palette-ordinarytime .screen-prayer .screen-fade-bottom,
+.palette-ordinarytime .screen-amen .screen-fade-bottom,
+.palette-red .screen-season .screen-fade-bottom,
+.palette-red .screen-scripture .screen-fade-bottom,
+.palette-red .screen-prayer .screen-fade-bottom,
+.palette-red .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #FAF7F2 50%, rgba(250,247,242,0)); }
+.palette-ordinarytime .screen-word .screen-fade-top,
+.palette-ordinarytime .screen-contemplation .screen-fade-top,
+.palette-ordinarytime .screen-practice .screen-fade-top,
+.palette-red .screen-word .screen-fade-top,
+.palette-red .screen-contemplation .screen-fade-top,
+.palette-red .screen-practice .screen-fade-top
+  { background: linear-gradient(to bottom, #F2EDE3 40%, rgba(242,237,227,0)); }
+.palette-ordinarytime .screen-word .screen-fade-bottom,
+.palette-ordinarytime .screen-contemplation .screen-fade-bottom,
+.palette-ordinarytime .screen-practice .screen-fade-bottom,
+.palette-red .screen-word .screen-fade-bottom,
+.palette-red .screen-contemplation .screen-fade-bottom,
+.palette-red .screen-practice .screen-fade-bottom
+  { background: linear-gradient(to top, #F2EDE3 50%, rgba(242,237,227,0)); }
+
+/* Ordinary Time Major fades */
+.palette-ordinarytime-major .screen-season .screen-fade-top,
+.palette-ordinarytime-major .screen-scripture .screen-fade-top,
+.palette-ordinarytime-major .screen-prayer .screen-fade-top,
+.palette-ordinarytime-major .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #1A2B1A 40%, rgba(26,43,26,0)); }
+.palette-ordinarytime-major .screen-season .screen-fade-bottom,
+.palette-ordinarytime-major .screen-scripture .screen-fade-bottom,
+.palette-ordinarytime-major .screen-prayer .screen-fade-bottom,
+.palette-ordinarytime-major .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #1A2B1A 50%, rgba(26,43,26,0)); }
+.palette-ordinarytime-major .screen-word .screen-fade-top,
+.palette-ordinarytime-major .screen-contemplation .screen-fade-top,
+.palette-ordinarytime-major .screen-practice .screen-fade-top
+  { background: linear-gradient(to bottom, #162414 40%, rgba(22,36,20,0)); }
+.palette-ordinarytime-major .screen-word .screen-fade-bottom,
+.palette-ordinarytime-major .screen-contemplation .screen-fade-bottom,
+.palette-ordinarytime-major .screen-practice .screen-fade-bottom
+  { background: linear-gradient(to top, #162414 50%, rgba(22,36,20,0)); }
+
+/* White fades */
+.palette-white .screen-season .screen-fade-top,
+.palette-white .screen-scripture .screen-fade-top,
+.palette-white .screen-prayer .screen-fade-top,
+.palette-white .screen-amen .screen-fade-top,
+.palette-white-major .screen-season .screen-fade-top,
+.palette-white-major .screen-scripture .screen-fade-top,
+.palette-white-major .screen-prayer .screen-fade-top,
+.palette-white-major .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #FEFEFE 40%, rgba(254,254,254,0)); }
+.palette-white .screen-season .screen-fade-bottom,
+.palette-white .screen-scripture .screen-fade-bottom,
+.palette-white .screen-prayer .screen-fade-bottom,
+.palette-white .screen-amen .screen-fade-bottom,
+.palette-white-major .screen-season .screen-fade-bottom,
+.palette-white-major .screen-scripture .screen-fade-bottom,
+.palette-white-major .screen-prayer .screen-fade-bottom,
+.palette-white-major .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #FEFEFE 50%, rgba(254,254,254,0)); }
+.palette-white .screen-word .screen-fade-top,
+.palette-white .screen-contemplation .screen-fade-top,
+.palette-white .screen-practice .screen-fade-top,
+.palette-white-major .screen-word .screen-fade-top,
+.palette-white-major .screen-contemplation .screen-fade-top,
+.palette-white-major .screen-practice .screen-fade-top
+  { background: linear-gradient(to bottom, #FEFEFE 40%, rgba(254,254,254,0)); }
+.palette-white .screen-word .screen-fade-bottom,
+.palette-white .screen-contemplation .screen-fade-bottom,
+.palette-white .screen-practice .screen-fade-bottom,
+.palette-white-major .screen-word .screen-fade-bottom,
+.palette-white-major .screen-contemplation .screen-fade-bottom,
+.palette-white-major .screen-practice .screen-fade-bottom
+  { background: linear-gradient(to top, #FEFEFE 50%, rgba(254,254,254,0)); }
+
+/* Advent fades (provisional — cream bg) */
+.palette-advent .screen-season .screen-fade-top,
+.palette-advent .screen-scripture .screen-fade-top,
+.palette-advent .screen-prayer .screen-fade-top,
+.palette-advent .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #FAF7F2 40%, rgba(250,247,242,0)); }
+.palette-advent .screen-season .screen-fade-bottom,
+.palette-advent .screen-scripture .screen-fade-bottom,
+.palette-advent .screen-prayer .screen-fade-bottom,
+.palette-advent .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #FAF7F2 50%, rgba(250,247,242,0)); }
+.palette-advent .screen-word .screen-fade-top,
+.palette-advent .screen-contemplation .screen-fade-top,
+.palette-advent .screen-practice .screen-fade-top
+  { background: linear-gradient(to bottom, #F2EDE3 40%, rgba(242,237,227,0)); }
+.palette-advent .screen-word .screen-fade-bottom,
+.palette-advent .screen-contemplation .screen-fade-bottom,
+.palette-advent .screen-practice .screen-fade-bottom
+  { background: linear-gradient(to top, #F2EDE3 50%, rgba(242,237,227,0)); }
+
+/* Rose fades (provisional — cream bg) */
+.palette-rose .screen-season .screen-fade-top,
+.palette-rose .screen-scripture .screen-fade-top,
+.palette-rose .screen-prayer .screen-fade-top,
+.palette-rose .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #FAF7F2 40%, rgba(250,247,242,0)); }
+.palette-rose .screen-season .screen-fade-bottom,
+.palette-rose .screen-scripture .screen-fade-bottom,
+.palette-rose .screen-prayer .screen-fade-bottom,
+.palette-rose .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #FAF7F2 50%, rgba(250,247,242,0)); }
+.palette-rose .screen-word .screen-fade-top,
+.palette-rose .screen-contemplation .screen-fade-top,
+.palette-rose .screen-practice .screen-fade-top
+  { background: linear-gradient(to bottom, #F2EDE3 40%, rgba(242,237,227,0)); }
+.palette-rose .screen-word .screen-fade-bottom,
+.palette-rose .screen-contemplation .screen-fade-bottom,
+.palette-rose .screen-practice .screen-fade-bottom
+  { background: linear-gradient(to top, #F2EDE3 50%, rgba(242,237,227,0)); }
+
+/* Black fades (All Souls) */
+.palette-black .screen-season .screen-fade-top,
+.palette-black .screen-scripture .screen-fade-top,
+.palette-black .screen-prayer .screen-fade-top,
+.palette-black .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #1A1A1A 40%, rgba(26,26,26,0)); }
+.palette-black .screen-season .screen-fade-bottom,
+.palette-black .screen-scripture .screen-fade-bottom,
+.palette-black .screen-prayer .screen-fade-bottom,
+.palette-black .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #1A1A1A 50%, rgba(26,26,26,0)); }
+.palette-black .screen-word .screen-fade-top,
+.palette-black .screen-contemplation .screen-fade-top,
+.palette-black .screen-practice .screen-fade-top
+  { background: linear-gradient(to bottom, #222222 40%, rgba(34,34,34,0)); }
+.palette-black .screen-word .screen-fade-bottom,
+.palette-black .screen-contemplation .screen-fade-bottom,
+.palette-black .screen-practice .screen-fade-bottom
+  { background: linear-gradient(to top, #222222 50%, rgba(34,34,34,0)); }
 
 /* Desktop nav arrows — hidden by default */
 .desktop-nav-arrow { display: none; }
 
+/* ── Threshold veil: Screen 7 → 1 wrap ── */
+#thresholdVeil {
+  position: fixed; inset: 0; z-index: 60;
+  background: #100D0B;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+#thresholdVeil.threshold-closing { opacity: 1; transition: opacity 0.6s ease; }
+#thresholdVeil.threshold-opening { opacity: 0; transition: opacity 0.7s ease; }
+
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(14px); }
+  from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.screen.animating .screen-label                  { animation: fadeUp 0.5s ease forwards; animation-delay: 0.02s; opacity: 0; }
-.screen.animating .screen-inner > *:nth-child(1) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.08s; opacity: 0; }
-.screen.animating .screen-inner > *:nth-child(2) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.15s; opacity: 0; }
-.screen.animating .screen-inner > *:nth-child(3) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.22s; opacity: 0; }
-.screen.animating .screen-inner > *:nth-child(4) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.29s; opacity: 0; }
-.screen.animating .screen-inner > *:nth-child(5) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.36s; opacity: 0; }
+.screen.animating .screen-label                  { animation: fadeUp 0.5s ease forwards; animation-delay: 0.10s; opacity: 0; }
+.screen.animating .screen-inner > *:nth-child(1) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.18s; opacity: 0; }
+.screen.animating .screen-inner > *:nth-child(2) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.25s; opacity: 0; }
+.screen.animating .screen-inner > *:nth-child(3) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.32s; opacity: 0; }
+.screen.animating .screen-inner > *:nth-child(4) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.39s; opacity: 0; }
+.screen.animating .screen-inner > *:nth-child(5) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.46s; opacity: 0; }
 
 /* ── Screen 1: Season ── */
 .season-day {
@@ -1165,7 +1523,7 @@ body { overflow: hidden; }
 }
 .scripture-text {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.35rem; font-style: italic; font-weight: 300;
+  font-size: 1.35rem; font-style: italic; font-weight: 500;
   line-height: 2.1; color: var(--text);
 }
 .scripture-text p + p { margin-top: 1rem; }
@@ -1211,14 +1569,14 @@ body { overflow: hidden; }
 }
 .prayer-body {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.3rem; font-style: italic; font-weight: 300;
+  font-size: 1.3rem; font-style: italic; font-weight: 500;
   line-height: 1.75; color: var(--text);
   margin-top: 1.2rem;
 }
 .prayer-body p + p { margin-top: 0.8rem; }
 .prayer-amen {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.3rem; font-style: italic; font-weight: 300;
+  font-size: 1.3rem; font-style: italic; font-weight: 500;
   letter-spacing: 0.05em; color: var(--text); margin-top: 1.2rem;
 }
 
@@ -1279,18 +1637,199 @@ body { overflow: hidden; }
   transition: opacity 0.5s ease;
 }
 
+/* ── Install nudge ── */
+.install-nudge {
+  position: fixed; bottom: 4.8rem; left: 0; right: 0;
+  padding: 0 1.4rem;
+  z-index: 30;
+  pointer-events: none;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+.install-nudge-rule {
+  border: none;
+  border-top: 1px solid var(--accent-soft);
+  margin-bottom: 0.55rem;
+}
+.install-nudge-text {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--dim);
+  pointer-events: none;
+}
+.install-nudge-link {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--gold);
+  padding: 0;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+.install-nudge-link:hover { opacity: 0.8; }
+.install-modal-open .install-nudge {
+  filter: blur(2px);
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ── Install modal ── */
+.install-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(200,190,170,0.55);
+  display: flex; align-items: flex-end; justify-content: center;
+  z-index: 110;
+  opacity: 0; pointer-events: none;
+}
+.install-modal-overlay.install-modal-visible {
+  opacity: 1; pointer-events: auto;
+}
+.palette-lent .install-modal-overlay,
+.palette-goodfriday .install-modal-overlay,
+.palette-pentecost .install-modal-overlay { background: rgba(5,3,8,0.72); }
+.install-modal-card {
+  background: var(--bg);
+  border: 1px solid var(--accent-soft);
+  border-bottom: none;
+  width: 100%;
+  max-width: 480px;
+  padding: 2rem 1.8rem 2.4rem;
+  position: relative;
+  box-shadow: 0 -12px 48px rgba(28,23,20,0.14);
+  transform: translateY(100%);
+}
+.install-modal-close {
+  position: absolute; top: 1rem; right: 1.2rem;
+  background: none; border: none;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem; font-weight: 300;
+  color: var(--dim); line-height: 1;
+  cursor: pointer; padding: 0.2rem 0.4rem;
+  transition: color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.install-modal-close:hover { color: var(--text); }
+.install-modal-wordmark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.75rem; font-weight: 400;
+  letter-spacing: 0.42em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 1.1rem;
+}
+.install-modal-intro {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.05rem; line-height: 2;
+  color: var(--text); margin-bottom: 1.3rem;
+}
+.install-modal-steps {
+  display: flex; flex-direction: column; gap: 0.9rem;
+}
+.install-modal-step {
+  display: flex; align-items: flex-start; gap: 1rem;
+}
+.install-modal-step-num {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 0.1em; color: var(--gold);
+  margin-top: 0.2rem; flex-shrink: 0;
+  width: 1rem; text-align: right;
+}
+.install-modal-step-text {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.05rem; line-height: 2;
+  color: var(--text);
+}
+.install-modal-step-text strong { font-weight: 700; }
+.install-dots-pill {
+  display: inline-block;
+  font-family: -apple-system, 'SF Pro Text', sans-serif;
+  font-size: 0.95rem; font-weight: 500;
+  background: rgba(184,134,11,0.1); color: var(--gold);
+  padding: 0.1rem 0.5rem; border-radius: 4px;
+  letter-spacing: 0.05em; line-height: 1.5;
+  vertical-align: baseline;
+}
+.install-modal-rule {
+  border: none;
+  border-top: 1px solid var(--accent-soft);
+  margin: 1.2rem 0 1.1rem;
+}
+.install-modal-footnote {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.05rem; font-style: italic;
+  color: var(--dim); line-height: 2;
+}
+
 /* ── Figure modal ── */
 .figure-overlay {
   position: fixed; inset: 0;
   background: rgba(200,190,170,0.6);
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  z-index: 100; display: none;
+  z-index: 100; display: flex;
   align-items: center; justify-content: center; padding: 1.5rem;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.75s ease;
 }
 .palette-lent .figure-overlay,
 .palette-goodfriday .figure-overlay,
-.palette-pentecost .figure-overlay { background: rgba(5,3,8,0.78); }
-.figure-overlay.open { display: flex; }
+.palette-pentecost .figure-overlay { background: rgba(60,8,8,0.82); }
+.palette-ordinarytime-major .figure-overlay { background: rgba(5,12,5,0.82); }
+.palette-black .figure-overlay              { background: rgba(0,0,0,0.88); }
+.figure-overlay.open { opacity: 1; pointer-events: auto; }
+
+/* ── First-visit welcome overlay ── */
+.welcome-overlay {
+  position: fixed; inset: 0;
+  background: rgba(200,190,170,0.6);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  z-index: 100;
+  display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+  opacity: 0; animation: welcomeFadeIn 1s ease 1.5s forwards;
+}
+.palette-lent .welcome-overlay,
+.palette-goodfriday .welcome-overlay,
+.palette-pentecost .welcome-overlay { background: rgba(60,8,8,0.82); }
+.palette-ordinarytime-major .welcome-overlay { background: rgba(5,12,5,0.82); }
+.palette-black .welcome-overlay              { background: rgba(0,0,0,0.88); }
+.welcome-overlay.welcome-hiding {
+  animation: welcomeFadeOut 0.3s ease forwards;
+}
+@keyframes welcomeFadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes welcomeFadeOut { from { opacity: 1; } to { opacity: 0; } }
+.welcome-card {
+  background: var(--bg); border: 1px solid var(--accent-soft);
+  max-width: 400px; width: 100%;
+  padding: 2.8rem 2rem 2.4rem;
+  text-align: center;
+  box-shadow: 0 16px 48px rgba(28,23,20,0.18);
+}
+.welcome-wordmark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.75rem; font-weight: 300;
+  letter-spacing: 0.38em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 1.8rem;
+}
+.welcome-body {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.05rem; font-weight: 400; line-height: 2;
+  color: var(--text); margin-bottom: 2rem;
+}
+.welcome-begin {
+  display: inline-block;
+  font-family: 'Raleway', sans-serif; font-size: 0.62rem;
+  font-weight: 600; letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--bg); background: var(--gold);
+  border: none; padding: 1.1rem 2.4rem;
+  cursor: pointer; transition: opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.welcome-begin:hover { opacity: 0.85; }
 .figure-card {
   background: var(--bg); border: 1px solid var(--accent-soft);
   max-width: 400px; width: 100%; max-height: 80vh; overflow-y: auto;
@@ -1443,7 +1982,11 @@ body { overflow: hidden; }
   text-align: center; width: 100%;
   padding: 0.5rem 0 1.8rem;
   margin-bottom: 0;
-  border-bottom: 1px solid var(--accent-soft);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.9s ease;
+}
+.amen-hero.amen-hero-checked {
+  border-bottom-color: var(--accent-soft);
 }
 
 .amen-checkbox-row {
@@ -1454,14 +1997,14 @@ body { overflow: hidden; }
 }
 .amen-checkbox-outer {
   width: 32px; height: 32px; flex-shrink: 0;
-  border: 1.5px solid rgba(184,134,11,0.4);
+  border: 1.5px solid var(--accent-soft);
   display: flex; align-items: center; justify-content: center;
   transition: border-color 0.25s ease, background 0.25s ease;
   color: transparent;
 }
 .amen-checkbox-outer.amen-checked {
   border-color: var(--gold);
-  background: rgba(184,134,11,0.06);
+  background: var(--accent-soft);
   color: var(--gold);
 }
 .amen-tick {
@@ -1481,10 +2024,15 @@ body { overflow: hidden; }
 .amen-word-block {
   display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
   width: 100%;
-  opacity: 0; transform: translateY(6px);
-  transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
+  opacity: 0; transform: translateY(-4px);
+  max-height: 0; overflow: hidden; margin-bottom: 0;
+  transition: opacity 0.9s ease, transform 0.9s ease,
+              max-height 0.9s ease, margin-bottom 0.9s ease;
 }
-.amen-word-block.amen-visible { opacity: 1; transform: translateY(0); }
+.amen-word-block.amen-visible {
+  opacity: 1; transform: translateY(0);
+  max-height: 300px; margin-bottom: 0;
+}
 .amen-word-rule {
   width: 2rem; height: 1px;
   background: linear-gradient(to right, transparent, var(--gold), transparent);
@@ -1499,6 +2047,7 @@ body { overflow: hidden; }
   font-size: clamp(2.6rem, 13vw, 3.6rem);
   font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--text); line-height: 1;
+  white-space: nowrap; display: block; max-width: 100%;
 }
 .amen-word-date {
   font-family: 'Raleway', sans-serif; font-size: 0.9rem; font-weight: 400;
@@ -1507,19 +2056,22 @@ body { overflow: hidden; }
 
 .amen-commission {
   width: 100%; text-align: center;
-  padding: 0; max-height: 0; overflow: visible;
-  border-top: 0px solid var(--accent-soft);
-  border-bottom: 0px solid var(--accent-soft);
+  padding: 0; max-height: 0; overflow: hidden;
+  border-top: 1px solid transparent;
+  border-bottom: 1px solid transparent;
   margin-bottom: 0;
-  opacity: 0;
-  transition: opacity 0.55s ease, max-height 0.55s ease, padding 0.55s ease,
-              margin-bottom 0.55s ease, border-top-width 0.3s ease, border-bottom-width 0.3s ease;
+  opacity: 0; transform: translateY(-4px);
+  transition: opacity 0.9s ease, transform 0.9s ease,
+              max-height 0.9s ease, padding 0.9s ease, margin-bottom 0.9s ease,
+              border-top-color 0.9s ease, border-bottom-color 0.9s ease;
+  pointer-events: none;
 }
 .amen-commission.amen-visible {
-  opacity: 1; max-height: 300px;
-  padding: 1.6rem 0 1.4rem;
-  border-top-width: 1px; border-bottom-width: 1px;
-  margin-bottom: 1.6rem;
+  opacity: 1; transform: translateY(0);
+  max-height: 300px; padding: 1.6rem 0 1.4rem; margin-bottom: 1.6rem;
+  border-top-color: var(--accent-soft);
+  border-bottom-color: var(--accent-soft);
+  pointer-events: auto;
 }
 .amen-commission-line1 {
   font-family: 'Cormorant Garamond', serif;
@@ -1545,12 +2097,16 @@ body { overflow: hidden; }
 
 .amen-share-block {
   width: 100%; text-align: center;
-  opacity: 0; max-height: 0; overflow: hidden;
-  transition: opacity 0.4s ease, max-height 0.4s ease, margin-bottom 0.4s ease;
-  pointer-events: none; margin-bottom: 0;
+  opacity: 0; transform: translateY(-4px);
+  max-height: 0; overflow: hidden; margin-bottom: 0;
+  transition: opacity 0.9s ease, transform 0.9s ease,
+              max-height 0.9s ease, margin-bottom 0.9s ease;
+  pointer-events: none;
 }
 .amen-share-block.amen-visible {
-  opacity: 1; max-height: 700px; pointer-events: all; margin-bottom: 1.6rem;
+  opacity: 1; transform: translateY(0);
+  max-height: 700px; margin-bottom: 1.6rem;
+  pointer-events: all;
 }
 .amen-share-prompt {
   font-family: 'Libre Baskerville', serif; font-size: 1rem; font-style: italic;
@@ -1571,7 +2127,7 @@ body { overflow: hidden; }
   font-family: 'Raleway', sans-serif; font-size: 0.75rem; font-weight: 600;
   letter-spacing: 0.34em; text-transform: uppercase;
   color: var(--gold); background: none;
-  border: 1px solid rgba(184,134,11,0.4); padding: 0.95rem 1.5rem;
+  border: 1px solid var(--accent-soft); padding: 0.95rem 1.5rem;
   cursor: pointer; margin-bottom: 0.8rem;
   transition: opacity 0.2s, border-color 0.2s; -webkit-tap-highlight-color: transparent;
 }
@@ -1607,7 +2163,7 @@ body { overflow: hidden; }
 .amen-invitation-trigger-inner {
   display: flex; align-items: center; justify-content: center; gap: 0.45rem;
   padding: 1.1rem 1rem;
-  border-bottom: 1px solid rgba(184,134,11,0.35);
+  border-bottom: 1px solid var(--accent-soft);
   transition: border-color 0.2s;
 }
 .amen-invitation-trigger:hover .amen-invitation-trigger-inner { border-color: var(--gold); }
@@ -1639,7 +2195,7 @@ body { overflow: hidden; }
   font-family: 'Libre Baskerville', serif; font-size: 0.95rem; font-style: italic;
   color: var(--dim); line-height: 1.85;
   border: 1px solid var(--accent-soft); padding: 1.1rem 1.2rem;
-  background: rgba(184,134,11,0.025); width: 100%; text-align: center;
+  background: var(--accent-soft); width: 100%; text-align: center;
 }
 .amen-invitation-send {
   display: block; width: 100%;
@@ -1657,12 +2213,26 @@ body { overflow: hidden; }
 }
 .amen-inv-confirmed.amen-inv-confirmed-visible { display: block; }
 
+/* ── Post-liturgy layer (notif + share — rises 3s after commission animates in) ── */
+.amen-post-liturgy {
+  width: 100%; text-align: center;
+  opacity: 0; transform: translateY(-4px);
+  max-height: 0; overflow: hidden; margin-bottom: 0;
+  transition: opacity 0.9s ease, transform 0.9s ease,
+              max-height 0.9s ease, margin-bottom 0.9s ease;
+  pointer-events: none;
+}
+.amen-post-liturgy.amen-visible {
+  opacity: 1; transform: translateY(0);
+  max-height: 1200px; margin-bottom: 1.6rem;
+  pointer-events: auto;
+}
+
 .amen-notif-section {
   display: none;
   width: 100%;
   text-align: center;
   padding: 1.4rem 0 0;
-  border-top: 1px solid var(--accent-soft);
   margin-bottom: 1rem;
 }
 .amen-notif-prompt {
@@ -1688,9 +2258,33 @@ body { overflow: hidden; }
 .palette-goodfriday .screen-amen .screen-fade-bottom
   { background: linear-gradient(to top, #0E0C0B 50%, rgba(14,12,11,0)); }
 .palette-pentecost .screen-amen .screen-fade-top
-  { background: linear-gradient(to bottom, #1A0A0A 40%, rgba(26,10,10,0)); }
+  { background: linear-gradient(to bottom, #8B1A1A 40%, rgba(139,26,26,0)); }
 .palette-pentecost .screen-amen .screen-fade-bottom
-  { background: linear-gradient(to top, #1A0A0A 50%, rgba(26,10,10,0)); }
+  { background: linear-gradient(to top, #8B1A1A 50%, rgba(139,26,26,0)); }
+.palette-ordinarytime .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #FAF7F2 40%, rgba(250,247,242,0)); }
+.palette-ordinarytime .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #FAF7F2 50%, rgba(250,247,242,0)); }
+.palette-ordinarytime-major .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #1A2B1A 40%, rgba(26,43,26,0)); }
+.palette-ordinarytime-major .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #1A2B1A 50%, rgba(26,43,26,0)); }
+.palette-white .screen-amen .screen-fade-top,
+.palette-white-major .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #FEFEFE 40%, rgba(254,254,254,0)); }
+.palette-white .screen-amen .screen-fade-bottom,
+.palette-white-major .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #FEFEFE 50%, rgba(254,254,254,0)); }
+.palette-advent .screen-amen .screen-fade-top,
+.palette-rose .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #FAF7F2 40%, rgba(250,247,242,0)); }
+.palette-advent .screen-amen .screen-fade-bottom,
+.palette-rose .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #FAF7F2 50%, rgba(250,247,242,0)); }
+.palette-black .screen-amen .screen-fade-top
+  { background: linear-gradient(to bottom, #1A1A1A 40%, rgba(26,26,26,0)); }
+.palette-black .screen-amen .screen-fade-bottom
+  { background: linear-gradient(to top, #1A1A1A 50%, rgba(26,26,26,0)); }
 
 /* Production top bar — centred */
 .top-bar-inner--prod { justify-content: center; }
@@ -1760,47 +2354,86 @@ function getScreenWidth() {
   return appEl ? appEl.offsetWidth : window.innerWidth;
 }
 
+let _transitioning = false;
+
 function goTo(i, anim=true) {
+  if (_transitioning) return;
   if (i >= TOTAL_SCREENS) { wrapAmenToScreen1(); return; }
   if (i < 0) i = 0;
+
+  const screens = getCurrentScreens();
+  const prev    = screens[currentScreen];
+  const next    = screens[i];
+
   currentScreen = i;
-  const dayEl = document.querySelector(`.day-screens[data-day="${currentDay}"]`);
-  if (!dayEl) return;
-  const sw = getScreenWidth();
-  dayEl.style.transform = `translateX(-${i * sw}px)`;
   document.querySelectorAll('.dot').forEach((d, idx) => d.classList.toggle('active', idx === i));
   document.getElementById('counter').textContent = `${i + 1} / ${TOTAL_SCREENS}`;
   const hint = document.getElementById('swipeHint');
   if (hint && i > 0) hint.style.opacity = '0';
-  if (anim) animateScreen(i);
+
+  if (!anim) {
+    screens.forEach(s => s.classList.remove('active', 'leaving', 'animating'));
+    next.classList.add('active');
+    return;
+  }
+
+  if (prev === next) return;
+
+  _transitioning = true;
+
+  prev.style.zIndex = '2';
+  next.style.zIndex = '1';
+  prev.classList.remove('active');
+  prev.classList.add('leaving');
+  next.classList.add('active');
+
+  animateScreen(i);
+
+  setTimeout(() => {
+    prev.classList.remove('leaving');
+    prev.style.zIndex = '';
+    next.style.zIndex = '';
+    _transitioning = false;
+  }, 880);
 }
 
 function wrapAmenToScreen1() {
-  const dayEl = document.querySelector(`.day-screens[data-day="${currentDay}"]`);
-  if (!dayEl) return;
-  const screens = dayEl.querySelectorAll('.screen');
-  const s1 = screens[0];
-  const sw = getScreenWidth();
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:50;pointer-events:none;overflow:hidden;';
-  const clone = s1.cloneNode(true);
-  clone.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;
-    transform:translateX(100%);transition:transform 0.42s cubic-bezier(0.4,0,0.2,1);`;
-  overlay.appendChild(clone);
-  document.body.appendChild(overlay);
-  dayEl.style.transition = 'transform 0.42s cubic-bezier(0.4,0,0.2,1)';
-  dayEl.style.transform  = `translateX(-${TOTAL_SCREENS * sw}px)`;
-  requestAnimationFrame(() => requestAnimationFrame(() => { clone.style.transform = 'translateX(0)'; }));
+  if (_transitioning) return;
+  _transitioning = true;
+
+  const screens = getCurrentScreens();
+  const prev    = screens[currentScreen];
+  const veil    = document.getElementById('thresholdVeil');
+
+  // Fade dark veil in
+  veil.classList.remove('threshold-opening');
+  veil.classList.add('threshold-closing');
+  veil.style.pointerEvents = 'all';
+
+  // Silently switch to screen 1 while veil is opaque
   setTimeout(() => {
-    overlay.remove();
-    dayEl.style.transition = 'none';
-    dayEl.style.transform  = 'translateX(0)';
+    screens.forEach(s => s.classList.remove('active', 'leaving', 'animating'));
     currentScreen = 0;
+    screens[0].classList.add('active');
+    const inner = screens[0].querySelector('.screen-inner');
+    if (inner) inner.scrollTop = 0;
     document.querySelectorAll('.dot').forEach((d, idx) => d.classList.toggle('active', idx === 0));
     document.getElementById('counter').textContent = `1 / ${TOTAL_SCREENS}`;
+  }, 650);
+
+  // Lift the veil, revealing screen 1
+  setTimeout(() => {
+    veil.classList.remove('threshold-closing');
+    veil.classList.add('threshold-opening');
     animateScreen(0);
-    setTimeout(() => { dayEl.style.transition = ''; }, 50);
-  }, 440);
+  }, 750);
+
+  // Full reset
+  setTimeout(() => {
+    veil.classList.remove('threshold-opening', 'threshold-closing');
+    veil.style.pointerEvents = 'none';
+    _transitioning = false;
+  }, 1550);
 }
 
 function animateScreen(i) {
@@ -1840,16 +2473,41 @@ function showDay(dayIndex, screenIndex=0) {
 // ── Figure modal ───────────────────────────────────────────────────────────
 
 function openFigure(key) {
-  const fig = FIGURES[key]; if (!fig) return;
+  const dayFigs = FIGURES_BY_DAY[currentDay] || {};
+  const fig = dayFigs[key]; if (!fig) return;
   document.getElementById('figureName').textContent  = fig.name;
   document.getElementById('figureDates').textContent = fig.dates;
   const roleEl = document.getElementById('figureRole');
   roleEl.textContent = fig.role || '';
   roleEl.style.display = fig.role ? '' : 'none';
   document.getElementById('figureBody').textContent  = fig.body;
-  document.getElementById('figureOverlay').classList.add('open');
+  const overlay = document.getElementById('figureOverlay');
+  const card = overlay.querySelector('.figure-card');
+  // Start card off-position, then animate in after overlay fades up.
+  card.style.transition = 'none';
+  card.style.opacity = '0';
+  card.style.transform = 'translateY(10px)';
+  void overlay.offsetHeight;
+  overlay.classList.add('open');
+  // Let the overlay begin fading, then animate the card in.
+  setTimeout(() => {{
+    card.style.transition = 'opacity 0.75s ease, transform 0.75s cubic-bezier(0.22,1,0.36,1)';
+    card.style.opacity = '1';
+    card.style.transform = 'translateY(0)';
+  }}, 50);
 }
-function closeFigure() { document.getElementById('figureOverlay').classList.remove('open'); }
+function closeFigure() {{
+  const ov = document.getElementById('figureOverlay');
+  ov.style.opacity = '0';
+  setTimeout(() => {{
+    ov.classList.remove('open');
+    ov.style.opacity = '';
+    const card = ov.querySelector('.figure-card');
+    card.style.transition = 'none';
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(10px)';
+  }}, 750);
+}}
 document.getElementById('figureClose').addEventListener('click', closeFigure);
 document.getElementById('figureOverlay').addEventListener('click', ev => {
   if (ev.target === document.getElementById('figureOverlay')) closeFigure();
@@ -1865,6 +2523,7 @@ let tx=0, ty=0, ta=false;
 document.addEventListener('touchstart', ev => {
   if (document.getElementById('figureOverlay').classList.contains('open')) return;
   if (ev.target.closest('.day-nav')) return;
+  if (ev.target.closest('.figure-link')) return;
   tx = ev.touches[0].clientX; ty = ev.touches[0].clientY; ta = true;
 }, {passive: true});
 document.addEventListener('touchend', ev => {
@@ -1907,6 +2566,27 @@ function fitWordTitle(dayIndex) {
     const style = getComputedStyle(container);
     const usable = container.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
     let lo = 14, hi = 128;
+    for (let iter = 0; iter < 14; iter++) {
+      const mid = (lo + hi) / 2;
+      el.style.fontSize = mid + 'px';
+      if (el.scrollWidth <= usable) lo = mid; else hi = mid;
+    }
+    el.style.fontSize = Math.floor(lo) + 'px';
+  });
+}
+
+function fitAmenWordName(dayIndex) {
+  const dayEl = document.querySelector(`.day-screens[data-day="${dayIndex}"]`);
+  if (!dayEl) return;
+  dayEl.querySelectorAll('.amen-word-name').forEach(el => {
+    el.style.fontSize = '';
+    const container = el.closest('.screen-inner') || el.parentElement;
+    if (!container) return;
+    const style = getComputedStyle(container);
+    const usable = container.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    // Cap at 3.6rem (58px at 16px base) — match the clamp maximum
+    const maxPx = parseFloat(getComputedStyle(document.documentElement).fontSize) * 3.6;
+    let lo = 14, hi = Math.min(maxPx, 128);
     for (let iter = 0; iter < 14; iter++) {
       const mid = (lo + hi) / 2;
       el.style.fontSize = mid + 'px';
@@ -1993,20 +2673,14 @@ goTo = function(i, anim=true) {
 
 // Initialise: fit word titles, update arrows, start scroll indicator
 setTimeout(() => {
-  for (let d = 0; d < totalDays; d++) fitWordTitle(d);
+  for (let d = 0; d < totalDays; d++) { fitWordTitle(d); fitAmenWordName(d); }
   updateDesktopArrows();
   updateScrollIndicator(0);
 }, 300);
 
-// Recalculate on resize
+// Recalculate word titles on resize
 window.addEventListener('resize', () => {
-  const dayEl = document.querySelector(`.day-screens[data-day="${currentDay}"]`);
-  if (!dayEl) return;
-  const sw = getScreenWidth();
-  dayEl.style.transition = 'none';
-  dayEl.style.transform = `translateX(-${currentScreen * sw}px)`;
-  setTimeout(() => { dayEl.style.transition = ''; }, 50);
-  for (let d = 0; d < totalDays; d++) fitWordTitle(d);
+  for (let d = 0; d < totalDays; d++) { fitWordTitle(d); fitAmenWordName(d); }
 });
 
 // ── Screen 7: Amen ─────────────────────────────────────────────────────────
@@ -2041,22 +2715,41 @@ const amenCounted = {};
 function amenCheck(row) {
   const uid     = row.dataset.uid;
   const box     = document.getElementById('amen-box-' + uid);
+  const hero    = document.getElementById('amen-hero-' + uid);
   const word    = document.getElementById('amen-word-' + uid);
   const comm    = document.getElementById('amen-commission-' + uid);
+  const post    = document.getElementById('amen-post-' + uid);
   const share   = document.getElementById('amen-share-' + uid);
   const checked = box.classList.toggle('amen-checked');
   row.setAttribute('aria-checked', String(checked));
-  word.classList.toggle('amen-visible', checked);
   if (checked) {
     if (!amenCounted[uid]) { amenCounted[uid] = true; amenIncrementCount(); }
+    vigilRecordKept();
     amenPrebuildShareImage(uid);
+
+    // Update completion count before deciding what to show
+    let count = parseInt(localStorage.getItem('vigil-completion-count') || '0', 10);
+    count = Math.max(0, count) + 1;
+    localStorage.setItem('vigil-completion-count', String(count));
+
+    setTimeout(() => { if (hero) hero.classList.add('amen-hero-checked'); }, 0);
+    setTimeout(() => word.classList.add('amen-visible'), 300);
+    // Commission appears 0.7s after tick; its own transition takes 0.9s
     setTimeout(() => comm.classList.add('amen-visible'), 700);
+    // Post-liturgy layer rises 3s after commission animation completes: 700 + 900 + 3000
     setTimeout(() => {
-      share.classList.add('amen-visible');
-    }, 1200);
+      amenShowPostLiturgy(uid, count);
+    }, 4600);
   } else {
-    comm.classList.remove('amen-visible');
-    share.classList.remove('amen-visible');
+    // Decrement count (min 0)
+    let count = parseInt(localStorage.getItem('vigil-completion-count') || '0', 10);
+    count = Math.max(0, count - 1);
+    localStorage.setItem('vigil-completion-count', String(count));
+
+    if (post)  post.classList.remove('amen-visible');
+    setTimeout(() => comm.classList.remove('amen-visible'), 300);
+    setTimeout(() => word.classList.remove('amen-visible'), 600);
+    setTimeout(() => { if (hero) hero.classList.remove('amen-hero-checked'); }, 900);
     const initial   = document.getElementById('amen-share-initial-' + uid);
     const confirmed = document.getElementById('amen-share-confirmed-' + uid);
     if (initial)   initial.style.display = '';
@@ -2064,118 +2757,269 @@ function amenCheck(row) {
   }
 }
 
+function amenShowPostLiturgy(uid, completionCount) {
+  const post  = document.getElementById('amen-post-' + uid);
+  const share = document.getElementById('amen-share-' + uid);
+  if (!post) return;
+
+  // Show the notif section if applicable
+  const notifShown = amenMaybeShowNotif(uid);
+
+  // Show the share ask if: count ≥ 2 AND share not permanently dismissed
+  const shareDismissed = localStorage.getItem('vigil-share-dismissed');
+  const showShare = !shareDismissed && completionCount >= 2;
+
+  if (showShare && share) {
+    // If notif was shown, delay share by 1.5s after the user resolves it;
+    // since we can't know when that is, we use a conservative minimum delay.
+    // The notif section hides itself when dismissed; share appears 1.5s later.
+    if (notifShown) {
+      // Mark that share should appear after notif resolves
+      share.dataset.pendingAfterNotif = '1';
+    } else {
+      // No notif — show share immediately as post-liturgy layer rises
+      share.classList.add('amen-visible');
+    }
+  }
+
+  post.classList.add('amen-visible');
+}
+
 // ── Share image: pre-render on checkbox tick, share synchronously on button tap ──
 
 const amenShareBlobs = new Map();
 
 async function amenPrebuildShareImage(uid) {
+  // Pure Canvas 2D rendering — no SVG foreignObject, works on iOS Safari.
+  // ctx.letterSpacing is NOT used anywhere — it is unsupported in WebKit webviews
+  // and causes font fallback failures. Spacing is achieved via pre-spaced strings
+  // or accepted as-is at small sizes.
+
   const wordEl   = document.getElementById('amen-word-' + uid);
   const wordName = wordEl ? (wordEl.querySelector('.amen-word-name')?.textContent?.trim() || '') : '';
-  const cs   = getComputedStyle(document.documentElement);
+  // Read palette colours from the app element, which carries the palette class.
+  // documentElement does not have the palette class and would return fallbacks.
+  const appEl = document.getElementById('app') || document.documentElement;
+  const cs   = getComputedStyle(appEl);
   const BG   = cs.getPropertyValue('--bg').trim()   || '#FAF7F2';
   const GOLD = cs.getPropertyValue('--gold').trim() || '#B8860B';
   const TEXT = cs.getPropertyValue('--text').trim() || '#1C1714';
   const DIM  = cs.getPropertyValue('--dim').trim()  || '#8A7D6E';
-  if (document.fonts && document.fonts.ready) await document.fonts.ready;
-  const PX = 375;
-  const goldRgb = GOLD.startsWith('#')
-    ? GOLD.slice(1).match(/../g).map(h => parseInt(h,16)).join(',')
-    : '184,134,11';
-  const wordUpper = wordName.toUpperCase();
-  let wSize = 88;
-  const tempC = document.createElement('canvas');
-  const tempCtx = tempC.getContext('2d');
-  tempCtx.font = `600 ${wSize}px "Cormorant Garamond", Georgia, serif`;
-  while (tempCtx.measureText(wordUpper).width > PX - 48 && wSize > 32) {
-    wSize -= 2;
-    tempCtx.font = `600 ${wSize}px "Cormorant Garamond", Georgia, serif`;
+
+  // ── Guarantee fonts are loaded before drawing ──────────────────────────────
+  // document.fonts.ready is not enough on all platforms — we explicitly load
+  // each required face via FontFace so the canvas engine has them available.
+  const GFONTS_URL = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,400&family=Raleway:wght@300;400&display=swap';
+  async function ensureFonts() {
+    // Step 1: wait for any already-loading fonts
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    // Step 2: check if our key faces are present; if not, load via FontFace API
+    const needed = [
+      { family: 'Cormorant Garamond', weight: '600', style: 'normal' },
+      { family: 'Cormorant Garamond', weight: '300', style: 'italic' },
+      { family: 'Cormorant Garamond', weight: '400', style: 'italic' },
+      { family: 'Raleway',            weight: '300', style: 'normal' },
+      { family: 'Raleway',            weight: '400', style: 'normal' },
+    ];
+    const missing = needed.filter(f => !document.fonts.check(`${f.style} ${f.weight} 16px "${f.family}"`));
+    if (missing.length > 0) {
+      // Inject a temporary hidden element to force the Google Fonts stylesheet
+      // to load all needed weights, then wait for fonts.ready again.
+      const probe = document.createElement('span');
+      probe.style.cssText = 'position:fixed;left:-9999px;opacity:0;font-size:4px;';
+      probe.innerHTML =
+        '<span style="font-family:\'Cormorant Garamond\';font-weight:600;">A</span>' +
+        '<span style="font-family:\'Cormorant Garamond\';font-weight:300;font-style:italic;">A</span>' +
+        '<span style="font-family:\'Cormorant Garamond\';font-weight:400;font-style:italic;">A</span>' +
+        '<span style="font-family:\'Raleway\';font-weight:300;">A</span>' +
+        '<span style="font-family:\'Raleway\';font-weight:400;">A</span>';
+      document.body.appendChild(probe);
+      await document.fonts.ready;
+      // Give WebKit an extra tick to finish rasterisation
+      await new Promise(r => setTimeout(r, 80));
+      document.body.removeChild(probe);
+    }
   }
-  const seasonLabel = (DAYS[currentDay] && DAYS[currentDay].label) ? DAYS[currentDay].label.split(' · ')[0] : 'Vigil';
-  const FONT_CSS = `
-    @font-face {
-      font-family: 'Cormorant Garamond';
-      font-style: italic;
-      font-weight: 400;
-      src: local('Cormorant Garamond Italic');
-    }
-    @font-face {
-      font-family: 'Raleway';
-      font-style: normal;
-      font-weight: 300;
-      src: local('Raleway Light');
-    }
-    @font-face {
-      font-family: 'Raleway';
-      font-style: normal;
-      font-weight: 400;
-      src: local('Raleway');
-    }
-  `;
-  const cardHTML = `
-<div xmlns="http://www.w3.org/1999/xhtml" style="
-  width:${PX}px; box-sizing:border-box;
-  background:${BG}; padding:40px 28px 36px;
-  font-family:'Cormorant Garamond',Georgia,serif;
-  display:flex; flex-direction:column; align-items:center; gap:0;
-">
-  <style xmlns="http://www.w3.org/1999/xhtml">${FONT_CSS}</style>
-  <div style="font-family:Raleway,'Helvetica Neue',Arial,sans-serif; font-weight:300;
-    font-size:22px; letter-spacing:0.32em; color:${GOLD}; text-align:center;
-    margin-bottom:6px;">V I G I L</div>
-  <div style="font-family:Raleway,'Helvetica Neue',Arial,sans-serif; font-weight:400;
-    font-size:9px; letter-spacing:0.22em; text-transform:uppercase; color:${DIM};
-    text-align:center; margin-bottom:32px;">${seasonLabel}</div>
-  <div style="display:flex; align-items:center; justify-content:center;
-    gap:12px; margin-bottom:24px; width:100%;">
-    <div style="width:22px; height:22px; flex-shrink:0;
-      border:1.5px solid ${GOLD}; background:rgba(${goldRgb},0.06);
-      display:flex; align-items:center; justify-content:center;">
-      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <polyline points="2,6.5 5,10 11,3" stroke="${GOLD}" stroke-width="1.5"
-          stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-    <div style="font-size:20px; font-weight:300; font-style:italic;
-      color:${TEXT}; letter-spacing:0.02em; line-height:1.15;">I kept Vigil today.</div>
-  </div>
-  <div style="width:48px; height:1px; background:${GOLD}; opacity:0.5; margin-bottom:20px;"></div>
-  <div style="font-size:${wSize}px; font-weight:600; letter-spacing:0.06em;
-    color:${TEXT}; text-align:center; line-height:1; margin-bottom:26px;
-    text-transform:uppercase;">${wordUpper}</div>
-  <div style="font-size:18px; font-weight:400; font-style:italic;
-    color:${TEXT}; text-align:center; line-height:1.7; letter-spacing:0.01em;
-    margin-bottom:28px;">Go in peace.<br/>And carry the Word with you.</div>
-  <div style="width:100%; height:1px; background:rgba(${goldRgb},0.25); margin-bottom:18px;"></div>
-  <div style="font-family:Raleway,'Helvetica Neue',Arial,sans-serif; font-weight:400;
-    font-size:10px; letter-spacing:0.2em; color:${GOLD};
-    text-align:center;">dailyvigil.app</div>
-</div>`;
-  const probe = document.createElement('div');
-  probe.style.cssText = `position:fixed;left:-9999px;top:0;width:${PX}px;visibility:hidden;`;
-  probe.innerHTML = cardHTML.replace(/xmlns="[^"]*"/g,'');
-  document.body.appendChild(probe);
-  const H = Math.ceil(probe.offsetHeight) + 2;
-  document.body.removeChild(probe);
-  const svgFinal = `<svg xmlns="http://www.w3.org/2000/svg" width="${PX}" height="${H}">
-    <foreignObject width="${PX}" height="${H}">${cardHTML}</foreignObject>
-  </svg>`;
-  const SCALE = 2;
+  await ensureFonts();
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function hexToRgba(hex, alpha) {
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+  function goldRgba(a) { return GOLD.startsWith('#') ? hexToRgba(GOLD, a) : `rgba(184,134,11,${a})`; }
+
+  // ── Content values ─────────────────────────────────────────────────────────
+  // Date: uppercase, e.g. "1 MAY 2026"
+  const dayLabel  = (DAYS[currentDay] && DAYS[currentDay].label) ? DAYS[currentDay].label : '';
+  const dateUpper = dayLabel.toUpperCase();
+  const wordUpper = wordName.toUpperCase();
+
+  // ── Canvas dimensions ──────────────────────────────────────────────────────
+  const SCALE = 3;  // 3× for crisp rendering on Retina / high-DPI screens
+  const W     = 375; // logical card width in px
+
+  // ── Find the largest word font size that fits the card width ───────────────
+  const measureC   = document.createElement('canvas');
+  const measureCtx = measureC.getContext('2d');
+  let wSize = 88;
+  measureCtx.font = `600 ${wSize}px "Cormorant Garamond", Georgia, serif`;
+  while (measureCtx.measureText(wordUpper).width > W - 48 && wSize > 32) {
+    wSize -= 2;
+    measureCtx.font = `600 ${wSize}px "Cormorant Garamond", Georgia, serif`;
+  }
+
+  // ── Layout constants (all in logical px) ──────────────────────────────────
+  const topPad       = 48;
+  const vigilSize    = 22;   // "V I G I L" — spaces give the letter-spacing feel
+  const dateSize     = 11;
+  const checkboxSz   = 24;   // checkbox square
+  const checkLabelSz = 20;   // "I kept Vigil today."
+  const shortRuleW   = 52;
+  const commSize     = 19;
+  const commLH       = 1.75;
+  const urlSize      = 11;
+  const btmPad       = 44;
+
+  const gapVigilDate   = 10;
+  const gapDateCheck   = 30;
+  const gapCheckRule   = 24;
+  const gapRuleWord    = 20;
+  const gapWordTopRule = 28;
+  const gapRuleComm    = 22;
+  const gapCommBotRule = 26;
+  const gapBotRuleUrl  = 22;
+
+  const commLineH = commSize * commLH;
+
+  // Measure checkbox label width using the actual font (post-load)
+  measureCtx.font = `300 italic ${checkLabelSz}px "Cormorant Garamond", Georgia, serif`;
+  const labelW = measureCtx.measureText('I kept Vigil today.').width;
+  const rowW   = checkboxSz + 14 + labelW;
+  const rowX   = (W - rowW) / 2;
+
+  const H = Math.ceil(
+    topPad +
+    vigilSize    + gapVigilDate   +
+    dateSize     + gapDateCheck   +
+    checkboxSz   + gapCheckRule   +
+    1            + gapRuleWord    +
+    wSize        + gapWordTopRule +
+    1            + gapRuleComm    +
+    commLineH    + commLineH      + gapCommBotRule +
+    1            + gapBotRuleUrl  +
+    urlSize      + btmPad
+  );
+
+  // ── Create canvas ──────────────────────────────────────────────────────────
+  const c   = document.createElement('canvas');
+  c.width   = W * SCALE;
+  c.height  = H * SCALE;
+  const ctx = c.getContext('2d');
+  ctx.scale(SCALE, SCALE);
+
+  // Background
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, W, H);
+
+  let y = topPad;
+
+  // ── "V I G I L" ───────────────────────────────────────────────────────────
+  // Spaces between letters give the tracking feel without ctx.letterSpacing
+  ctx.fillStyle    = GOLD;
+  ctx.font         = `300 ${vigilSize}px "Raleway", "Helvetica Neue", Arial, sans-serif`;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText('V I G I L', W / 2, y);
+  y += vigilSize + gapVigilDate;
+
+  // ── Date line ─────────────────────────────────────────────────────────────
+  ctx.fillStyle = DIM;
+  ctx.font      = `400 ${dateSize}px "Raleway", "Helvetica Neue", Arial, sans-serif`;
+  ctx.fillText(dateUpper, W / 2, y);
+  y += dateSize + gapDateCheck;
+
+  // ── Checkbox square ────────────────────────────────────────────────────────
+  ctx.lineWidth   = 1.5;
+  ctx.fillStyle   = goldRgba(0.06);
+  ctx.fillRect(rowX, y, checkboxSz, checkboxSz);
+  ctx.strokeStyle = GOLD;
+  ctx.strokeRect(rowX + 0.75, y + 0.75, checkboxSz - 1.5, checkboxSz - 1.5);
+
+  // Tick mark — polyline scaled to fit the checkbox
+  const st = checkboxSz / 13;
+  const tx = rowX + (checkboxSz - 13 * st) / 2;
+  const ty = y    + (checkboxSz - 13 * st) / 2;
+  ctx.beginPath();
+  ctx.moveTo(tx + 2  * st, ty + 6.5 * st);
+  ctx.lineTo(tx + 5  * st, ty + 10  * st);
+  ctx.lineTo(tx + 11 * st, ty + 3   * st);
+  ctx.strokeStyle = GOLD;
+  ctx.lineWidth   = 1.6;
+  ctx.lineCap     = 'round';
+  ctx.lineJoin    = 'round';
+  ctx.stroke();
+
+  // ── "I kept Vigil today." ─────────────────────────────────────────────────
+  ctx.fillStyle    = TEXT;
+  ctx.font         = `300 italic ${checkLabelSz}px "Cormorant Garamond", Georgia, serif`;
+  ctx.textAlign    = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('I kept Vigil today.', rowX + checkboxSz + 14, y + checkboxSz / 2);
+  y += checkboxSz + gapCheckRule;
+
+  // ── Short gold rule ────────────────────────────────────────────────────────
+  ctx.globalAlpha = 0.5;
+  ctx.fillStyle   = GOLD;
+  ctx.fillRect((W - shortRuleW) / 2, y, shortRuleW, 1);
+  ctx.globalAlpha = 1;
+  y += 1 + gapRuleWord;
+
+  // ── Word of the day ────────────────────────────────────────────────────────
+  ctx.fillStyle    = TEXT;
+  ctx.font         = `600 ${wSize}px "Cormorant Garamond", Georgia, serif`;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText(wordUpper, W / 2, y);
+  y += wSize + gapWordTopRule;
+
+  // ── Full-width rule above commission (gold 25%) ────────────────────────────
+  ctx.globalAlpha = 0.25;
+  ctx.fillStyle   = GOLD;
+  ctx.fillRect(0, y, W, 1);
+  ctx.globalAlpha = 1;
+  y += 1 + gapRuleComm;
+
+  // ── Commission phrase ──────────────────────────────────────────────────────
+  ctx.fillStyle    = TEXT;
+  ctx.font         = `400 italic ${commSize}px "Cormorant Garamond", Georgia, serif`;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText('Go in peace.', W / 2, y);
+  y += commLineH;
+  ctx.fillText('And carry the Word with you.', W / 2, y);
+  y += commLineH + gapCommBotRule;
+
+  // ── Full-width rule below commission (gold 25%) ────────────────────────────
+  ctx.globalAlpha = 0.25;
+  ctx.fillStyle   = GOLD;
+  ctx.fillRect(0, y, W, 1);
+  ctx.globalAlpha = 1;
+  y += 1 + gapBotRuleUrl;
+
+  // ── URL ───────────────────────────────────────────────────────────────────
+  ctx.fillStyle    = GOLD;
+  ctx.font         = `400 ${urlSize}px "Raleway", "Helvetica Neue", Arial, sans-serif`;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText('https://dailyvigil.com', W / 2, y);
+
+  // ── Export ────────────────────────────────────────────────────────────────
   try {
     const blob = await new Promise((resolve, reject) => {
-      const img = new Image();
-      const svgBlob = new Blob([svgFinal], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(svgBlob);
-      img.onload = () => {
-        const c = document.createElement('canvas');
-        c.width = PX * SCALE; c.height = H * SCALE;
-        const ctx2 = c.getContext('2d');
-        ctx2.scale(SCALE, SCALE);
-        ctx2.drawImage(img, 0, 0);
-        URL.revokeObjectURL(url);
-        c.toBlob(b => b ? resolve(b) : reject(new Error('toBlob returned null')), 'image/png');
-      };
-      img.onerror = (e) => { URL.revokeObjectURL(url); reject(e); };
-      img.src = url;
+      c.toBlob(b => b ? resolve(b) : reject(new Error('toBlob returned null')), 'image/png');
     });
     amenShareBlobs.set(uid, blob);
   } catch(e) {
@@ -2215,7 +3059,7 @@ async function amenShareImage(uid) {
 }
 
 function amenShareApp(uid) {
-  const text = '\u2018I\u2019ve been keeping Vigil \u2014 a daily devotional app rooted in the Christian year. You might love it.';
+  const text = '\u2018I\u2019ve been keeping Vigil \u2014 a daily devotional app rooted in the Christian year. I like it and thought you might too.';
   amenTriggerShare(text, 'https://dailyvigil.app',
     () => amenShowShareConfirmed(uid, 'Thank you for sharing Vigil.'),
     () => amenShowShareConfirmed(uid, 'The message has been copied. Paste it into a text, email or WhatsApp to share.')
@@ -2299,31 +3143,210 @@ function amenExecCopy(text, cb) {
 
 // ── Notification permission ────────────────────────────────────────────────
 
+// Number of consecutive days kept before the prompt re-appears after dismissal.
+const NOTIF_REPROMPT_DAYS = 4;
+
+function vigilTodayISO() {
+  const now = new Date();
+  return now.getFullYear() + '-'
+    + String(now.getMonth() + 1).padStart(2, '0') + '-'
+    + String(now.getDate()).padStart(2, '0');
+}
+
+// Add today's date to the kept-dates log and trim the list to the last
+// NOTIF_REPROMPT_DAYS entries — we never need more than that.
+function vigilRecordKept() {
+  const today = vigilTodayISO();
+  let dates = [];
+  try { dates = JSON.parse(localStorage.getItem('vigil-kept-dates') || '[]'); } catch(e) {}
+  if (!dates.includes(today)) dates.push(today);
+  dates.sort();
+  dates = dates.slice(-NOTIF_REPROMPT_DAYS);
+  localStorage.setItem('vigil-kept-dates', JSON.stringify(dates));
+}
+
+// Returns true if the kept-dates log contains a run of NOTIF_REPROMPT_DAYS
+// consecutive calendar days ending on today.
+function vigilHasStreak() {
+  const today = vigilTodayISO();
+  let dates = [];
+  try { dates = JSON.parse(localStorage.getItem('vigil-kept-dates') || '[]'); } catch(e) {}
+  if (dates.length < NOTIF_REPROMPT_DAYS) return false;
+  const recent = dates.slice(-NOTIF_REPROMPT_DAYS);
+  // The last entry must be today.
+  if (recent[recent.length - 1] !== today) return false;
+  // Each entry must be exactly one calendar day before the next.
+  for (let i = 1; i < recent.length; i++) {
+    const diff = (new Date(recent[i]) - new Date(recent[i - 1])) / 86400000;
+    if (diff !== 1) return false;
+  }
+  return true;
+}
+
+function vigilShouldShowNotifPrompt() {
+  if (typeof Notification !== 'undefined' && Notification.permission === 'granted') return false;
+  if (typeof Notification !== 'undefined' && Notification.permission === 'denied') return false;
+  const dismissed = localStorage.getItem('vigil-notif-dismissed');
+  // Never shown before — show it.
+  if (!dismissed) return true;
+  // Permanently dismissed after granting (should be caught above, but guard anyway).
+  if (dismissed === 'granted') return false;
+  // Re-prompt only when the user has kept a streak of NOTIF_REPROMPT_DAYS consecutive days.
+  return vigilHasStreak();
+}
+
+// ── Notification browser detection ───────────────────────────────────────────
+
+function vigilGetNotifState() {
+  // Returns 'normal', 'ios-safari', or 'ios-other'.
+  const ua = navigator.userAgent;
+  const isIOS = /iP(hone|ad|od)/.test(ua) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (!isIOS) return 'normal';
+  // Installed PWA on iOS behaves like normal — notifications are supported.
+  if (window.navigator.standalone === true) return 'normal';
+  // Other iOS browsers all inject their own token into the UA string.
+  // If none of those tokens are present, we are in Safari.
+  const isOtherBrowser = /CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo|Brave|SamsungBrowser|MiuiBrowser/.test(ua);
+  return isOtherBrowser ? 'ios-other' : 'ios-safari';
+}
+
 function vigilMaybeShowNotifPrompt(screenIndex) {
-  if (screenIndex !== 6) return;
-  if (localStorage.getItem('vigil-notif-dismissed')) return;
-  if (typeof Notification !== 'undefined' && Notification.permission !== 'default') return;
-  const uid = 'd' + (currentDay + 1);
-  const el = document.getElementById('amen-notif-' + uid);
-  if (el) el.style.display = 'block';
+  // No longer shows on screen arrival — the post-liturgy layer handles this.
+  // Kept as a no-op stub so existing goTo hook calls do not error.
+}
+
+function amenMaybeShowNotif(uid) {
+  // Shows the notif section inside the post-liturgy layer if applicable.
+  // Returns true if it was shown, false if suppressed.
+  if (!vigilShouldShowNotifPrompt()) return false;
+  const outer = document.getElementById('amen-notif-' + uid);
+  if (!outer) return false;
+  const state = vigilGetNotifState();
+  const inner = document.getElementById('amen-notif-' + state + '-' + uid);
+  if (inner) {
+    outer.style.display = 'block';
+    inner.style.display = 'block';
+    return true;
+  }
+  return false;
+}
+
+function amenTriggerDeferredShare(uid) {
+  // Called 1.5s after the notif section resolves, to show the share ask if pending.
+  const share = document.getElementById('amen-share-' + uid);
+  if (share && share.dataset.pendingAfterNotif) {
+    delete share.dataset.pendingAfterNotif;
+    const shareDismissed = localStorage.getItem('vigil-share-dismissed');
+    if (!shareDismissed) {
+      setTimeout(() => {
+        share.classList.add('amen-visible');
+      }, 1500);
+    }
+  }
 }
 
 function vigilRequestNotification(uid) {
-  if (window.OneSignalDeferred) {
-    OneSignalDeferred.push(async function(OneSignal) {
-      await OneSignal.Notifications.requestPermission();
-      localStorage.setItem('vigil-notif-dismissed', '1');
+  function doRequest() {
+    OneSignal.Notifications.requestPermission().then(function() {
+      localStorage.setItem('vigil-notif-dismissed', 'granted');
       const el = document.getElementById('amen-notif-' + uid);
       if (el) el.style.display = 'none';
+      amenTriggerDeferredShare(uid);
     });
+  }
+  // By the time the user taps the button, the SDK will already be initialised.
+  // Call it directly. Fall back to the deferred queue only if somehow it is not.
+  if (window.OneSignal && window.OneSignal.Notifications) {
+    doRequest();
+  } else if (window.OneSignalDeferred) {
+    OneSignalDeferred.push(async function(OneSignal) { doRequest(); });
   }
 }
 
 function vigilDismissNotification(uid) {
-  localStorage.setItem('vigil-notif-dismissed', '1');
+  // Record the dismissal date so we can measure streaks from this point,
+  // but do not clear the kept-dates log — the streak continues to accrue.
+  localStorage.setItem('vigil-notif-dismissed', vigilTodayISO());
   const el = document.getElementById('amen-notif-' + uid);
   if (el) el.style.display = 'none';
+  amenTriggerDeferredShare(uid);
 }
+
+// ── First-visit welcome overlay ───────────────────────────────────────────
+
+(function initWelcomeOverlay() {
+  const overlay = document.getElementById('welcomeOverlay');
+  const btn     = document.getElementById('welcomeBegin');
+  if (!overlay || !btn) return;
+
+  if (!localStorage.getItem('vigil-welcomed')) {
+    overlay.style.display = 'flex';
+    btn.addEventListener('click', function() {
+      overlay.classList.add('welcome-hiding');
+      setTimeout(function() {
+        overlay.style.display = 'none';
+      }, 320);
+      localStorage.setItem('vigil-welcomed', '1');
+    });
+  }
+})();
+
+// ── Desktop notification nudge in welcome overlay ────────────────────────
+// On desktop browsers only, adds a short sentence to the first-visit overlay
+// reminding the user that notifications can be turned on from the final screen.
+// Only shown if the user has not already granted or denied notification permission.
+
+(function addDesktopNotifNudge() {
+  // Desktop = not iOS, not Android (no touch-primary device).
+  const ua = navigator.userAgent;
+  const isIOS     = /iP(hone|ad|od)/.test(ua) ||
+                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isAndroid = /Android/.test(ua);
+  if (isIOS || isAndroid) return;
+
+  // Only show if notification permission is not yet decided.
+  if (typeof Notification !== 'undefined' &&
+      (Notification.permission === 'granted' || Notification.permission === 'denied')) return;
+
+  // Inject the nudge sentence before the Begin button.
+  const btn = document.getElementById('welcomeBegin');
+  if (!btn) return;
+  const nudge = document.createElement('p');
+  nudge.style.cssText = [
+    'font-family:\'Libre Baskerville\',serif',
+    'font-size:0.82rem',
+    'line-height:1.8',
+    'color:var(--dim)',
+    'margin:0 0 1.6rem 0',
+    'font-style:italic',
+  ].join(';');
+  nudge.textContent = 'You can also turn on morning notifications from the final screen.';
+  btn.parentNode.insertBefore(nudge, btn);
+})();
+
+// ── PWA first-launch overlay ──────────────────────────────────────────────
+// Shown once when the app is opened from the home screen icon for the first
+// time, reminding the user to complete the liturgy and turn on notifications.
+
+(function initPwaWelcomeOverlay() {
+  // Only fires when running as an installed PWA (standalone mode).
+  if (window.navigator.standalone !== true) return;
+  const overlay = document.getElementById('pwaWelcomeOverlay');
+  const btn     = document.getElementById('pwaWelcomeBegin');
+  if (!overlay || !btn) return;
+
+  if (!localStorage.getItem('vigil-pwa-welcomed')) {
+    overlay.style.display = 'flex';
+    btn.addEventListener('click', function() {
+      overlay.classList.add('welcome-hiding');
+      setTimeout(function() {
+        overlay.style.display = 'none';
+      }, 320);
+      localStorage.setItem('vigil-pwa-welcomed', '1');
+    });
+  }
+})();
 
 // ── Production mode: today only ───────────────────────────────────────────
 
@@ -2334,59 +3357,189 @@ function showNoContentMessage(msg) {
       display:flex; flex-direction:column; align-items:center; justify-content:center;
       height:100svh; padding:2rem; text-align:center; font-family:'Raleway',sans-serif;
       color:var(--dim);">
-      <div style="font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:300;
+      <div style="font-family:'Cormorant Garamond',serif; font-size:2.6rem; font-weight:300;
         letter-spacing:0.4em; text-transform:uppercase; color:var(--gold); margin-bottom:2rem;">
         Vigil
       </div>
-      <div style="font-size:1rem; line-height:1.8; max-width:280px;">${msg}</div>
+      <div style="font-size:1.2rem; line-height:2; max-width:320px;">${msg}</div>
     </div>`;
 }
 
-const todayIdx = findTodayIndex();
+// ── Date override via ?date=YYYY-MM-DD query parameter ────────────────────
+// Visiting ?date=2026-05-12 shows that day's content regardless of the
+// actual date.  Only works if that day's content is embedded in this file.
+// Normal visitors never use this parameter, so their experience is unchanged.
 
-if (todayIdx === -1) {
-  const today = todayISO();
-  const firstDate = parseDayDate(DAYS[0] && DAYS[0].date);
-  if (firstDate && today < firstDate) {
-    showNoContentMessage('Vigil begins on ' + DAYS[0].date + '.<br>Come back then.');
+function getDateOverride() {
+  try {
+    const p = new URLSearchParams(window.location.search);
+    const v = p.get('date');
+    if (v && /^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+  } catch(e) {}
+  return null;
+}
+
+function findDateIndex(iso) {
+  for (let i = 0; i < DAYS.length; i++) {
+    if (parseDayDate(DAYS[i].date) === iso) return i;
+  }
+  return -1;
+}
+
+const dateOverride = getDateOverride();
+const targetIdx = dateOverride ? findDateIndex(dateOverride) : findTodayIndex();
+
+if (targetIdx === -1) {
+  if (dateOverride) {
+    showNoContentMessage('No content found for ' + dateOverride + '.<br>The date may be outside the embedded range.');
   } else {
-    showNoContentMessage('Vigil will return with a new word tomorrow.');
+    const today = todayISO();
+    const firstDate = parseDayDate(DAYS[0] && DAYS[0].date);
+    if (firstDate && today < firstDate) {
+      showNoContentMessage('Vigil begins on ' + DAYS[0].date + '.<br>Come back then.');
+    } else {
+      showNoContentMessage('Vigil will return with a new word tomorrow.');
+    }
   }
 } else {
-  showDay(todayIdx, 0);
+  showDay(targetIdx, 0);
 
-  function msUntilMidnight() {
-    const now  = new Date();
-    const next = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1, 0, 0, 0, 0);
-    return next - now;
+  // Only schedule the midnight advance for normal (non-override) visits,
+  // so the preview page stays on the chosen date.
+  if (!dateOverride) {
+    function msUntilMidnight() {
+      const now  = new Date();
+      const next = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1, 0, 0, 0, 0);
+      return next - now;
+    }
+    function scheduleMidnightAdvance() {
+      setTimeout(() => { window.location.reload(); }, msUntilMidnight());
+    }
+    scheduleMidnightAdvance();
   }
-  function scheduleMidnightAdvance() {
-    setTimeout(() => { window.location.reload(); }, msUntilMidnight());
-  }
-  scheduleMidnightAdvance();
 }
+
+// ── Install nudge ─────────────────────────────────────────────────────────────
+// Shows a persistent footer nudge on every screen until the app is installed.
+// On iOS Safari: tapping the link shows a modal with step-by-step instructions.
+// On Android Chrome: tapping the link triggers the native install prompt.
+// Hidden permanently once running in standalone mode (installed PWA).
+
+(function initInstallNudge() {
+  const nudge    = document.getElementById('installNudge');
+  const link     = document.getElementById('installNudgeLink');
+  const overlay  = document.getElementById('installModalOverlay');
+  const card     = document.getElementById('installModalCard');
+  const closeBtn = document.getElementById('installModalClose');
+  const app      = document.getElementById('app');
+  if (!nudge || !link || !overlay || !card || !closeBtn) return;
+
+  // Detect standalone mode — if installed, hide nudge permanently.
+  const isStandalone = window.navigator.standalone === true ||
+                       window.matchMedia('(display-mode: standalone)').matches;
+  if (isStandalone) return;
+
+  // Show the nudge.
+  nudge.style.display = 'block';
+
+  // Capture Android Chrome install prompt.
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+
+  // Detect iOS Safari (to show modal rather than native prompt).
+  const ua = navigator.userAgent;
+  const isIOS = /iP(hone|ad|od)/.test(ua) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isOtherBrowser = /CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo|Brave|SamsungBrowser/.test(ua);
+  const isIOSSafari = isIOS && !isOtherBrowser;
+
+  // Animation keyframes.
+  const styleEl = document.createElement('style');
+  styleEl.textContent = [
+    '@keyframes installOverlayIn  { from { opacity:0; } to { opacity:1; } }',
+    '@keyframes installOverlayOut { from { opacity:1; } to { opacity:0; } }',
+    '@keyframes installCardUp     { from { transform:translateY(100%); opacity:0.6; } to { transform:translateY(0); opacity:1; } }',
+    '@keyframes installCardDown   { from { transform:translateY(0); opacity:1; } to { transform:translateY(100%); opacity:0.6; } }',
+  ].join('');
+  document.head.appendChild(styleEl);
+
+  function openModal() {
+    card.style.animation = 'none';
+    card.offsetHeight;
+    overlay.style.opacity = '0';
+    overlay.classList.add('install-modal-visible');
+    overlay.offsetHeight;
+    overlay.style.animation = 'installOverlayIn 0.32s ease forwards';
+    card.style.animation = 'installCardUp 0.55s cubic-bezier(0.22,1,0.36,1) forwards';
+    app.classList.add('install-modal-open');
+  }
+
+  function closeModal() {
+    overlay.style.animation = 'installOverlayOut 0.32s ease forwards';
+    card.style.animation = 'installCardDown 0.32s cubic-bezier(0.4,0,1,1) forwards';
+    setTimeout(function() {
+      overlay.classList.remove('install-modal-visible');
+      app.classList.remove('install-modal-open');
+    }, 320);
+  }
+
+  link.addEventListener('click', function() {
+    if (deferredPrompt) {
+      // Android Chrome — trigger native prompt directly.
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function(result) {
+        if (result.outcome === 'accepted') nudge.style.display = 'none';
+        deferredPrompt = null;
+      });
+    } else {
+      // iOS Safari and all other browsers — show the modal.
+      openModal();
+    }
+  });
+
+  closeBtn.addEventListener('click', closeModal);
+
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) closeModal();
+  });
+
+  // Hide nudge permanently once installed.
+  window.addEventListener('appinstalled', function() {
+    nudge.style.display = 'none';
+  });
+})();
 """
 
 
-def build_html(day, day_index, figures, build_time):
-    """Assemble the complete index.html string."""
-    days_js, figures_js = build_days_js(day, figures)
-    day_html = build_day_html(day, day_index, figures)
+def build_html(days_window, today_day, build_time):
+    """Assemble the complete index.html string.
 
-    # Extract word for build comment
-    raw_word = day["word"].strip().split("\n")[0].strip()
+    days_window — list of (day, figures) tuples, from today through
+                  today + DAYS_WINDOW - 1. The JS selects the correct
+                  entry by matching the user's local date at runtime.
+    today_day   — the day dict for today (used only for the build comment).
+    """
+    days_js, figures_js = build_days_js(days_window)
+    all_days_html = build_all_days_html(days_window)
+
+    # Build comment: show today's word and date range embedded
+    raw_word = today_day["word"].strip().split("\n")[0].strip()
     m = re.match(r'^([A-Z\s\-\']+?)\s*(\[|$)', raw_word)
     word_display = m.group(1).strip() if m else raw_word
-
-    # Parse date for display
-    d = parse_date_from_liturgical_day(day["liturgical_day"])
+    d = parse_date_from_liturgical_day(today_day["liturgical_day"])
     date_display = d.strftime("%-d %B %Y") if d else "unknown date"
+    last_day, _ = days_window[-1]
+    d_last = parse_date_from_liturgical_day(last_day["liturgical_day"])
+    last_display = d_last.strftime("%-d %B %Y") if d_last else "?"
 
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Vigil · Production MVP · Generated {build_time} -->
+<!-- Vigil · Production MVP · Generated {build_time} · {date_display} – {last_display} ({len(days_window)} day(s)) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil</title>
 <!-- PWA / icon declarations -->
@@ -2398,6 +3551,8 @@ def build_html(day, day_index, figures, build_time):
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Vigil">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 {CSS}
@@ -2413,6 +3568,24 @@ def build_html(day, day_index, figures, build_time):
     }});
   }});
 </script>
+<script>
+/* Lift the font-loading veil once fonts are ready, or after 800ms — whichever
+   comes first. This prevents the flash of fallback text on first visit while
+   ensuring the app never stays hidden on a slow connection. */
+(function() {{
+  var TIMEOUT = 800;
+  function reveal() {{
+    var app = document.getElementById('app');
+    if (app) app.classList.add('fonts-ready');
+  }}
+  if (document.fonts && document.fonts.ready) {{
+    var timer = setTimeout(reveal, TIMEOUT);
+    document.fonts.ready.then(function() {{ clearTimeout(timer); reveal(); }});
+  }} else {{
+    setTimeout(reveal, TIMEOUT);
+  }}
+}})();
+</script>
 </head>
 <body>
 <div class="app" id="app">
@@ -2427,8 +3600,11 @@ def build_html(day, day_index, figures, build_time):
   </div>
 
   <div class="screens-container" id="screens">
-{day_html}
+{all_days_html}
   </div>
+
+  <!-- Threshold veil: Screen 7 → Screen 1 wrap -->
+  <div id="thresholdVeil"></div>
 
   <!-- Navigation dots -->
   <nav class="nav-dots" id="dots" aria-label="Screen navigation"></nav>
@@ -2452,6 +3628,59 @@ def build_html(day, day_index, figures, build_time):
   <button class="desktop-nav-arrow desktop-nav-prev" id="desktopPrev" aria-label="Previous screen">&#8249;</button>
   <button class="desktop-nav-arrow desktop-nav-next" id="desktopNext" aria-label="Next screen">&#8250;</button>
 
+  <!-- First-visit welcome overlay -->
+  <div class="welcome-overlay" id="welcomeOverlay" role="dialog" aria-modal="true" style="display:none">
+    <div class="welcome-card">
+      <div class="welcome-wordmark">V I G I L</div>
+      <div class="welcome-body">Vigil is a short daily devotional shaped by the Christian year. Each day gives you one word to carry through scripture, contemplation, prayer and practice. Move through the seven screens slowly. At the end, mark that you have kept Vigil and return tomorrow.</div>
+      <button class="welcome-begin" id="welcomeBegin">Begin</button>
+    </div>
+  </div>
+
+  <!-- PWA first-launch overlay (shown once when opened from home screen icon) -->
+  <div class="welcome-overlay" id="pwaWelcomeOverlay" role="dialog" aria-modal="true" style="display:none">
+    <div class="welcome-card">
+      <div class="welcome-wordmark">V I G I L</div>
+      <div class="welcome-body">You&#8217;re now using Vigil as an app. To receive a word each morning, complete today&#8217;s devotions and &#8216;turn on notifications&#8217; on the final screen.</div>
+      <button class="welcome-begin" id="pwaWelcomeBegin">Begin</button>
+    </div>
+  </div>
+
+  <!-- Install nudge — hidden when running as installed PWA -->
+  <div class="install-nudge" id="installNudge" style="display:none">
+    <div class="install-nudge-rule"></div>
+    <div class="install-nudge-text">Keep Vigil close — <button class="install-nudge-link" id="installNudgeLink">add it to your home screen</button></div>
+  </div>
+
+  <!-- Install modal -->
+  <div class="install-modal-overlay" id="installModalOverlay">
+    <div class="install-modal-card" id="installModalCard">
+      <button class="install-modal-close" id="installModalClose" aria-label="Close">&times;</button>
+      <div class="install-modal-wordmark">V I G I L</div>
+      <div class="install-modal-intro">Adding Vigil to your iPhone home screen is quick and easy. Just follow these steps.</div>
+      <div class="install-modal-steps">
+        <div class="install-modal-step">
+          <div class="install-modal-step-num">1</div>
+          <div class="install-modal-step-text">Tap <span class="install-dots-pill">&middot;&middot;&middot;</span> at the bottom right of this screen.</div>
+        </div>
+        <div class="install-modal-step">
+          <div class="install-modal-step-num">2</div>
+          <div class="install-modal-step-text">Tap <strong>Share</strong> at the top of the menu.</div>
+        </div>
+        <div class="install-modal-step">
+          <div class="install-modal-step-num">3</div>
+          <div class="install-modal-step-text">Scroll down and tap <strong>Add to Home Screen.</strong> (You may need to tap <strong>View More</strong> to see it).</div>
+        </div>
+        <div class="install-modal-step">
+          <div class="install-modal-step-num">4</div>
+          <div class="install-modal-step-text">Tap <strong>Add</strong> in the top right corner.</div>
+        </div>
+      </div>
+      <div class="install-modal-rule"></div>
+      <div class="install-modal-footnote">Once installed, Vigil will send you a quiet word each morning.</div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -2460,6 +3689,30 @@ def build_html(day, day_index, figures, build_time):
 </script>
 <script>
 {JS}
+</script>
+<script>
+// ── Service worker registration and update reload ──────────────────────────
+// Registers service-worker.js and, when a newly-deployed worker activates,
+// reloads the page immediately so users always see today's content rather
+// than a cached copy from the previous day.
+if ('serviceWorker' in navigator) {{
+  navigator.serviceWorker.register('/service-worker.js').then(function(reg) {{
+    reg.addEventListener('updatefound', function() {{
+      var newWorker = reg.installing;
+      newWorker.addEventListener('statechange', function() {{
+        // 'activated' fires when the new worker has taken control.
+        // Reload so the freshly-cached index.html is served immediately.
+        if (newWorker.state === 'activated') {{
+          window.location.reload();
+        }}
+      }});
+    }});
+  }});
+  // If the controller changes (e.g. skipWaiting was called), reload.
+  navigator.serviceWorker.addEventListener('controllerchange', function() {{
+    window.location.reload();
+  }});
+}}
 </script>
 </body>
 </html>"""
@@ -2499,8 +3752,8 @@ def build_holding_page(days, build_time):
 :root {{ --bg: #FAF7F2; --gold: #B8860B; --dim: #8A7D6E; }}
 html, body {{ margin:0; height:100%; background:var(--bg); font-family:'Raleway',sans-serif; color:var(--dim); }}
 .centre {{ display:flex; flex-direction:column; align-items:center; justify-content:center; height:100svh; padding:2rem; text-align:center; }}
-.wordmark {{ font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:300; letter-spacing:0.4em; text-transform:uppercase; color:var(--gold); margin-bottom:2rem; }}
-.message {{ font-size:1rem; line-height:1.8; max-width:280px; }}
+.wordmark {{ font-family:'Cormorant Garamond',serif; font-size:2.6rem; font-weight:300; letter-spacing:0.4em; text-transform:uppercase; color:var(--gold); margin-bottom:2rem; }}
+.message {{ font-size:1.2rem; line-height:2; max-width:320px; }}
 </style>
 </head>
 <body>
@@ -2508,8 +3761,58 @@ html, body {{ margin:0; height:100%; background:var(--bg); font-family:'Raleway'
   <div class="wordmark">Vigil</div>
   <div class="message">{msg}</div>
 </div>
+<script>
+if ('serviceWorker' in navigator) {{
+  navigator.serviceWorker.register('/service-worker.js').then(function(reg) {{
+    reg.addEventListener('updatefound', function() {{
+      var newWorker = reg.installing;
+      newWorker.addEventListener('statechange', function() {{
+        if (newWorker.state === 'activated') {{ window.location.reload(); }}
+      }});
+    }});
+  }});
+  navigator.serviceWorker.addEventListener('controllerchange', function() {{
+    window.location.reload();
+  }});
+}}
+</script>
 </body>
 </html>"""
+
+
+# ── Cache version ─────────────────────────────────────────────────────────────
+
+SERVICE_WORKER_FILE = "service-worker.js"
+
+def increment_cache_version():
+    """Read service-worker.js, increment the CACHE_VERSION number by 1,
+    write the file back, and return (old_version, new_version).
+    If the file cannot be found or parsed, prints a warning and returns
+    (None, None) so the build can continue without blocking."""
+    if not os.path.exists(SERVICE_WORKER_FILE):
+        print(f"Warning: {SERVICE_WORKER_FILE} not found — cache version not incremented.")
+        return None, None
+
+    with open(SERVICE_WORKER_FILE, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    pattern = r"(const CACHE_VERSION\s*=\s*'vigil-v)(\d+)(')"
+    m = re.search(pattern, content)
+    if not m:
+        print(f"Warning: Could not find CACHE_VERSION in {SERVICE_WORKER_FILE} — not incremented.")
+        return None, None
+
+    old_n = int(m.group(2))
+    new_n = old_n + 1
+    old_ver = f"vigil-v{old_n}"
+    new_ver = f"vigil-v{new_n}"
+
+    new_content = re.sub(pattern, lambda _: f"{m.group(1)}{new_n}{m.group(3)}", content)
+
+    with open(SERVICE_WORKER_FILE, "w", encoding="utf-8") as f:
+        f.write(new_content)
+
+    return old_ver, new_ver
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -2537,13 +3840,24 @@ def main():
         mark = "✓" if i == today_idx else "◦"
         print(f"  {mark} Day {i+1:2d} · {date_str} · {word_display}")
 
+    # --all-days embeds every content row so ?date= can reach past and future days.
+    all_days_flag = "--all-days" in sys.argv
+
     if today_idx == -1:
         print("\n  ◦ No content for today — generating holding page.")
         html_out = build_holding_page(days, build_time)
     else:
-        day = days[today_idx]
-        figures = parse_hover_links(day["hover_links"])
-        html_out = build_html(day, today_idx, figures, build_time)
+        if all_days_flag:
+            # Embed all rows from the spreadsheet, not just the rolling window.
+            # Today is still the default view; ?date= can reach any embedded day.
+            window_days = days
+            print(f"\n  --all-days: embedding all {len(days)} day(s).")
+        else:
+            # Standard production build: rolling window only.
+            window_days = days[today_idx : today_idx + DAYS_WINDOW]
+        days_window = [(day, parse_hover_links(day["hover_links"])) for day in window_days]
+        today_window_idx = today_idx if all_days_flag else 0
+        html_out = build_html(days_window, window_days[today_window_idx], build_time)
 
     # Write output
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
@@ -2551,11 +3865,32 @@ def main():
 
     size_kb = os.path.getsize(OUTPUT_FILE) / 1024
 
-    # Flag the column discrepancy for the user
-    print(f"\n  ✓ Wrote {OUTPUT_FILE} ({size_kb:.1f} KB) — today's date only")
+    days_embedded = len(days_window) if today_idx != -1 else 0
+    print(f"\n  ✓ Wrote {OUTPUT_FILE} ({size_kb:.1f} KB) — {days_embedded} day(s) embedded")
+
+    # Increment cache version automatically on every build
+    old_ver, new_ver = increment_cache_version()
+    if new_ver:
+        print(f"  ✓ Cache version: {old_ver} → {new_ver}")
     print()
     print(f"Deploy to github.com/This-Is-Pelagius/Vigil (v2-build branch):")
     print(f"  dailyvigil.app  ← {OUTPUT_FILE}")
+    if new_ver:
+        print(f"  dailyvigil.app  ← {SERVICE_WORKER_FILE}")
+        print()
+        print(f"Commit message:")
+        today_ref = window_days[today_window_idx] if today_idx != -1 else None
+        today_d = parse_date_from_liturgical_day(today_ref["liturgical_day"]) if today_ref else None
+        commit_date = today_d.strftime("%-d %b %Y") if today_d else "today"
+        raw_word = today_ref["word"].strip().split("\n")[0].strip() if today_ref else "WORD"
+        wm = re.match(r'^([A-Z\s\-\']+?)\s*(\[|$)', raw_word)
+        commit_word = wm.group(1).strip() if wm else raw_word
+        print(f'  git add index.html service-worker.js')
+        print(f'  git commit -m "Deploy: {commit_date} · {commit_word} · cache {new_ver}"')
+        print(f'  git push origin v2-build')
+        print()
+        print(f'Then schedule notifications:')
+        print(f'  ~/vigil-env/bin/python3 vigil_notify.py 14')
     print()
 
 
